@@ -7,7 +7,7 @@ data class SearchFilters(val mediaType: MediaTypeFilter = MediaTypeFilter.ALL, v
 }
 object FilterOptions {
     val YEARS = listOf("All") + (java.time.Year.now().value downTo 1980).map(Int::toString)
-    val COUNTRIES = listOf("All", "大陆", "香港", "台湾", "韩国", "日本", "泰国", "新加坡", "United States", "United Kingdom")
+    val COUNTRIES = listOf("All", "大陆", "香港", "台湾", "韩国", "日本", "泰国", "新加坡", "美国", "英国")
     val GENRES = listOf("All", "古装", "武侠", "科幻", "悬疑", "都市", "爱情", "战争", "青春", "偶像", "喜剧", "家庭", "奇幻", "剧情", "乡村", "年代", "警匪", "谍战", "历险", "罪案", "宫廷", "经典", "动作", "惊悚", "历史", "穿越", "同性")
 }
 data class ProviderSearchStatus(val provider: String, val count: Int, val error: String? = null, val isUnsupported: Boolean = false, val message: String? = null)

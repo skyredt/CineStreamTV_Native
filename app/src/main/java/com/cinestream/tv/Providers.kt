@@ -46,7 +46,12 @@ class ProvidersRepository {
     }
     suspend fun searchWithFilters(query: String, filters: SearchFilters = SearchFilters(), page: Int = 1, nextPages: Map<String, String> = emptyMap()): SearchResults = withContext(Dispatchers.IO) {
         val value = URLEncoder.encode(query.trim(), "UTF-8")
-        val initial = mapOf("cineby" to "$CINEBY/search?q=$value&type=all", "dbku" to "$DBKU/vodsearch/-------------.html?wd=$value")
+        val dbkuBrowse = filters.genre != "All" || filters.country != "All"
+        val initial = mutableMapOf("cineby" to "$CINEBY/search?q=$value&type=all")
+        if (dbkuBrowse) {
+            val types = when (filters.mediaType) { MediaTypeFilter.MOVIES -> listOf(1); MediaTypeFilter.DRAMAS -> listOf(2, 4); MediaTypeFilter.SHORTS -> listOf(21); else -> listOf(1, 2, 4, 21) }
+            types.forEach { type -> initial["dbku:$type"] = dbkuFilterUrl(type, filters) }
+        } else initial["dbku"] = "$DBKU/vodsearch/-------------.html?wd=$value"
         val requests = if (page == 1) initial else nextPages
         val metadataNeeded = filters.genre != "All" || filters.country != "All" || filters.mediaType != MediaTypeFilter.ALL
         val permits = kotlinx.coroutines.sync.Semaphore(4)
@@ -55,9 +60,9 @@ class ProvidersRepository {
                 requireProviderPage(provider, url)
                 val html = request(url)
                 val doc = Jsoup.parse(html, url)
-                var titles = if (provider == "cineby") parseCinebySearch(html) else parseDbkuSearch(html)
+                var titles = if (provider == "cineby") parseCinebySearch(html) else if (provider.startsWith("dbku:")) parseDbkuBrowse(doc, provider.substringAfter(':').toInt(), filters).filter { query.isBlank() || it.title.contains(query.trim(), true) } else parseDbkuSearch(html)
                 var metadataFailures = 0
-                if (metadataNeeded && provider == "dbku") titles = coroutineScope { titles.map { title -> async {
+                if (provider.startsWith("dbku") && ((metadataNeeded && !dbkuBrowse) || filters.year != "All" || filters.sort == SortOption.YEAR)) titles = coroutineScope { titles.map { title -> async {
                     permits.acquire()
                     try { details(title) } catch (e: CancellationException) { throw e }
                     catch (_: Exception) { synchronized(permits) { metadataFailures++ }; title }
@@ -71,7 +76,7 @@ class ProvidersRepository {
         val titles = responses.flatMap { it.first }.distinctBy { it.id }
         val next = responses.mapNotNull { it.third?.let { url -> it.second.provider to url } }.toMap()
         SearchResults(sortTitles(filterTitles(titles, filters), filters.sort), statuses,
-            if (filters.isActive) "Country and Chinese genre filters apply to DBKU only; Cineby results ignore those two filters. Other filters and sorting apply to loaded results." else null, next)
+            if (filters.isActive) "Country and Chinese genre: DBKU only. In this mode DBKU searches title text within filtered catalog pages; load more for older titles. Cineby ignores these two filters. Other filters/sorting apply to loaded results." else null, next)
     }
 
     suspend fun search(query: String): List<DesignTitle> = searchWithFilters(query).titles
@@ -195,7 +200,7 @@ internal fun parseDbkuDetails(title: DesignTitle, doc: Document): DesignTitle {
         overview = doc.select("#desc").text().ifBlank { detail?.select("p.data")?.firstOrNull { it.text().contains("简介：") }?.text().orEmpty() },
         rating = detail?.select(".branch")?.text()?.takeIf { it.isNotBlank() } ?: title.rating,
         year = year(firstData?.text().orEmpty()), poster = doc.selectFirst(".myui-content__thumb img")?.absUrl("data-original")?.takeIf { it.isNotBlank() } ?: title.poster,
-        genres = (listOfNotNull(category.takeIf { it.isNotBlank() }) + doc.select(".myui-content__detail a[href*=/vodshow/]").map { it.text() } + publishedGenres).distinct(), countries = firstData?.select("a")?.getOrNull(1)?.text()?.let { listOf(it) } ?: title.countries, isShort = category.contains("短剧"), cast = cast, seasons = groups,
+        genres = (listOfNotNull(category.takeIf { it.isNotBlank() }) + doc.select(".myui-content__detail a[href*=/vodshow/]").map { it.text() } + publishedGenres + title.genres).distinct(), countries = firstData?.select("a")?.getOrNull(1)?.text()?.let { listOf(it) } ?: title.countries, isShort = category.contains("短剧"), cast = cast, seasons = groups,
         playbackPage = groups.firstOrNull()?.episodes?.firstOrNull()?.pageUrl.orEmpty())
 }
 

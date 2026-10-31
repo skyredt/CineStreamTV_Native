@@ -15,7 +15,7 @@ class TvSmokeRunner : Instrumentation() {
     override fun onStart() {
         val report = Bundle()
         try {
-            startActivitySync(targetContext.packageManager.getLaunchIntentForPackage(targetContext.packageName)!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+            startActivitySync(Intent().setClassName(targetContext.packageName, "${targetContext.packageName}.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
             waitUntil { all().any { it.text?.toString() == "Watch Now" } }
             check(all().none { it.text?.toString() == "Minimize Remote" })
             passed += "Live TV home without floating D-pad"
@@ -53,6 +53,7 @@ class TvSmokeRunner : Instrumentation() {
             check(all().none { it.text?.toString()?.contains("Playback failed") == true })
             sendKeyDownUpSync(KeyEvent.KEYCODE_MEDIA_PAUSE)
             sendKeyDownUpSync(KeyEvent.KEYCODE_MEDIA_FAST_FORWARD)
+            sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_CENTER)
             passed += "Selected DBKU episode opens player without immediate playback error"
             sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
             waitUntil { all().any { it.text?.toString()?.startsWith("Play 第") == true } }
@@ -66,7 +67,7 @@ class TvSmokeRunner : Instrumentation() {
     }
     private fun all(): List<AccessibilityNodeInfo> {
         val result = mutableListOf<AccessibilityNodeInfo>()
-        fun visit(node: AccessibilityNodeInfo?) { if (node == null) return; result += node; for (i in 0 until node.childCount) visit(node.getChild(i)) }
+        fun visit(node: AccessibilityNodeInfo?) { if (node == null) return; result += node; if (node.className?.toString() == "android.webkit.WebView" || result.size > 400) return; for (i in 0 until node.childCount) visit(node.getChild(i)) }
         visit(uiAutomation.rootInActiveWindow)
         return result
     }
@@ -83,17 +84,18 @@ class TvSmokeRunner : Instrumentation() {
     }
     private fun setQuery(query: String) {
         waitUntil { all().any { it.isEditable } }
+        sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_RIGHT)
         val field = all().first { it.isEditable }
         check(field.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply { putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, query) }))
         SystemClock.sleep(1500)
     }
     private fun scrollFind(label: String) {
-        repeat(60) {
+        repeat(24) {
             if (all().any { !it.isEditable && (it.text?.toString() == label || it.contentDescription?.toString() == label) }) return
-            all().firstOrNull { it.isScrollable }?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
+            all().firstOrNull { node -> val rect = android.graphics.Rect(); node.getBoundsInScreen(rect); node.isScrollable && rect.width() > 500 && rect.height() > 250 }?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
             SystemClock.sleep(400)
         }
         error("Could not scroll to $label")
     }
-    private fun scrollTop() { repeat(16) { all().firstOrNull { it.isScrollable }?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD); SystemClock.sleep(150) } }
+    private fun scrollTop() { repeat(16) { all().firstOrNull { node -> val rect = android.graphics.Rect(); node.getBoundsInScreen(rect); node.isScrollable && rect.width() > 500 && rect.height() > 250 }?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD); SystemClock.sleep(150) } }
 }

@@ -1,10 +1,18 @@
-# CineStream TV 1.2.0
+# CineDBKTV 1.3.0
 
-Repair baseline: skyredt/CineStreamTV_Native commit 7558d5c2ac5c2b34ba83eeee4f9f4123b3e0ead0. Work is in this separate folder; the original archive and D:\CineStreamTV_Native were not overwritten. No changes have been pushed to GitHub.
+Original repair baseline: skyredt/CineStreamTV_Native commit 7558d5c2ac5c2b34ba83eeee4f9f4123b3e0ead0. Work is in this separate folder; the original archive and D:\CineStreamTV_Native were not overwritten. Source is versioned on the GitHub branch development/cinedbktv-1.3.
 
 This is the native Android TV project. It retains the supplied Compose design, uses the configured Cineby and DBKU providers, and has no floating remote overlay. Phone launcher support has been removed following the updated TV-only requirement.
 
-Repairs include the missing filter models, a malformed Kotlin string, the Cineby search parser, DBKU category/country/year mapping, provider failure reporting, real next-page links, and Chinese Unicode search. The Taiwan/Thailand category now uses DBKU's actual category rather than being labelled Hong Kong/Taiwan. Both providers retain exact episode URLs. No catalog selection falls back to a sample video.
+TV feedback changes in 1.3.0:
+
+- DBKU episodes use compact text buttons, ranges of 50 episodes, and a jump-to-episode field. No episode thumbnails are shown for DBKU.
+- Both native playback and the supported Cineby Xpass player use a shared draggable timeline. With remote focus on the timeline, Left/Right previews a position, holding accelerates, OK seeks, and Back cancels the preview.
+- Cineby Up/Down controls Android media volume. These keys are handled by the app for the supported player.
+- Cineby source failures automatically try another source from the already-selected title/episode, display a notice, preserve the last reported playback position where supported, and stop after all sources have been tried. Supported embeds also switch if no timeline becomes ready within 45 seconds. No unrelated video or sample is substituted.
+- Country/region and Chinese genre filters apply only to DBKU. Cineby ignores those two filters. DBKU's published filtered catalog links supply the matching categories; in this mode title text is searched within loaded filtered pages. Load more to inspect older matches. The server's selected filters are checked before results receive those labels.
+- App label and visible branding are CineDBKTV. The application ID stays com.cinestream.tv so existing installs can update.
+
 
 ## Build and install
 
@@ -28,8 +36,8 @@ The debug APK is suitable for initial sideloading. Release shrinking/ProGuard co
 
 - Third-party availability and their embedded players can change. A listed title or episode does not by itself prove that every source plays. Source switching stays within the selected title/episode.
 - Chinese input uses the Android system keyboard; enable a Chinese-capable TV keyboard. The included A–Z keypad is only an optional English input shortcut.
-- Filters and sorting apply to loaded search results. Unknown country/genre/year metadata cannot match a selected filter. Some providers do not supply those fields. Popularity data is not exposed by these adapters, so no popularity ranking is fabricated. Rating is labelled separately.
-- Cineby iframe players control their own available audio, quality, and subtitle options. Native direct-media playback exposes only available tracks. Host-specific remote media support varies.
-- This revision needs testing on the user's physical TV; previous physical-TV feedback concerned an earlier APK.
+- Filters and sorting apply to loaded search results. Unknown country/genre/year metadata cannot match a selected filter. Some providers do not supply those fields. Popularity ranking is not supplied by these adapters; rating remains a separate option.
+- Cineby Xpass supports the shared timeline through its published player message protocol. Other embedded hosts retain their own controls; a universal native timeline cannot be guaranteed for hosts without that protocol. Audio, quality and subtitle options remain limited to what the selected source provides. App notices cover app-selected source changes; embedded players may also perform their own internal failover. Cineby timeline seeking uses the provider’s play-at command and resumes playback.
+- This revision still needs the user's physical-TV testing; verification outcomes below distinguish compilation from device tests.
 
 See VERIFICATION.md for the actual build and test outcomes for this revision.
