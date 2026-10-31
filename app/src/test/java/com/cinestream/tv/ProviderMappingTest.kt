@@ -42,35 +42,48 @@ class ProviderMappingTest {
         assertThrows(IllegalArgumentException::class.java) { parseDbkuHome("<html>changed</html>") }
         assertTrue(parseCinebyHome("<html>no search results</html>", true).isEmpty())
     }
-    @Test fun cinebySearchParsesSearchResultsWithBothMovieAndTvBadges() {
-        val searchHtml = """
-            <div class="search-results">
-              <div class="card">
-                <span class="rating-badge">★ 5.0</span>
-                <a href="/movie/valley-of-lanterns-2018" title="Valley of Lanterns">
-                  <img src="https://cineby.ws/images/valley.jpg" alt="Valley of Lanterns">
-                </a>
-              </div>
-              <div class="card">
-                <span class="badge">TV</span>
-                <span class="rating-badge">★ 8.2</span>
-                <a href="/tv/lanterns-2026" title="LANTERNS">
-                  <img src="https://cineby.ws/images/lanterns.jpg" alt="LANTERNS">
-                </a>
-              </div>
-            </div>
-        """.trimIndent()
-        val results = parseCinebySearch(searchHtml)
+    private fun fixture(name: String) = javaClass.classLoader!!.getResource(name)!!.readText()
+    @Test fun capturedLanternsResultsKeepMovieAndSeriesSeparate() {
+        val results = parseCinebySearch(fixture("cineby-lanterns.html"))
         assertEquals(2, results.size)
-        val movie = results.find { it.title.contains("Valley of Lanterns") }
-        assertNotNull(movie)
-        assertFalse(movie!!.isTv)
-        assertEquals("5.0", movie.rating)
-
-        val series = results.find { it.title.contains("LANTERNS") }
-        assertNotNull(series)
-        assertTrue(series!!.isTv)
+        assertFalse(results.first().isTv)
+        val series = results.single { it.title == "Lanterns" }
+        assertTrue(series.isTv)
+        assertEquals(2026, series.year)
         assertEquals("8.2", series.rating)
-        assertEquals("https://cineby.ws/tv/lanterns-2026", series.pageUrl)
+        assertEquals("https://cineby.ws/tv/09qkml-lanterns-2026-full", series.pageUrl)
+        assertThrows(IllegalArgumentException::class.java) { parseCinebySearch("<html>challenge</html>") }
+        assertTrue(parseCinebySearch("<p class='search-results-count'>0 results</p>").isEmpty())
     }
+    @Test fun capturedChineseSearchUsesActualCategoryCountryAndYear() {
+        val title = parseDbkuSearch(fixture("dbku-chinese.html")).single()
+        assertEquals("尚公主", title.title)
+        assertEquals(listOf("大陆"), title.countries)
+        assertEquals(2026, title.year)
+        assertTrue(title.isTv)
+        assertFalse(title.isShort)
+        assertEquals(1, filterTitles(listOf(title), SearchFilters(country = "大陆", year = "2026", mediaType = MediaTypeFilter.DRAMAS)).size)
+        assertTrue(filterTitles(listOf(title), SearchFilters(mediaType = MediaTypeFilter.SHORTS)).isEmpty())
+        assertTrue(filterTitles(listOf(title), SearchFilters(country = "日本")).isEmpty())
+        val encoded = java.net.URLEncoder.encode(title.title, "UTF-8")
+        assertEquals(title.title, java.net.URLDecoder.decode(encoded, "UTF-8"))
+    }
+    @Test fun paginationRequiresAnActualNextLinkFromSameProvider() {
+        val url = "https://cineby.ws/search?q=Lanterns&type=all"
+        assertNull(nextSearchPage(Jsoup.parse(fixture("cineby-lanterns.html"), url), "cineby", url))
+        assertEquals("https://cineby.ws/search?q=Lanterns&page=2", nextSearchPage(Jsoup.parse("<a rel='next' href='/search?q=Lanterns&page=2'>Next</a>", url), "cineby", url))
+        assertNull(nextSearchPage(Jsoup.parse("<a rel='next' href='https://other.example/'>Next</a>", url), "cineby", url))
+    }
+    @Test fun capturedEpisodeListsKeepExactSelectionUrls() {
+        val series = parseCinebySearch(fixture("cineby-lanterns.html")).single { it.isTv }
+        val episodes = parseCinebyDetails(series, Jsoup.parse(fixture("cineby-episodes.html"), series.pageUrl)).seasons.single().episodes
+        assertEquals(8, episodes.size)
+        assertEquals("https://cineby.ws/tv/09qkml/episode/1/8", episodes.last().pageUrl)
+        val drama = parseDbkuSearch(fixture("dbku-chinese.html")).single()
+        val dbku = parseDbkuDetails(drama, Jsoup.parse(fixture("dbku-episodes.html"), drama.pageUrl)).seasons.single().episodes
+        assertEquals(20, dbku.size)
+        assertEquals("第2集", dbku[1].title)
+        assertEquals("https://www.dbku.tv/vodplay/150623-1-2.html", dbku[1].pageUrl)
+    }
+
 }

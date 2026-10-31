@@ -48,6 +48,7 @@ class SearchState {
     var localFilterNotice by mutableStateOf<String?>(null)
     var page by mutableIntStateOf(1)
     var hasMore by mutableStateOf(false)
+    var nextPages: Map<String, String> = emptyMap()
     var searchError by mutableStateOf<String?>(null)
 }
 
@@ -102,12 +103,11 @@ class StreamingState(val repository: ProvidersRepository) : ViewModel() {
         searchJob?.cancel()
         searchState.query = query
         searchState.filters = filters
-        searchState.page = page
         searchState.searching = true
         searchState.searchError = null
         searchJob = viewModelScope.launch {
             try {
-                val res = repository.searchWithFilters(query, filters, page)
+                val res = repository.searchWithFilters(query, filters, page, searchState.nextPages)
                 if (page == 1) {
                     searchState.results = res.titles
                 } else {
@@ -115,7 +115,10 @@ class StreamingState(val repository: ProvidersRepository) : ViewModel() {
                 }
                 searchState.providerStatuses = res.statuses
                 searchState.localFilterNotice = res.localFilterNotice
-                searchState.hasMore = res.titles.isNotEmpty()
+                searchState.page = page
+                searchState.nextPages = res.nextPages
+                searchState.hasMore = res.nextPages.isNotEmpty()
+                searchState.searchError = if (res.statuses.any { it.error != null }) "Some providers could not be searched. Results may be incomplete." else null
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -160,7 +163,7 @@ fun TvAppNavigation(state: StreamingState) {
                 when {
                     selected != null -> DesignDetails(selected, compact, onBack = state::back, onPlay = { state.play(selected, it) })
                     catalog == null -> Column(Modifier.fillMaxSize().padding(48.dp), verticalArrangement = Arrangement.Center) {
-                        Text("CINESTREAM TV", color = Accent, style = MaterialTheme.typography.headlineLarge)
+                        Text("CineDBKTV", color = Accent, style = MaterialTheme.typography.headlineLarge)
                         Spacer(Modifier.height(24.dp))
                         if (state.catalogError == null) { CircularProgressIndicator(color = Accent); Text("Loading Cineby and DBKU…", Modifier.padding(top = 16.dp)) }
                         else { Text(state.catalogError.orEmpty()); Action("Retry catalog") { state.reload() } }
@@ -196,3 +199,4 @@ fun TvAppNavigation(state: StreamingState) {
         }
     }
 }
+

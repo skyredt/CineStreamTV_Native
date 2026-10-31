@@ -79,11 +79,11 @@ fun DesignShell(tab: String, menuSignal: Int, onTab: (String) -> Unit, onTester:
             LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(horizontal = if (compact && !expanded) 4.dp else 16.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 item {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 20.dp)) {
-                        Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(Brush.linearGradient(listOf(Color(0xFF06B6D4), Color(0xFF67E8F9)))), contentAlignment = Alignment.Center) { Icon(Icons.Outlined.AutoAwesome, "CineStream", tint = Color.Black, modifier = Modifier.size(22.dp)) }
-                        if (expanded) Column(Modifier.padding(start = 12.dp)) { Text("CINESTREAM", fontWeight = FontWeight.Black); Text("ANDROID TV", color = Accent, fontSize = 10.sp) }
+                        Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(Brush.linearGradient(listOf(Color(0xFF06B6D4), Color(0xFF67E8F9)))), contentAlignment = Alignment.Center) { Icon(Icons.Outlined.AutoAwesome, "CineDBKTV", tint = Color.Black, modifier = Modifier.size(22.dp)) }
+                        if (expanded) Column(Modifier.padding(start = 12.dp)) { Text("CineDBKTV", fontWeight = FontWeight.Black); Text("ANDROID TV", color = Accent, fontSize = 10.sp) }
                     }
                 }
-                val tabs = listOf(Tab("home", "首页 Home", Icons.Outlined.Home), Tab("mainland", "陆剧 Chinese Dramas", Icons.Outlined.Tv), Tab("hk_taiwan", "港台剧 HK / Taiwan", Icons.Outlined.LocalMovies), Tab("japan_korea", "日韩剧 Japan & Korea", Icons.Outlined.Public), Tab("anime", "动漫 Anime / Donghua", Icons.Outlined.AutoAwesome), Tab("variety", "综艺 Variety Shows", Icons.Outlined.Mic), Tab("search", "搜索 Search", Icons.Outlined.Search))
+                val tabs = listOf(Tab("home", "首页 Home", Icons.Outlined.Home), Tab("mainland", "陆剧 Chinese Dramas", Icons.Outlined.Tv), Tab("taiwan_thailand", "台泰剧 Taiwan / Thailand", Icons.Outlined.LocalMovies), Tab("japan_korea", "日韩剧 Japan & Korea", Icons.Outlined.Public), Tab("anime", "动漫 Anime / Donghua", Icons.Outlined.AutoAwesome), Tab("variety", "综艺 Variety Shows", Icons.Outlined.Mic), Tab("search", "搜索 Search", Icons.Outlined.Search))
                 items(tabs, key = { it.id }) { item ->
                     var focused by remember { mutableStateOf(false) }
                     val selected = tab == item.id
@@ -208,13 +208,15 @@ fun DesignDetails(title: DesignTitle, compact: Boolean, onBack: () -> Unit, onPl
                     Text(title.title, fontSize = if (compact) 32.sp else 48.sp, fontWeight = FontWeight.Black, lineHeight = if (compact) 36.sp else 52.sp)
                     Text(title.overview, color = Color.LightGray, fontSize = 14.sp, lineHeight = 22.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
                     Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Action(if (title.isTv && title.provider == "dbku") "Play Episode 1" else if (title.isTv) "Play S1:E1" else "Play Movie", primary = true, icon = Icons.Outlined.PlayArrow, requester = first) { onPlay(title.seasons.firstOrNull()?.episodes?.firstOrNull()) }
+                        Action(if (!title.isTv) "Play Movie" else title.seasons.firstOrNull()?.episodes?.firstOrNull()?.let { if (title.provider == "dbku") "Play ${it.title}" else "Play S${it.season}:E${it.number}" } ?: "No episodes available", primary = true, icon = Icons.Outlined.PlayArrow, requester = first) { onPlay(title.seasons.firstOrNull()?.episodes?.firstOrNull()) }
                         if (!compact) Text("Source: ${title.provider.uppercase()}", color = Muted, fontSize = 11.sp)
                     }
                 }
             }
         }
-        if (title.seasons.isNotEmpty()) {
+        if (title.provider == "dbku" && title.seasons.isNotEmpty()) {
+            item { DbkuEpisodes(title, onPlay) }
+        } else if (title.seasons.isNotEmpty()) {
             item {
                 Column(Modifier.padding(horizontal = padding), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text("Seasons & Episodes", fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -245,6 +247,7 @@ fun DesignDetails(title: DesignTitle, compact: Boolean, onBack: () -> Unit, onPl
                 }
             }
         }
+        if (title.isTv && title.seasons.isEmpty()) item { Text("The provider has not listed any available episodes for this title.", Modifier.padding(horizontal = padding), color = Muted) }
         item { Text("Cast & Crew", Modifier.padding(horizontal = padding), fontSize = 20.sp, fontWeight = FontWeight.Bold) }
         item {
             LazyRow(contentPadding = PaddingValues(horizontal = padding), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -308,15 +311,18 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
                 value = inputQuery,
                 onValueChange = { inputQuery = it },
                 modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
-                placeholder = { Text("Search titles, actors, or keywords with remote D-Pad or keyboard...") },
+                placeholder = { Text("Search titles / 搜索中文片名") },
                 leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Accent) },
                 singleLine = true,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
+                keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { state.search(inputQuery, searchState.filters) }),
                 shape = RoundedCornerShape(16.dp)
             )
         }
 
         item {
             Column(Modifier.widthIn(max = 420.dp).background(Color(0xFF101010), RoundedCornerShape(16.dp)).border(1.dp, Color(0xFF262626), RoundedCornerShape(16.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("Chinese input: select the search box and use your TV’s Chinese keyboard.", color = Muted, fontSize = 11.sp)
                 Text("ANDROID TV ON-SCREEN KEYBOARD", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.Bold)
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toList().chunked(6).forEach { row ->
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -326,7 +332,7 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Action("SPACE", Modifier.weight(1f), dense = true) { inputQuery += " " }
                     Action("DEL", Modifier.weight(1f), dense = true) { inputQuery = inputQuery.dropLast(1) }
-                    Action("CLEAR", Modifier.weight(1f), dense = true) { inputQuery = ""; state.clearSearchFilters() }
+                    Action("CLEAR", Modifier.weight(1f), dense = true) { inputQuery = ""; state.search("", SearchFilters()) }
                 }
             }
         }
@@ -339,38 +345,38 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
                 // Active Filters bar & Clear button
                 if (searchState.filters.isActive) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().background(Color(0xFF141414), RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).background(Color(0xFF141414), RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text("ACTIVE:", fontSize = 10.sp, color = Gold, fontWeight = FontWeight.Bold)
                         if (searchState.filters.mediaType != MediaTypeFilter.ALL) {
                             FilterPill("Type: ${searchState.filters.mediaType.label} ✕", selected = true) {
-                                state.search(searchState.query, searchState.filters.copy(mediaType = MediaTypeFilter.ALL), 1)
+                                state.search(inputQuery, searchState.filters.copy(mediaType = MediaTypeFilter.ALL), 1)
                             }
                         }
                         if (searchState.filters.sort != SortOption.DEFAULT) {
                             FilterPill("Sort: ${searchState.filters.sort.label} ✕", selected = true) {
-                                state.search(searchState.query, searchState.filters.copy(sort = SortOption.DEFAULT), 1)
+                                state.search(inputQuery, searchState.filters.copy(sort = SortOption.DEFAULT), 1)
                             }
                         }
                         if (searchState.filters.year != "All") {
                             FilterPill("Year: ${searchState.filters.year} ✕", selected = true) {
-                                state.search(searchState.query, searchState.filters.copy(year = "All"), 1)
+                                state.search(inputQuery, searchState.filters.copy(year = "All"), 1)
                             }
                         }
                         if (searchState.filters.country != "All") {
                             FilterPill("Country: ${searchState.filters.country.substringBefore(" ")} ✕", selected = true) {
-                                state.search(searchState.query, searchState.filters.copy(country = "All"), 1)
+                                state.search(inputQuery, searchState.filters.copy(country = "All"), 1)
                             }
                         }
                         if (searchState.filters.genre != "All") {
                             FilterPill("Genre: ${searchState.filters.genre.substringBefore(" ")} ✕", selected = true) {
-                                state.search(searchState.query, searchState.filters.copy(genre = "All"), 1)
+                                state.search(inputQuery, searchState.filters.copy(genre = "All"), 1)
                             }
                         }
                         Action("Clear All Filters", icon = Icons.Outlined.Clear, dense = true) {
-                            state.clearSearchFilters()
+                            state.search(inputQuery, SearchFilters())
                         }
                     }
                 }
@@ -381,7 +387,7 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
                     Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         MediaTypeFilter.values().forEach { type ->
                             FilterPill(type.label, selected = searchState.filters.mediaType == type) {
-                                state.search(searchState.query, searchState.filters.copy(mediaType = type), 1)
+                                state.search(inputQuery, searchState.filters.copy(mediaType = type), 1)
                             }
                         }
                     }
@@ -389,11 +395,11 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
 
                 // Sort Options Row
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("SORT BY (EXPLICIT ORDER)", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
+                    Text("SORT LOADED RESULTS (POPULARITY NOT PROVIDED)", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
                     Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         SortOption.values().forEach { sort ->
                             FilterPill(sort.label, selected = searchState.filters.sort == sort) {
-                                state.search(searchState.query, searchState.filters.copy(sort = sort), 1)
+                                state.search(inputQuery, searchState.filters.copy(sort = sort), 1)
                             }
                         }
                     }
@@ -405,7 +411,7 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
                     Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterOptions.YEARS.forEach { y ->
                             FilterPill(y, selected = searchState.filters.year == y) {
-                                state.search(searchState.query, searchState.filters.copy(year = y), 1)
+                                state.search(inputQuery, searchState.filters.copy(year = y), 1)
                             }
                         }
                     }
@@ -413,11 +419,11 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
 
                 // Country / Origin Row
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("COUNTRY OF ORIGIN (SEPARATE FROM LANGUAGE)", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
+                    Text("COUNTRY / REGION — DBKU ONLY", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
                     Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterOptions.COUNTRIES.forEach { c ->
                             FilterPill(c, selected = searchState.filters.country == c) {
-                                state.search(searchState.query, searchState.filters.copy(country = c), 1)
+                                state.search(inputQuery, searchState.filters.copy(country = c), 1)
                             }
                         }
                     }
@@ -425,11 +431,11 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
 
                 // Genre Row
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("GENRE", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
+                    Text("CHINESE GENRE — DBKU ONLY", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
                     Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterOptions.GENRES.forEach { g ->
                             FilterPill(g, selected = searchState.filters.genre == g) {
-                                state.search(searchState.query, searchState.filters.copy(genre = g), 1)
+                                state.search(inputQuery, searchState.filters.copy(genre = g), 1)
                             }
                         }
                     }
@@ -454,7 +460,7 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
                         val text = when {
                             isErr -> "${status.provider.uppercase()}: Request Failed (${status.error})"
                             isUnsupp -> "${status.provider.uppercase()}: Unsupported (${status.message})"
-                            else -> "${status.provider.uppercase()}: ${status.count} results"
+                            else -> "${status.provider.uppercase()}: ${status.count} results${status.message?.let { " · $it" }.orEmpty()}"
                         }
                         Text(
                             text = text,
@@ -508,7 +514,7 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        if (searchState.query.isNotBlank()) "No matching titles found on active providers for "${searchState.query}""
+                        if (searchState.query.isNotBlank()) "No matching titles found for \"${searchState.query}\". Check provider status above."
                         else "No titles match the selected filter criteria",
                         color = Muted,
                         fontSize = 14.sp
@@ -527,7 +533,7 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
         }
 
         // Pagination / Load More button
-        if (searchState.hasMore && results.isNotEmpty()) {
+        if (searchState.hasMore) {
             item {
                 Action(
                     label = "Load More Results (Page ${searchState.page + 1})",
@@ -539,3 +545,4 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
         }
     }
 }
+
