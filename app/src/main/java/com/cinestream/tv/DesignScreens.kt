@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
+import kotlinx.coroutines.delay
 
 val Accent = Color(0xFF00E5FF)
 val Background = Color(0xFF0F0F0F)
@@ -258,32 +259,283 @@ fun DesignDetails(title: DesignTitle, compact: Boolean, onBack: () -> Unit, onPl
 }
 
 @Composable
-fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, repository: ProvidersRepository, onSelect: (DesignTitle) -> Unit) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var found by remember { mutableStateOf<List<DesignTitle>>(emptyList()) }
-    var searching by remember { mutableStateOf(false) }
-    var searchError by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(query) {
-        if (query.isNotBlank()) {
-            searching = true; searchError = null
-            kotlinx.coroutines.delay(500)
-            try { found = repository.search(query) } catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (e: Exception) { searchError = e.message; found = emptyList() } finally { searching = false }
+fun FilterPill(label: String, selected: Boolean, onClick: () -> Unit) {
+    var focused by remember { mutableStateOf(false) }
+    val shape = RoundedCornerShape(10.dp)
+    Surface(
+        onClick = onClick,
+        modifier = Modifier
+            .onFocusChanged { focused = it.isFocused }
+            .border(
+                width = if (focused) 2.dp else 1.dp,
+                color = if (focused) Color.White else if (selected) Accent else Color(0xFF292929),
+                shape = shape
+            ),
+        shape = shape,
+        color = if (focused) Color.White else if (selected) Accent else Color(0xFF171717),
+        contentColor = if (focused || selected) Color.Black else Color.White
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+            fontSize = 11.sp,
+            fontWeight = if (selected || focused) FontWeight.Bold else FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingState, onSelect: (DesignTitle) -> Unit) {
+    val searchState = state.searchState
+    var inputQuery by rememberSaveable { mutableStateOf(searchState.query) }
+
+    LaunchedEffect(inputQuery) {
+        if (inputQuery != searchState.query) {
+            delay(500)
+            state.search(inputQuery, searchState.filters, 1)
         }
     }
-    val results = if (query.isBlank()) titles.take(8) else found
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(if (compact) 24.dp else 48.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        item { OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth().padding(top = 48.dp), placeholder = { Text("Type with remote D-Pad or keyboard...") }, leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Accent) }, singleLine = true, shape = RoundedCornerShape(16.dp)) }
+
+    val results = if (searchState.query.isBlank() && !searchState.filters.isActive && searchState.results.isEmpty()) {
+        titles.take(8)
+    } else {
+        searchState.results
+    }
+
+    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(if (compact) 24.dp else 48.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         item {
-            Column(Modifier.widthIn(max = 400.dp).background(Color(0xFF101010), RoundedCornerShape(16.dp)).border(1.dp, Color(0xFF262626), RoundedCornerShape(16.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("ANDROID TV ON-SCREEN KEYBOARD", fontSize = 10.sp, color = Muted)
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toList().chunked(6).forEach { row -> Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { row.forEach { letter -> Action(letter.toString(), Modifier.weight(1f), dense = true) { query += letter } } } }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { Action("SPACE", Modifier.weight(1f), dense = true) { query += " " }; Action("DEL", Modifier.weight(1f), dense = true) { query = query.dropLast(1) }; Action("CLEAR", Modifier.weight(1f), dense = true) { query = "" } }
+            OutlinedTextField(
+                value = inputQuery,
+                onValueChange = { inputQuery = it },
+                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                placeholder = { Text("Search titles, actors, or keywords with remote D-Pad or keyboard...") },
+                leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Accent) },
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp)
+            )
+        }
+
+        item {
+            Column(Modifier.widthIn(max = 420.dp).background(Color(0xFF101010), RoundedCornerShape(16.dp)).border(1.dp, Color(0xFF262626), RoundedCornerShape(16.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("ANDROID TV ON-SCREEN KEYBOARD", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.Bold)
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toList().chunked(6).forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        row.forEach { letter -> Action(letter.toString(), Modifier.weight(1f), dense = true) { inputQuery += letter } }
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Action("SPACE", Modifier.weight(1f), dense = true) { inputQuery += " " }
+                    Action("DEL", Modifier.weight(1f), dense = true) { inputQuery = inputQuery.dropLast(1) }
+                    Action("CLEAR", Modifier.weight(1f), dense = true) { inputQuery = ""; state.clearSearchFilters() }
+                }
             }
         }
-        item { Text(if (query.isBlank()) "Recommended" else "Search results (${results.size})", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
-        if (searching) item { Text("Searching providers…", color = Accent) }
-        searchError?.let { message -> item { Text(message, color = MaterialTheme.colorScheme.error) } }
-        if (results.isEmpty()) item { Text("No matching titles", color = Muted) }
-        item { LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(vertical = 16.dp)) { items(results, key = { it.id }) { DesignPoster(it, onSelect) } } }
+
+        // Search Filters Section
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("SEARCH FILTERS", fontSize = 12.sp, color = Accent, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+
+                // Active Filters bar & Clear button
+                if (searchState.filters.isActive) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().background(Color(0xFF141414), RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text("ACTIVE:", fontSize = 10.sp, color = Gold, fontWeight = FontWeight.Bold)
+                        if (searchState.filters.mediaType != MediaTypeFilter.ALL) {
+                            FilterPill("Type: ${searchState.filters.mediaType.label} ✕", selected = true) {
+                                state.search(searchState.query, searchState.filters.copy(mediaType = MediaTypeFilter.ALL), 1)
+                            }
+                        }
+                        if (searchState.filters.sort != SortOption.DEFAULT) {
+                            FilterPill("Sort: ${searchState.filters.sort.label} ✕", selected = true) {
+                                state.search(searchState.query, searchState.filters.copy(sort = SortOption.DEFAULT), 1)
+                            }
+                        }
+                        if (searchState.filters.year != "All") {
+                            FilterPill("Year: ${searchState.filters.year} ✕", selected = true) {
+                                state.search(searchState.query, searchState.filters.copy(year = "All"), 1)
+                            }
+                        }
+                        if (searchState.filters.country != "All") {
+                            FilterPill("Country: ${searchState.filters.country.substringBefore(" ")} ✕", selected = true) {
+                                state.search(searchState.query, searchState.filters.copy(country = "All"), 1)
+                            }
+                        }
+                        if (searchState.filters.genre != "All") {
+                            FilterPill("Genre: ${searchState.filters.genre.substringBefore(" ")} ✕", selected = true) {
+                                state.search(searchState.query, searchState.filters.copy(genre = "All"), 1)
+                            }
+                        }
+                        Action("Clear All Filters", icon = Icons.Outlined.Clear, dense = true) {
+                            state.clearSearchFilters()
+                        }
+                    }
+                }
+
+                // Media Type Filter Row
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("MEDIA TYPE", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
+                    Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MediaTypeFilter.values().forEach { type ->
+                            FilterPill(type.label, selected = searchState.filters.mediaType == type) {
+                                state.search(searchState.query, searchState.filters.copy(mediaType = type), 1)
+                            }
+                        }
+                    }
+                }
+
+                // Sort Options Row
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("SORT BY (EXPLICIT ORDER)", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
+                    Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SortOption.values().forEach { sort ->
+                            FilterPill(sort.label, selected = searchState.filters.sort == sort) {
+                                state.search(searchState.query, searchState.filters.copy(sort = sort), 1)
+                            }
+                        }
+                    }
+                }
+
+                // Release Year Row
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("RELEASE YEAR", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
+                    Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterOptions.YEARS.forEach { y ->
+                            FilterPill(y, selected = searchState.filters.year == y) {
+                                state.search(searchState.query, searchState.filters.copy(year = y), 1)
+                            }
+                        }
+                    }
+                }
+
+                // Country / Origin Row
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("COUNTRY OF ORIGIN (SEPARATE FROM LANGUAGE)", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
+                    Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterOptions.COUNTRIES.forEach { c ->
+                            FilterPill(c, selected = searchState.filters.country == c) {
+                                state.search(searchState.query, searchState.filters.copy(country = c), 1)
+                            }
+                        }
+                    }
+                }
+
+                // Genre Row
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("GENRE", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
+                    Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterOptions.GENRES.forEach { g ->
+                            FilterPill(g, selected = searchState.filters.genre == g) {
+                                state.search(searchState.query, searchState.filters.copy(genre = g), 1)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Provider Status badges & notices
+        if (searchState.providerStatuses.isNotEmpty()) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    searchState.providerStatuses.forEach { status ->
+                        val isErr = status.error != null
+                        val isUnsupp = status.isUnsupported
+                        val badgeBg = if (isErr) Color(0x33FF5252) else if (isUnsupp) Color(0x33FFA000) else Color(0x3300E5FF)
+                        val badgeBorder = if (isErr) Color(0xFFFF5252) else if (isUnsupp) Color(0xFFFFA000) else Accent.copy(alpha = 0.5f)
+                        val badgeColor = if (isErr) Color(0xFFFF8A80) else if (isUnsupp) Color(0xFFFFD180) else Color(0xFF80DEEA)
+                        val text = when {
+                            isErr -> "${status.provider.uppercase()}: Request Failed (${status.error})"
+                            isUnsupp -> "${status.provider.uppercase()}: Unsupported (${status.message})"
+                            else -> "${status.provider.uppercase()}: ${status.count} results"
+                        }
+                        Text(
+                            text = text,
+                            color = badgeColor,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier
+                                .background(badgeBg, RoundedCornerShape(6.dp))
+                                .border(1.dp, badgeBorder, RoundedCornerShape(6.dp))
+                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // Local filter notice (if applicable)
+        searchState.localFilterNotice?.let { notice ->
+            item { Text("ℹ $notice", color = Gold, fontSize = 11.sp) }
+        }
+
+        // Results Header & Progress
+        item {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(
+                    text = if (searchState.query.isBlank() && !searchState.filters.isActive) "Recommended" else "Search results (${results.size})",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                if (searchState.searching) {
+                    CircularProgressIndicator(Modifier.size(18.dp), color = Accent, strokeWidth = 2.dp)
+                    Text("Searching providers…", color = Accent, fontSize = 12.sp)
+                }
+            }
+        }
+
+        // Provider search error message
+        searchState.searchError?.let { message ->
+            item {
+                Surface(color = Color(0x33FF5252), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, Color(0xFFFF5252))) {
+                    Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text(message, color = Color(0xFFFF8A80), modifier = Modifier.weight(1f), fontSize = 12.sp)
+                        Action("Retry", dense = true) { state.search(searchState.query, searchState.filters, 1) }
+                    }
+                }
+            }
+        }
+
+        // Empty Result handling
+        if (results.isEmpty() && !searchState.searching) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        if (searchState.query.isNotBlank()) "No matching titles found on active providers for "${searchState.query}""
+                        else "No titles match the selected filter criteria",
+                        color = Muted,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        }
+
+        // Posters Row / Grid
+        if (results.isNotEmpty()) {
+            item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(vertical = 12.dp)) {
+                    items(results, key = { it.id }) { DesignPoster(it, onSelect) }
+                }
+            }
+        }
+
+        // Pagination / Load More button
+        if (searchState.hasMore && results.isNotEmpty()) {
+            item {
+                Action(
+                    label = "Load More Results (Page ${searchState.page + 1})",
+                    icon = Icons.Outlined.ExpandMore,
+                    dense = true,
+                    onClick = { state.loadMoreSearch() }
+                )
+            }
+        }
     }
 }

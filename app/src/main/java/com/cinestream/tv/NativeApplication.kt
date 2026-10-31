@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -40,6 +39,18 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+class SearchState {
+    var query by mutableStateOf("")
+    var filters by mutableStateOf(SearchFilters())
+    var results by mutableStateOf<List<DesignTitle>>(emptyList())
+    var searching by mutableStateOf(false)
+    var providerStatuses by mutableStateOf<List<ProviderSearchStatus>>(emptyList())
+    var localFilterNotice by mutableStateOf<String?>(null)
+    var page by mutableIntStateOf(1)
+    var hasMore by mutableStateOf(false)
+    var searchError by mutableStateOf<String?>(null)
+}
+
 class StreamingState(val repository: ProvidersRepository) : ViewModel() {
     var catalog by mutableStateOf<DesignCatalog?>(null); private set
     var catalogError by mutableStateOf<String?>(null); private set
@@ -52,8 +63,10 @@ class StreamingState(val repository: ProvidersRepository) : ViewModel() {
     var streams by mutableStateOf<List<ProviderStream>>(emptyList()); private set
     var sourceIndex by mutableIntStateOf(0)
     var playingTitle by mutableStateOf(""); private set
+    val searchState = SearchState()
     private var job: Job? = null
     private var catalogJob: Job? = null
+    private var searchJob: Job? = null
     init { reload() }
     fun reload() {
         catalogJob?.cancel(); catalogError = null
@@ -84,6 +97,44 @@ class StreamingState(val repository: ProvidersRepository) : ViewModel() {
     fun back() { cancel(); when { streams.isNotEmpty() -> streams = emptyList(); selected != null -> selected = null; else -> tab = "home" } }
     fun home() { cancel(); streams = emptyList(); selected = null; tab = "home" }
     fun navigate(value: String) { cancel(); selected = null; tab = value }
+
+    fun search(query: String, filters: SearchFilters = searchState.filters, page: Int = 1) {
+        searchJob?.cancel()
+        searchState.query = query
+        searchState.filters = filters
+        searchState.page = page
+        searchState.searching = true
+        searchState.searchError = null
+        searchJob = viewModelScope.launch {
+            try {
+                val res = repository.searchWithFilters(query, filters, page)
+                if (page == 1) {
+                    searchState.results = res.titles
+                } else {
+                    searchState.results = (searchState.results + res.titles).distinctBy { it.id }
+                }
+                searchState.providerStatuses = res.statuses
+                searchState.localFilterNotice = res.localFilterNotice
+                searchState.hasMore = res.titles.isNotEmpty()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                searchState.searchError = e.message ?: "Search failed"
+            } finally {
+                if (currentCoroutineContext().isActive) searchState.searching = false
+            }
+        }
+    }
+
+    fun clearSearchFilters() {
+        search(searchState.query, SearchFilters(), 1)
+    }
+
+    fun loadMoreSearch() {
+        if (!searchState.searching && searchState.hasMore) {
+            search(searchState.query, searchState.filters, searchState.page + 1)
+        }
+    }
 }
 
 @Composable
@@ -114,13 +165,12 @@ fun TvAppNavigation(state: StreamingState) {
                         if (state.catalogError == null) { CircularProgressIndicator(color = Accent); Text("Loading Cineby and DBKU…", Modifier.padding(top = 16.dp)) }
                         else { Text(state.catalogError.orEmpty()); Action("Retry catalog") { state.reload() } }
                     }
-                    state.tab == "search" -> DesignSearch(catalog.titles, compact, state.repository, onSelect = state::open)
+                    state.tab == "search" -> DesignSearch(catalog.titles, compact, state, onSelect = state::open)
                     else -> DesignHome(catalog, state.tab, compact, onSelect = state::open, onPlay = { state.play(it, null) })
                 }
             }
             if (state.warnings.isNotEmpty()) Text(state.warnings.joinToString("\n"), Modifier.align(Alignment.BottomStart).padding(start = 112.dp, bottom = 12.dp), color = Color(0xFFFFB300))
         }
-        FloatingRemote(mediaEnabled = stream != null, onHome = state::home, onMenu = { menuSignal++ })
     }
     if (state.loadingDetails || state.resolving) Dialog(onDismissRequest = state::cancel) {
         Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFF101010), border = BorderStroke(1.dp, Accent.copy(alpha = .4f))) {

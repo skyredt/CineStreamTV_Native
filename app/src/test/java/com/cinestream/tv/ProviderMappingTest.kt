@@ -42,4 +42,35 @@ class ProviderMappingTest {
         assertThrows(IllegalArgumentException::class.java) { parseDbkuHome("<html>changed</html>") }
         assertTrue(parseCinebyHome("<html>no search results</html>", true).isEmpty())
     }
+    @Test fun cinebySearchParsesSearchResultsWithBothMovieAndTvBadges() {
+        val searchHtml = """
+            <div class="search-results">
+              <div class="card">
+                <span class="rating-badge">★ 5.0</span>
+                <a href="/movie/valley-of-lanterns-2018" title="Valley of Lanterns">
+                  <img src="https://cineby.ws/images/valley.jpg" alt="Valley of Lanterns">
+                </a>
+              </div>
+              <div class="card">
+                <span class="badge">TV</span>
+                <span class="rating-badge">★ 8.2</span>
+                <a href="/tv/lanterns-2026" title="LANTERNS">
+                  <img src="https://cineby.ws/images/lanterns.jpg" alt="LANTERNS">
+                </a>
+              </div>
+            </div>
+        """.trimIndent()
+        val results = parseCinebySearch(searchHtml)
+        assertEquals(2, results.size)
+        val movie = results.find { it.title.contains("Valley of Lanterns") }
+        assertNotNull(movie)
+        assertFalse(movie!!.isTv)
+        assertEquals("5.0", movie.rating)
+
+        val series = results.find { it.title.contains("LANTERNS") }
+        assertNotNull(series)
+        assertTrue(series!!.isTv)
+        assertEquals("8.2", series.rating)
+        assertEquals("https://cineby.ws/tv/lanterns-2026", series.pageUrl)
+    }
 }

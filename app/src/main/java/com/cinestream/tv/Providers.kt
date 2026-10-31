@@ -44,18 +44,114 @@ class ProvidersRepository {
             synchronized(detailsCache) { detailsCache[title.id] = value }; value
         }
     }
-    suspend fun search(query: String): List<DesignTitle> = withContext(Dispatchers.IO) {
-        val value = URLEncoder.encode(query, "UTF-8")
-        val cine = async { runCatching { parseCinebyHome(request("$CINEBY/search?q=$value"), true).flatMap { it.titles }.distinctBy { it.id } } }
-        val dbku = async { runCatching {
-            val doc = Jsoup.parse(request("$DBKU/vodsearch/-------------.html?wd=$value"), DBKU)
-            doc.select("a.myui-vodlist__thumb[href*=/voddetail/]").map { a -> liveTitle("dbku", a.absUrl("href"), a.attr("title"), a.absUrl("data-original")) }.distinctBy { it.id }
-        } }
-        val c = cine.await(); val d = dbku.await()
-        c.exceptionOrNull()?.let { if (it is CancellationException) throw it }; d.exceptionOrNull()?.let { if (it is CancellationException) throw it }
-        if (c.isFailure && d.isFailure) error("Both provider searches failed: ${c.exceptionOrNull()?.message}; ${d.exceptionOrNull()?.message}")
-        c.getOrDefault(emptyList()) + d.getOrDefault(emptyList())
+    suspend fun searchWithFilters(query: String, filters: SearchFilters = SearchFilters(), page: Int = 1): SearchResults = withContext(Dispatchers.IO) {
+        val cleanQuery = query.trim()
+        val value = URLEncoder.encode(cleanQuery, "UTF-8")
+        val statuses = mutableListOf<ProviderSearchStatus>()
+        var localNotice: String? = null
+
+        val cine = async {
+            if (filters.mediaType == MediaTypeFilter.SHORTS) {
+                Pair(emptyList<DesignTitle>(), ProviderSearchStatus("cineby", 0, isUnsupported = true, message = "Cineby does not host short-form drama series"))
+            } else {
+                runCatching {
+                    val typeParam = when (filters.mediaType) {
+                        MediaTypeFilter.MOVIES -> "movie"
+                        MediaTypeFilter.DRAMAS -> "tv"
+                        else -> "all"
+                    }
+                    val url = if (cleanQuery.isNotBlank()) {
+                        "$CINEBY/search?q=$value&type=$typeParam"
+                    } else {
+                        when (filters.mediaType) {
+                            MediaTypeFilter.MOVIES -> "$CINEBY/movies"
+                            MediaTypeFilter.DRAMAS -> "$CINEBY/tv"
+                            else -> "$CINEBY/movies"
+                        }
+                    }
+                    val titles = if (cleanQuery.isNotBlank()) {
+                        parseCinebySearch(request(url))
+                    } else {
+                        parseCinebyHome(request(url), true).flatMap { it.titles }.distinctBy { it.id }
+                    }
+                    Pair(titles, ProviderSearchStatus("cineby", titles.size))
+                }.fold(
+                    onSuccess = { it },
+                    onFailure = {
+                        if (it is CancellationException) throw it
+                        Pair(emptyList(), ProviderSearchStatus("cineby", 0, error = it.message ?: "Request failed"))
+                    }
+                )
+            }
+        }
+
+        val dbku = async {
+            runCatching {
+                val dbkuType = filters.mediaType.dbkuId
+                val url = if (cleanQuery.isNotBlank()) {
+                    if (dbkuType.isNotEmpty()) {
+                        "$DBKU/vodsearch/${dbkuType}-------------.html?wd=$value${if (page > 1) "&page=$page" else ""}"
+                    } else {
+                        "$DBKU/vodsearch/-------------.html?wd=$value${if (page > 1) "&page=$page" else ""}"
+                    }
+                } else {
+                    val area = when (filters.country) {
+                        "Mainland China (大陆)" -> URLEncoder.encode("大陆", "UTF-8")
+                        "Hong Kong & Taiwan (港台)" -> URLEncoder.encode("台湾", "UTF-8")
+                        "Korea (韩国)" -> URLEncoder.encode("韩国", "UTF-8")
+                        "Japan (日本)" -> URLEncoder.encode("日本", "UTF-8")
+                        "Thailand (泰国)" -> URLEncoder.encode("泰国", "UTF-8")
+                        "Singapore (新加坡)" -> URLEncoder.encode("新加坡", "UTF-8")
+                        else -> ""
+                    }
+                    val by = filters.sort.dbkuBy
+                    val year = if (filters.year != "All" && filters.year.toIntOrNull() != null) filters.year else ""
+                    val typeId = if (dbkuType.isNotEmpty()) dbkuType else "2"
+                    "$DBKU/vodshow/${typeId}-${area}-${by}------${page}---${year}.html"
+                }
+                val doc = Jsoup.parse(request(url), DBKU)
+                val titles = doc.select("a.myui-vodlist__thumb[href*=/voddetail/]").map { a ->
+                    val li = a.closest("li") ?: a
+                    val score = rating(li.select(".pic-tag-top, .pic-tag").text())
+                    val isShort = dbkuType == "21" || a.absUrl("href").contains("21")
+                    liveTitle(
+                        provider = "dbku",
+                        url = a.absUrl("href"),
+                        name = a.attr("title"),
+                        image = a.absUrl("data-original"),
+                        score = score,
+                        tv = if (isShort) true else !a.absUrl("href").contains("/1-") && !a.attr("title").contains("电影"),
+                        genres = if (isShort) listOf("短剧") else emptyList()
+                    )
+                }.distinctBy { it.id }
+                Pair(titles, ProviderSearchStatus("dbku", titles.size))
+            }.fold(
+                onSuccess = { it },
+                onFailure = {
+                    if (it is CancellationException) throw it
+                    Pair(emptyList(), ProviderSearchStatus("dbku", 0, error = it.message ?: "Request failed"))
+                }
+            )
+        }
+
+        val (cTitles, cStatus) = cine.await()
+        val (dTitles, dStatus) = dbku.await()
+        statuses += cStatus
+        statuses += dStatus
+
+        if (filters.country != "All") {
+            localNotice = "Country filter (${filters.country}) applied locally to loaded results. Cineby does not provide server-side country queries."
+        }
+
+        val combined = (cTitles + dTitles).distinctBy { it.id }
+        val filtered = filterTitles(combined, filters)
+        val sorted = sortTitles(filtered, filters.sort)
+
+        SearchResults(sorted, statuses, localNotice)
     }
+
+    suspend fun search(query: String): List<DesignTitle> = searchWithFilters(query).titles
+
     suspend fun sources(title: DesignTitle, episode: DesignEpisode?): List<ProviderStream> = withContext(Dispatchers.IO) {
         val detail = details(title)
         val sources = if (title.provider == "dbku") {
@@ -100,7 +196,7 @@ private fun Element.image(): String = selectFirst("img")?.let { it.absUrl("data-
 private fun Element.link(): String = if (tagName() == "a") absUrl("href") else selectFirst("a[href]")?.absUrl("href").orEmpty()
 private fun year(text: String): Int = Regex("(?:19|20)\\d{2}").find(text)?.value?.toIntOrNull() ?: 0
 private fun rating(text: String): String = Regex("\\d+(?:\\.\\d+)?").find(text)?.value.orEmpty()
-private fun liveTitle(provider: String, url: String, name: String, image: String, year: Int = 0, score: String = "", tv: Boolean = true, featured: Boolean = false, backdrop: String = image, overview: String = "", genres: List<String> = emptyList()) = DesignTitle("$provider:${URI(url).path}", name, "", overview, image, backdrop, year, score, "SOURCE", genres, tv, featured, 0, emptyList(), emptyList(), provider, url)
+internal fun liveTitle(provider: String, url: String, name: String, image: String, year: Int = 0, score: String = "", tv: Boolean = true, featured: Boolean = false, backdrop: String = image, overview: String = "", genres: List<String> = emptyList()) = DesignTitle("$provider:${URI(url).path}", name, "", overview, image, backdrop, year, score, "SOURCE", genres, tv, featured, 0, emptyList(), emptyList(), provider, url)
 
 internal fun parseCinebyHome(html: String, allowEmpty: Boolean = false): List<DesignRow> {
     val doc = Jsoup.parse(html, ProvidersRepository.CINEBY)
@@ -173,4 +269,52 @@ internal fun parseDbkuDetails(title: DesignTitle, doc: Document): DesignTitle {
         year = year(firstData?.text().orEmpty()), poster = doc.selectFirst(".myui-content__thumb img")?.absUrl("data-original")?.takeIf { it.isNotBlank() } ?: title.poster,
         genres = firstData?.select("a")?.take(1)?.map { it.text() }.orEmpty(), cast = cast, seasons = groups,
         playbackPage = groups.firstOrNull()?.episodes?.firstOrNull()?.pageUrl.orEmpty())
+}
+
+
+internal fun parseCinebySearch(html: String): List<DesignTitle> {
+    val doc = Jsoup.parse(html, ProvidersRepository.CINEBY)
+    val elements = doc.select("article, .content-card, div[class*=card], a[href*=/movie/], a[href*=/tv/], a[href*=/series/]")
+    val titles = mutableListOf<DesignTitle>()
+    val seenUrls = mutableSetOf<String>()
+
+    for (el in elements) {
+        val linkEl = if (el.tagName() == "a") el else el.selectFirst("a[href*=/movie/], a[href*=/tv/], a[href*=/series/]")
+        val href = linkEl?.absUrl("href").orEmpty()
+        if (href.isBlank() || href in seenUrls) continue
+        if (!href.contains("/movie/") && !href.contains("/tv/") && !href.contains("/series/")) continue
+
+        val titleText = el.selectFirst(".card-title, .title, h2, h3, h4, .name")?.text()
+            ?.takeIf { it.isNotBlank() }
+            ?: linkEl.attr("title").takeIf { it.isNotBlank() }
+            ?: el.selectFirst("img")?.attr("alt")?.takeIf { it.isNotBlank() }
+            ?: href.substringAfterLast("/").replace("-", " ").split(" ").filter { it.isNotBlank() }.joinToString(" ") { word -> word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } }
+
+        val img = el.selectFirst("img")?.let {
+            it.absUrl("data-original").ifBlank { it.absUrl("data-src") }.ifBlank { it.absUrl("src") }
+        }.orEmpty()
+
+        val ratingText = rating(
+            el.select(".rating-badge, [class*=rating], span:contains(★), div:contains(★)").text()
+        )
+
+        val yearText = year(el.select("time, .year, [class*=year], .card-meta").text())
+
+        val isTv = href.contains("/tv/") || href.contains("/series/") || el.select("*:containsOwn(TV)").isNotEmpty()
+
+        seenUrls.add(href)
+        titles.add(
+            liveTitle(
+                provider = "cineby",
+                url = href,
+                name = titleText,
+                image = img,
+                year = yearText,
+                score = ratingText,
+                tv = isTv,
+                genres = if (isTv) listOf("TV Series") else listOf("Movie")
+            )
+        )
+    }
+    return titles
 }
