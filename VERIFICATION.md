@@ -1,3 +1,13 @@
+# CineDBKTV 1.3.1 — phone launcher update
+
+- Build succeeded: assembleDebug, testDebugUnitTest, lintDebug. The 16 existing tests remain passing (up-to-date); Android lint reports 0 errors and 14 warnings.
+- APK binary inspected with aapt: version code 8, version 1.3.1, application label CineDBKTV, both standard LAUNCHER and LEANBACK_LAUNCHER activities present, Leanback optional.
+- APK signature verified with apksigner. Application ID and signing identity unchanged so this updates the existing app. TV interface and landscape orientation unchanged.
+- This revision was not installed or tested on a phone by the agent. The launcher configuration was verified in the compiled APK.
+- APK SHA256: c72bfe30846bcc1fc75d4f224440fc194811846777154efa218cebe5cef3c416
+
+Previous revision verification follows.
+
 # CineDBKTV 1.3.0 verification — 1 November 2026 (Singapore)
 
 - Final build: BUILD SUCCESSFUL. Tasks: assembleDebug, testDebugUnitTest, lintDebug, assembleDebugAndroidTest. See build-1.3-delivery.log locally.

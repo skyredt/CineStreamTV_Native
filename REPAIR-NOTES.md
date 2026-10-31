@@ -1,8 +1,10 @@
-# CineDBKTV 1.3.0
+# CineDBKTV 1.3.1
 
 Original repair baseline: skyredt/CineStreamTV_Native commit 7558d5c2ac5c2b34ba83eeee4f9f4123b3e0ead0. Work is in this separate folder; the original archive and D:\CineStreamTV_Native were not overwritten. Source is versioned on the GitHub branch development/cinedbktv-1.3.
 
-This is the native Android TV project. It retains the supplied Compose design, uses the configured Cineby and DBKU providers, and has no floating remote overlay. Phone launcher support has been removed following the updated TV-only requirement.
+This is the native Android TV project. It retains the supplied Compose design, uses the configured Cineby and DBKU providers, and has no floating remote overlay. Version 1.3.1 restores a phone launcher for testing while retaining the TV launcher, original interface and landscape orientation. Leanback is optional so phones can install and list the app.
+
+Version 1.3.1 adds phone launcher compatibility; playback and TV controls are unchanged.
 
 TV feedback changes in 1.3.0:
 
