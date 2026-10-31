@@ -1,0 +1,1832 @@
+{
+  "titles": [
+    {
+      "id": "dune-2",
+      "tmdbId": 693134,
+      "title": "Dune: Part Two",
+      "originalTitle": "Dune: Part Two",
+      "tagline": "Long live the fighters.",
+      "overview": "Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the known universe, he endeavors to prevent a terrible future only he can foresee.",
+      "posterUrl": "file:///android_asset/artwork/97a1f28646a8367e4e81.jpg",
+      "backdropUrl": "file:///android_asset/artwork/6a6c1e53feaa093d356b.jpg",
+      "releaseYear": 2024,
+      "voteAverage": 8.6,
+      "voteCount": 14200,
+      "genres": [
+        "Science Fiction",
+        "Adventure",
+        "Drama"
+      ],
+      "mediaType": "movie",
+      "durationMinutes": 166,
+      "qualityBadge": "4K HDR",
+      "trendingRank": 1,
+      "isFeatured": true,
+      "cast": [
+        {
+          "id": 1,
+          "name": "Timothée Chalamet",
+          "character": "Paul Atreides",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 2,
+          "name": "Zendaya",
+          "character": "Chani",
+          "profileUrl": "file:///android_asset/artwork/0dcc092eab986a0c8acd.jpg"
+        },
+        {
+          "id": 3,
+          "name": "Rebecca Ferguson",
+          "character": "Lady Jessica",
+          "profileUrl": "file:///android_asset/artwork/14b7eb1457221dceaa59.jpg"
+        },
+        {
+          "id": 4,
+          "name": "Austin Butler",
+          "character": "Feyd-Rautha",
+          "profileUrl": "file:///android_asset/artwork/7cf34b168777a22b6a00.jpg"
+        }
+      ]
+    },
+    {
+      "id": "severance",
+      "tmdbId": 95396,
+      "title": "Severance",
+      "originalTitle": "Severance",
+      "tagline": "We all have something to hide.",
+      "overview": "Mark leads a team of office workers whose memories have been surgically divided between their work and personal lives. When a mysterious colleague appears outside of work, it begins a journey to discover the truth about their jobs.",
+      "posterUrl": "file:///android_asset/artwork/45f9f4039761f27e73ce.jpg",
+      "backdropUrl": "file:///android_asset/artwork/75265d7d02c05fcef97f.jpg",
+      "releaseYear": 2024,
+      "voteAverage": 8.8,
+      "voteCount": 9800,
+      "genres": [
+        "Mystery",
+        "Sci-Fi",
+        "Thriller"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 2,
+      "qualityBadge": "4K HDR",
+      "trendingRank": 2,
+      "isFeatured": true,
+      "cast": [
+        {
+          "id": 10,
+          "name": "Adam Scott",
+          "character": "Mark Scout",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 11,
+          "name": "Patricia Arquette",
+          "character": "Harmony Cobel",
+          "profileUrl": "file:///android_asset/artwork/c63106ca4ced2690fad1.jpg"
+        },
+        {
+          "id": 12,
+          "name": "John Turturro",
+          "character": "Irving Bailiff",
+          "profileUrl": "file:///android_asset/artwork/90959cdd6a7747e9a4b9.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 2,
+          "name": "Season 2",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 2 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 201,
+              "seasonNumber": 2,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 202,
+              "seasonNumber": 2,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 203,
+              "seasonNumber": 2,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 204,
+              "seasonNumber": 2,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 205,
+              "seasonNumber": 2,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 206,
+              "seasonNumber": 2,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "oppenheimer",
+      "tmdbId": 872585,
+      "title": "Oppenheimer",
+      "originalTitle": "Oppenheimer",
+      "tagline": "The world forever changes.",
+      "overview": "The story of J. Robert Oppenheimer’s role in the development of the atomic bomb during World War II, examining the scientific breakthrough and subsequent ethical crisis.",
+      "posterUrl": "file:///android_asset/artwork/c7626b60c50f193c9b82.jpg",
+      "backdropUrl": "file:///android_asset/artwork/fcc0eb94227ea1fd99f6.jpg",
+      "releaseYear": 2023,
+      "voteAverage": 8.9,
+      "voteCount": 21000,
+      "genres": [
+        "Drama",
+        "History",
+        "Biography"
+      ],
+      "mediaType": "movie",
+      "durationMinutes": 180,
+      "qualityBadge": "4K HDR",
+      "trendingRank": 3,
+      "isFeatured": true,
+      "cast": [
+        {
+          "id": 20,
+          "name": "Cillian Murphy",
+          "character": "J. Robert Oppenheimer",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 21,
+          "name": "Emily Blunt",
+          "character": "Katherine Oppenheimer",
+          "profileUrl": "file:///android_asset/artwork/14b7eb1457221dceaa59.jpg"
+        },
+        {
+          "id": 22,
+          "name": "Robert Downey Jr.",
+          "character": "Lewis Strauss",
+          "profileUrl": "file:///android_asset/artwork/7cf34b168777a22b6a00.jpg"
+        }
+      ]
+    },
+    {
+      "id": "shogun",
+      "tmdbId": 126308,
+      "title": "Shōgun",
+      "originalTitle": "Shōgun",
+      "tagline": "Honor will be tested. Empires will fall.",
+      "overview": "In 1600 Japan at the dawn of a century-defining civil war, Lord Yoshii Toranaga is fighting for his life as his enemies on the Council of Regents unite against him.",
+      "posterUrl": "https://images.unsplash.com/photo-1528164344705-475426879c0d?auto=format&fit=crop&w=600&h=900&q=85",
+      "backdropUrl": "file:///android_asset/artwork/f50685f3cec00e5b7979.jpg",
+      "releaseYear": 2024,
+      "voteAverage": 8.7,
+      "voteCount": 11400,
+      "genres": [
+        "Drama",
+        "War",
+        "History"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 1,
+      "qualityBadge": "4K HDR",
+      "trendingRank": 4,
+      "isFeatured": true,
+      "cast": [
+        {
+          "id": 30,
+          "name": "Hiroyuki Sanada",
+          "character": "Lord Yoshii Toranaga",
+          "profileUrl": "file:///android_asset/artwork/90959cdd6a7747e9a4b9.jpg"
+        },
+        {
+          "id": 31,
+          "name": "Cosmo Jarvis",
+          "character": "John Blackthorne",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 32,
+          "name": "Anna Sawai",
+          "character": "Toda Mariko",
+          "profileUrl": "file:///android_asset/artwork/c63106ca4ced2690fad1.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cyberpunk-edgerunners",
+      "tmdbId": 105248,
+      "title": "Cyberpunk: Edgerunners",
+      "originalTitle": "Cyberpunk: Edgerunners",
+      "tagline": "Night City is a city of dreams, and I’m a big dreamer.",
+      "overview": "A street kid trying to survive in a technology and body modification-obsessed city of the future. Having everything to lose, he chooses to stay alive by becoming an edgerunner: a mercenary outlaw.",
+      "posterUrl": "file:///android_asset/artwork/b963f76e86ffe93090cf.jpg",
+      "backdropUrl": "file:///android_asset/artwork/8448888a0ac68a1e807f.jpg",
+      "releaseYear": 2022,
+      "voteAverage": 8.7,
+      "voteCount": 16500,
+      "genres": [
+        "Animation",
+        "Action",
+        "Sci-Fi"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 1,
+      "qualityBadge": "FHD 1080p",
+      "trendingRank": 5,
+      "cast": [
+        {
+          "id": 40,
+          "name": "KENN",
+          "character": "David Martinez",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 41,
+          "name": "Aoi Yuki",
+          "character": "Lucy",
+          "profileUrl": "file:///android_asset/artwork/14b7eb1457221dceaa59.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "interstellar",
+      "tmdbId": 157336,
+      "title": "Interstellar",
+      "originalTitle": "Interstellar",
+      "tagline": "Mankind was born on Earth. It was never meant to die here.",
+      "overview": "The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.",
+      "posterUrl": "file:///android_asset/artwork/67e413f044008f62d400.jpg",
+      "backdropUrl": "file:///android_asset/artwork/c557b228202628484e13.jpg",
+      "releaseYear": 2014,
+      "voteAverage": 8.7,
+      "voteCount": 34000,
+      "genres": [
+        "Adventure",
+        "Drama",
+        "Science Fiction"
+      ],
+      "mediaType": "movie",
+      "durationMinutes": 169,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 50,
+          "name": "Matthew McConaughey",
+          "character": "Cooper",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 51,
+          "name": "Anne Hathaway",
+          "character": "Brand",
+          "profileUrl": "file:///android_asset/artwork/c63106ca4ced2690fad1.jpg"
+        }
+      ]
+    },
+    {
+      "id": "fallout",
+      "tmdbId": 106379,
+      "title": "Fallout",
+      "originalTitle": "Fallout",
+      "tagline": "The world ended. The fun began.",
+      "overview": "The story of haves and have-nots in a world in which there’s almost nothing left to have. 200 years after the apocalypse, the gentle denizens of luxury fallout shelters are forced to return to the irradiated hellscape their ancestors left behind.",
+      "posterUrl": "file:///android_asset/artwork/70bdfff2daee4ceae835.jpg",
+      "backdropUrl": "file:///android_asset/artwork/6a6c1e53feaa093d356b.jpg",
+      "releaseYear": 2024,
+      "voteAverage": 8.5,
+      "voteCount": 13200,
+      "genres": [
+        "Action",
+        "Sci-Fi",
+        "Adventure"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 1,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 60,
+          "name": "Ella Purnell",
+          "character": "Lucy MacLean",
+          "profileUrl": "file:///android_asset/artwork/0dcc092eab986a0c8acd.jpg"
+        },
+        {
+          "id": 61,
+          "name": "Walton Goggins",
+          "character": "The Ghoul",
+          "profileUrl": "file:///android_asset/artwork/7cf34b168777a22b6a00.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "the-batman",
+      "tmdbId": 414906,
+      "title": "The Batman",
+      "originalTitle": "The Batman",
+      "tagline": "Unmask the truth.",
+      "overview": "In his second year of fighting crime, Batman uncovers corruption in Gotham City that connects to his own family while facing a serial killer known as the Riddler.",
+      "posterUrl": "file:///android_asset/artwork/ce13fdd668efac950f8b.jpg",
+      "backdropUrl": "file:///android_asset/artwork/cea650f06e94e465dd7b.jpg",
+      "releaseYear": 2022,
+      "voteAverage": 7.9,
+      "voteCount": 14000,
+      "genres": [
+        "Crime",
+        "Mystery",
+        "Thriller"
+      ],
+      "mediaType": "movie",
+      "durationMinutes": 176,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 70,
+          "name": "Robert Pattinson",
+          "character": "Bruce Wayne / Batman",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 71,
+          "name": "Zoë Kravitz",
+          "character": "Selina Kyle / Catwoman",
+          "profileUrl": "file:///android_asset/artwork/14b7eb1457221dceaa59.jpg"
+        }
+      ]
+    },
+    {
+      "id": "arcane",
+      "tmdbId": 94605,
+      "title": "Arcane",
+      "originalTitle": "Arcane",
+      "tagline": "Every legend has a beginning.",
+      "overview": "Amid the stark discord of twin cities Piltover and Zaun, two sisters fight on rival sides of a war between magic technologies and incompatible convictions.",
+      "posterUrl": "file:///android_asset/artwork/16dd6987a9249142f499.jpg",
+      "backdropUrl": "file:///android_asset/artwork/9305c7872ffb21de530d.jpg",
+      "releaseYear": 2024,
+      "voteAverage": 9,
+      "voteCount": 22000,
+      "genres": [
+        "Animation",
+        "Sci-Fi",
+        "Action"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 2,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 80,
+          "name": "Hailee Steinfeld",
+          "character": "Vi",
+          "profileUrl": "file:///android_asset/artwork/0dcc092eab986a0c8acd.jpg"
+        },
+        {
+          "id": 81,
+          "name": "Ella Purnell",
+          "character": "Jinx",
+          "profileUrl": "file:///android_asset/artwork/c63106ca4ced2690fad1.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 2,
+          "name": "Season 2",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 2 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 201,
+              "seasonNumber": 2,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 202,
+              "seasonNumber": 2,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 203,
+              "seasonNumber": 2,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 204,
+              "seasonNumber": 2,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 205,
+              "seasonNumber": 2,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 206,
+              "seasonNumber": 2,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spider-man-across-spider-verse",
+      "tmdbId": 569094,
+      "title": "Spider-Man: Across the Spider-Verse",
+      "originalTitle": "Spider-Man: Across the Spider-Verse",
+      "tagline": "It’s how you wear the mask that matters.",
+      "overview": "After reuniting with Gwen Stacy, Brooklyn’s full-time, friendly neighborhood Spider-Man is catapulted across the Multiverse, where he encounters the Spider Society, a team of Spider-People charged with protecting the Multiverse’s very existence.",
+      "posterUrl": "file:///android_asset/artwork/5e71360117e2b16d8c43.jpg",
+      "backdropUrl": "file:///android_asset/artwork/c9f84581b47857d960e4.jpg",
+      "releaseYear": 2023,
+      "voteAverage": 8.8,
+      "voteCount": 18000,
+      "genres": [
+        "Animation",
+        "Action",
+        "Adventure"
+      ],
+      "mediaType": "movie",
+      "durationMinutes": 140,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 90,
+          "name": "Shameik Moore",
+          "character": "Miles Morales",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 91,
+          "name": "Hailee Steinfeld",
+          "character": "Gwen Stacy",
+          "profileUrl": "file:///android_asset/artwork/14b7eb1457221dceaa59.jpg"
+        }
+      ]
+    },
+    {
+      "id": "three-body",
+      "tmdbId": 202250,
+      "title": "Three-Body (三体)",
+      "originalTitle": "三体",
+      "tagline": "Do not answer! Do not answer! Do not answer!",
+      "overview": "Nanomaterials scientist Wang Miao discovers a mysterious countdown appearing in his vision. Together with detective Shi Qiang, he investigates a series of unexplained suicides among top physicists and uncovers an impending alien invasion from the Trisolaran civilization.",
+      "posterUrl": "file:///android_asset/artwork/15c724be85cdc766ed13.jpg",
+      "backdropUrl": "file:///android_asset/artwork/c557b228202628484e13.jpg",
+      "releaseYear": 2023,
+      "voteAverage": 8.9,
+      "voteCount": 9400,
+      "genres": [
+        "Sci-Fi",
+        "Mystery",
+        "Drama"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 1,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 101,
+          "name": "Zhang Luyi (张鲁一)",
+          "character": "Wang Miao",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 102,
+          "name": "Yu Hewei (于和伟)",
+          "character": "Shi Qiang (Da Shi)",
+          "profileUrl": "file:///android_asset/artwork/7cf34b168777a22b6a00.jpg"
+        },
+        {
+          "id": 103,
+          "name": "Chen Jin (陈瑾)",
+          "character": "Elder Ye Wenjie",
+          "profileUrl": "file:///android_asset/artwork/c63106ca4ced2690fad1.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "joy-of-life",
+      "tmdbId": 95558,
+      "title": "Joy of Life (庆余年)",
+      "originalTitle": "庆余年",
+      "tagline": "Fate is written in the court.",
+      "overview": "Fan Xian, a young man who retains modern memories, navigates the treacherous political waters, secret agencies, and philosophical intrigues of the ancient Southern Qing dynasty.",
+      "posterUrl": "https://images.unsplash.com/photo-1528164344705-475426879c0d?auto=format&fit=crop&w=600&h=900&q=85",
+      "backdropUrl": "file:///android_asset/artwork/75265d7d02c05fcef97f.jpg",
+      "releaseYear": 2024,
+      "voteAverage": 9.1,
+      "voteCount": 18200,
+      "genres": [
+        "Historical",
+        "Wuxia",
+        "Political Drama",
+        "Comedy"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 2,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 110,
+          "name": "Zhang Ruoyun (张若昀)",
+          "character": "Fan Xian",
+          "profileUrl": "file:///android_asset/artwork/90959cdd6a7747e9a4b9.jpg"
+        },
+        {
+          "id": 111,
+          "name": "Li Qin (李沁)",
+          "character": "Lin Wan’er",
+          "profileUrl": "file:///android_asset/artwork/14b7eb1457221dceaa59.jpg"
+        },
+        {
+          "id": 112,
+          "name": "Chen Daoming (陈道明)",
+          "character": "Emperor of Qing",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 2,
+          "name": "Season 2",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 2 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 201,
+              "seasonNumber": 2,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 202,
+              "seasonNumber": 2,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 203,
+              "seasonNumber": 2,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 204,
+              "seasonNumber": 2,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 205,
+              "seasonNumber": 2,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 206,
+              "seasonNumber": 2,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "the-untamed",
+      "tmdbId": 90812,
+      "title": "The Untamed (陈情令)",
+      "originalTitle": "陈情令",
+      "tagline": "Two soulmates face mortal dangers in a fantasy realm.",
+      "overview": "In a magical world of rival clans, two soulmates Wei Wuxian and Lan Wangji uncover a dark secret connecting tragic events of the past to present turmoil.",
+      "posterUrl": "file:///android_asset/artwork/70bdfff2daee4ceae835.jpg",
+      "backdropUrl": "file:///android_asset/artwork/6a6c1e53feaa093d356b.jpg",
+      "releaseYear": 2019,
+      "voteAverage": 8.9,
+      "voteCount": 15400,
+      "genres": [
+        "Xianxia",
+        "Fantasy",
+        "Adventure",
+        "Mystery"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 1,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 120,
+          "name": "Xiao Zhan (肖战)",
+          "character": "Wei Wuxian",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 121,
+          "name": "Wang Yibo (王一博)",
+          "character": "Lan Wangji",
+          "profileUrl": "file:///android_asset/artwork/7cf34b168777a22b6a00.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reset",
+      "tmdbId": 153496,
+      "title": "Reset (开端)",
+      "originalTitle": "开端",
+      "tagline": "Escape the endless loop before the explosion.",
+      "overview": "A college student and a video game designer find themselves trapped in an endless time loop aboard a city bus destined to explode, racing against time to save everyone on board.",
+      "posterUrl": "file:///android_asset/artwork/45f9f4039761f27e73ce.jpg",
+      "backdropUrl": "file:///android_asset/artwork/75265d7d02c05fcef97f.jpg",
+      "releaseYear": 2022,
+      "voteAverage": 8.8,
+      "voteCount": 8900,
+      "genres": [
+        "Sci-Fi",
+        "Suspense",
+        "Time Travel"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 1,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 130,
+          "name": "Bai Jingting (白敬亭)",
+          "character": "Xiao Heyun",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 131,
+          "name": "Zhao Jinmai (赵今麦)",
+          "character": "Li Shiqing",
+          "profileUrl": "file:///android_asset/artwork/0dcc092eab986a0c8acd.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "someday-or-one-day",
+      "tmdbId": 95559,
+      "title": "Someday or One Day (想见你)",
+      "originalTitle": "想见你",
+      "tagline": "Only if you asked to see me, our meeting would be meaningful to me.",
+      "overview": "In 2019, grieving 27-year-old Huang Yu-hsuan longs for her deceased boyfriend Wang Quan-sheng. Through a mysterious Walkman cassette tape, she finds herself transported back to 1998 inhabiting another girl’s body.",
+      "posterUrl": "file:///android_asset/artwork/97a1f28646a8367e4e81.jpg",
+      "backdropUrl": "file:///android_asset/artwork/6a6c1e53feaa093d356b.jpg",
+      "releaseYear": 2019,
+      "voteAverage": 9,
+      "voteCount": 12000,
+      "genres": [
+        "Romance",
+        "Mystery",
+        "Time Travel",
+        "HK/Taiwan Drama"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 1,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 140,
+          "name": "Alice Ko (柯佳嬿)",
+          "character": "Huang Yu-hsuan",
+          "profileUrl": "file:///android_asset/artwork/14b7eb1457221dceaa59.jpg"
+        },
+        {
+          "id": 141,
+          "name": "Greg Hsu (许光汉)",
+          "character": "Li Zi-wei",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "link-click",
+      "tmdbId": 124119,
+      "title": "Link Click (时光代理人)",
+      "originalTitle": "时光代理人",
+      "tagline": "Enter the photograph. Alter nothing.",
+      "overview": "Using super powers to enter their clientele’s photos one by one, Cheng Xiaoshi and Lu Guang take their work seriously at Time Photo Studio, a small photography shop set in the backdrop of a modern metropolis.",
+      "posterUrl": "file:///android_asset/artwork/16dd6987a9249142f499.jpg",
+      "backdropUrl": "file:///android_asset/artwork/9305c7872ffb21de530d.jpg",
+      "releaseYear": 2023,
+      "voteAverage": 8.8,
+      "voteCount": 11000,
+      "genres": [
+        "Donghua",
+        "Anime",
+        "Supernatural",
+        "Suspense"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 2,
+      "qualityBadge": "FHD 1080p",
+      "cast": [
+        {
+          "id": 150,
+          "name": "Su Shangqing (苏尚卿)",
+          "character": "Cheng Xiaoshi",
+          "profileUrl": "file:///android_asset/artwork/e5e8b0ce749b843f661f.jpg"
+        },
+        {
+          "id": 151,
+          "name": "Yang Tianxiang (杨天翔)",
+          "character": "Lu Guang",
+          "profileUrl": "file:///android_asset/artwork/7cf34b168777a22b6a00.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 2,
+          "name": "Season 2",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 2 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 201,
+              "seasonNumber": 2,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 202,
+              "seasonNumber": 2,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 203,
+              "seasonNumber": 2,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 204,
+              "seasonNumber": 2,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 205,
+              "seasonNumber": 2,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 206,
+              "seasonNumber": 2,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "singer-2024",
+      "tmdbId": 250100,
+      "title": "Singer 2024 (歌手2024)",
+      "originalTitle": "歌手2024",
+      "tagline": "Live vocal showdown without pre-recording.",
+      "overview": "China’s premier live international vocal competition returns with an unedited broadcast format, pitching top Chinese legends against global music stars in real-time acoustic performances.",
+      "posterUrl": "file:///android_asset/artwork/ae3b39fc4503c766be99.jpg",
+      "backdropUrl": "file:///android_asset/artwork/b4fcc0d50cb7b454a19a.jpg",
+      "releaseYear": 2024,
+      "voteAverage": 8.6,
+      "voteCount": 7500,
+      "genres": [
+        "Variety",
+        "Music",
+        "Live Competition"
+      ],
+      "mediaType": "tv",
+      "seasonsCount": 1,
+      "qualityBadge": "4K HDR",
+      "cast": [
+        {
+          "id": 160,
+          "name": "Chante Moore",
+          "character": "Contestant",
+          "profileUrl": "file:///android_asset/artwork/14b7eb1457221dceaa59.jpg"
+        },
+        {
+          "id": 161,
+          "name": "Na Ying (那英)",
+          "character": "Contestant",
+          "profileUrl": "file:///android_asset/artwork/c63106ca4ced2690fad1.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Season 1",
+          "episodeCount": 6,
+          "overview": "The stakes escalate in Season 1 as hidden conspiracies and conflicting loyalties threaten survival.",
+          "episodes": [
+            {
+              "id": 101,
+              "seasonNumber": 1,
+              "episodeNumber": 1,
+              "title": "Episode 1: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440136628?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-02-15"
+            },
+            {
+              "id": 102,
+              "seasonNumber": 1,
+              "episodeNumber": 2,
+              "title": "Episode 2: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440190949?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 56,
+              "airDate": "2024-03-15"
+            },
+            {
+              "id": 103,
+              "seasonNumber": 1,
+              "episodeNumber": 3,
+              "title": "Episode 3: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440245270?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 58,
+              "airDate": "2024-04-15"
+            },
+            {
+              "id": 104,
+              "seasonNumber": 1,
+              "episodeNumber": 4,
+              "title": "Episode 4: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440299591?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 60,
+              "airDate": "2024-05-15"
+            },
+            {
+              "id": 105,
+              "seasonNumber": 1,
+              "episodeNumber": 5,
+              "title": "Episode 5: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440353912?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 52,
+              "airDate": "2024-06-15"
+            },
+            {
+              "id": 106,
+              "seasonNumber": 1,
+              "episodeNumber": 6,
+              "title": "Episode 6: The Genesis Point",
+              "overview": "Following the critical turn of events, the team uncovers unexpected revelations across uncharted territories.",
+              "stillUrl": "https://images.unsplash.com/photo-1536440408233?auto=format&fit=crop&w=640&q=80",
+              "durationMinutes": 54,
+              "airDate": "2024-07-15"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "trending",
+      "title": "热门推荐 (Trending Hits)",
+      "categoryTag": "独播精选 • Top 10",
+      "ids": [
+        "dune-2",
+        "severance",
+        "oppenheimer",
+        "shogun",
+        "cyberpunk-edgerunners"
+      ]
+    },
+    {
+      "id": "mainland",
+      "title": "陆剧精选 (Mainland Chinese Dramas)",
+      "categoryTag": "热播古装 & 都市悬疑",
+      "ids": [
+        "three-body",
+        "joy-of-life",
+        "the-untamed",
+        "reset"
+      ]
+    },
+    {
+      "id": "hk_taiwan",
+      "title": "港台剧场 (Hong Kong & Taiwan Classics)",
+      "categoryTag": "穿越悬疑 & 经典商战",
+      "ids": [
+        "dune-2",
+        "the-batman",
+        "someday-or-one-day"
+      ]
+    },
+    {
+      "id": "japan_korea",
+      "title": "日韩剧场 (Japan & Korea Series)",
+      "categoryTag": "热血史诗 & 沉浸探案",
+      "ids": [
+        "severance",
+        "shogun",
+        "cyberpunk-edgerunners"
+      ]
+    },
+    {
+      "id": "anime",
+      "title": "动漫新番 & 国创 (Anime & Donghua)",
+      "categoryTag": "奇幻国漫 & 人气动画",
+      "ids": [
+        "cyberpunk-edgerunners",
+        "arcane",
+        "spider-man-across-spider-verse",
+        "link-click"
+      ]
+    },
+    {
+      "id": "variety",
+      "title": "人气综艺 (Top Variety Shows)",
+      "categoryTag": "全开麦竞技 & 爆笑真人秀",
+      "ids": [
+        "oppenheimer",
+        "fallout",
+        "singer-2024"
+      ]
+    }
+  ]
+}

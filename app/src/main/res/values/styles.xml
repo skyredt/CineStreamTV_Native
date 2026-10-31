@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.CineStreamTV" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#0F0F0F</item>
+        <item name="android:colorAccent">#00E5FF</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+</resources>
