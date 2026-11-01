@@ -198,7 +198,7 @@ fun TvAppNavigation(state: StreamingState) {
                     catalog == null -> Column(Modifier.fillMaxSize().padding(48.dp), verticalArrangement = Arrangement.Center) {
                         Text("CineDBKTV", color = Accent, style = MaterialTheme.typography.headlineLarge)
                         Spacer(Modifier.height(24.dp))
-                        if (state.catalogError == null) { CircularProgressIndicator(color = Accent); Text("Loading Cineby and DBKU…", Modifier.padding(top = 16.dp)) }
+                        if (state.catalogError == null) { CircularProgressIndicator(color = Accent); Text("Loading Cineby, DBKU and BingeBang…", Modifier.padding(top = 16.dp)) }
                         else { Text(state.catalogError.orEmpty()); Action("Retry catalog") { state.reload() } }
                     }
                     state.tab == "search" -> DesignSearch(catalog.titles, compact, state, onSelect = state::open)
@@ -221,7 +221,7 @@ fun TvAppNavigation(state: StreamingState) {
         Surface(shape = RoundedCornerShape(20.dp), color = Color(0xFF101010), border = BorderStroke(1.dp, Accent.copy(alpha = .4f))) {
             LazyColumn(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 item { Text("Stream Extractor API", style = MaterialTheme.typography.titleLarge, color = Accent) }
-                item { Text("Catalog providers: cineby.ws and dbku.tv. Enter a direct media URL for an independent player test.") }
+                item { Text("Catalog providers: cineby.ws, dbku.tv and bingebang.st. Enter a direct media URL for an independent player test.") }
                 item { OutlinedTextField(input, { input = it; validation = null }, Modifier.fillMaxWidth(), label = { Text("HTTPS MP4, HLS or DASH URL") }, singleLine = true, isError = validation != null) }
                 validation?.let { message -> item { Text(message, color = MaterialTheme.colorScheme.error) } }
                 item { Action("Play entered URL", primary = true) { validation = MediaUrl.validate(input); if (validation == null) { tester = false; state.direct(input.trim(), "User-provided media") } } }

@@ -1,0 +1,101 @@
+{
+  "results": [
+    {
+      "id": 21696,
+      "media_type": "tv",
+      "name": "Lanterns",
+      "original_name": "Lanterns",
+      "overview": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
+      "poster_path": "/rb94rKVIzLyfWufIN7WqLvadBDH.jpg",
+      "backdrop_path": "/6gqezQJ2mkm4jreWwLyOZy2Vf6i.jpg",
+      "backdrop_titled_path": "/jMCAu91V7fsnHNUvabOPMBLaLaj.jpg",
+      "logo_path": "/kANHXGvFKW13UEkZbYwl9nIJeEl.png",
+      "first_air_date": "2026-08-16",
+      "year": 2026,
+      "number_of_seasons": 1,
+      "certification": "TV-MA",
+      "vote_average": 8.2,
+      "vote_count": 840,
+      "popularity": 63.666,
+      "genre_ids": [
+        18,
+        9648,
+        10765
+      ],
+      "url": "/tv/watch/lanterns-sne6ck",
+      "play_url": "/tv/play/lanterns-sne6ck"
+    },
+    {
+      "id": 83701,
+      "media_type": "movie",
+      "title": "Valley of the Lanterns",
+      "original_title": "Valley of the Lanterns",
+      "overview": "An elderly grandmother has a big decision to make when it emerges that the hold she has on her past puts her family's future in jeopardy.",
+      "poster_path": "/bEc8WKnCOYFoC1jLQKP3mIQuvmY.jpg",
+      "backdrop_path": "/70Ebgn1ZfBQ8IqektswNt48pLiq.jpg",
+      "backdrop_titled_path": "/oiRCvVAhbivPFV4Q5J5EsZ0Bn6N.jpg",
+      "logo_path": null,
+      "release_date": "2018-07-16",
+      "year": 2018,
+      "runtime": 107,
+      "certification": null,
+      "vote_average": 5,
+      "vote_count": 12,
+      "popularity": 3.442,
+      "genre_ids": [
+        16
+      ],
+      "url": "/movie/watch/valley-of-the-lanterns-2018-mhd4ys",
+      "play_url": "/movie/play/valley-of-the-lanterns-2018-mhd4ys"
+    },
+    {
+      "id": 9473,
+      "media_type": "movie",
+      "title": "Human Lanterns",
+      "original_title": "人皮燈籠",
+      "overview": "A psychotic craftsman pits two rival Kung-Fu masters against each other while designing special lanterns from a disturbing source.",
+      "poster_path": "/v5a25FBIPqzVvLqhrBhUvMoB7mk.jpg",
+      "backdrop_path": "/RH3yBITcVZsmYGvQG0PJP1ZtcJ.jpg",
+      "backdrop_titled_path": "/aFkJrg4cnuNfLBu4J1YrNkYgIzz.jpg",
+      "logo_path": "/AelWZyqcgGajSjpGyHVqaG19Lyk.png",
+      "release_date": "1982-07-14",
+      "year": 1982,
+      "runtime": 99,
+      "certification": null,
+      "vote_average": 6.1,
+      "vote_count": 52,
+      "popularity": 2.295,
+      "genre_ids": [
+        28,
+        27
+      ],
+      "url": "/movie/watch/human-lanterns-1982-2fhlyh",
+      "play_url": "/movie/play/human-lanterns-1982-2fhlyh"
+    },
+    {
+      "id": 101082,
+      "media_type": "movie",
+      "title": "Jack vs. Lanterns",
+      "original_title": "Jack vs. Lanterns",
+      "overview": "Genbetter has been growing gourds and the massive orange veggies are on the attack. Jack and his friends have to stop an invasion of pumpkin headed monsters.",
+      "poster_path": "/8UIHTwg3co2rI30gsSS1IWFOqXw.jpg",
+      "backdrop_path": "/7PW2vcho2989zNUstyUHugxNjjh.jpg",
+      "backdrop_titled_path": null,
+      "logo_path": null,
+      "release_date": "2019-12-14",
+      "year": 2019,
+      "runtime": 105,
+      "certification": "NR",
+      "vote_average": 0,
+      "vote_count": 0,
+      "popularity": 1.67,
+      "genre_ids": [
+        35,
+        27,
+        878
+      ],
+      "url": "/movie/watch/jack-vs-lanterns-2019-ljuj2y",
+      "play_url": "/movie/play/jack-vs-lanterns-2019-ljuj2y"
+    }
+  ]
+}

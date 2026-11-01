@@ -12,9 +12,11 @@ import android.view.accessibility.AccessibilityNodeInfo
 class TvSmokeRunner : Instrumentation() {
     private var mediaUrl: String? = null
     private var searchLayout = false
+    private var bingeProvider = false
     private val passed = mutableListOf<String>()
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); mediaUrl = arguments?.getString("mediaUrl"); searchLayout = arguments?.getString("searchLayout") == "true"; start() }
+    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); mediaUrl = arguments?.getString("mediaUrl"); searchLayout = arguments?.getString("searchLayout") == "true"; bingeProvider = arguments?.getString("bingeProvider") == "true"; start() }
     override fun onStart() {
+        if (bingeProvider) { runBingeBangCheck(this); return }
         if (searchLayout) { runSearchLayoutCheck(this); return }
         mediaUrl?.let { runWebPlayerCheck(this, it); return }
         val report = Bundle()

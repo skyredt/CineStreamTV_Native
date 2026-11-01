@@ -104,7 +104,7 @@ fun DesignShell(tab: String, menuSignal: Int, onTab: (String) -> Unit, onTester:
             HorizontalDivider(color = Color(0xFF222222))
             Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(9.dp).clip(CircleShape).background(Color(0xFF10B981)))
-                if (expanded) Text("Cineby · DBKU", Modifier.padding(start = 12.dp), fontSize = 11.sp, color = Muted)
+                if (expanded) Text("Cineby · DBKU · BingeBang", Modifier.padding(start = 12.dp), fontSize = 11.sp, color = Muted)
             }
         }
         Box(Modifier.align(Alignment.TopEnd).padding(16.dp)) { Action("Stream Extractor API", icon = Icons.Outlined.WifiTethering, dense = true, onClick = onTester) }
@@ -174,7 +174,7 @@ fun DesignHome(catalog: DesignCatalog, tab: String, compact: Boolean, onSelect: 
                 }
             }
         }
-        item { Text("Catalog and playback sources: cineby.ws · dbku.tv", Modifier.padding(horizontal = if (compact) 24.dp else 64.dp), color = Muted, fontSize = 11.sp) }
+        item { Text("Catalog and playback sources: cineby.ws · dbku.tv · bingebang.st", Modifier.padding(horizontal = if (compact) 24.dp else 64.dp), color = Muted, fontSize = 11.sp) }
     }
 }
 

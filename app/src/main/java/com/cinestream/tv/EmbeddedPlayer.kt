@@ -31,8 +31,9 @@ import org.json.JSONObject
 fun EmbeddedPlayer(source: ProviderStream, title: String, initialPosition: Long = 0, onPosition: (Long) -> Unit = {}, onFailure: (String) -> Boolean = { false }, onBack: () -> Unit) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
-    val supported = android.net.Uri.parse(source.url).host == "play.xpass.top"
-    val script = remember { context.assets.open("tv-web-player.js").bufferedReader().use { it.readText() } }
+    val binge = android.net.Uri.parse(source.url).host == "bingebang.st"
+    val supported = binge || android.net.Uri.parse(source.url).host == "play.xpass.top"
+    val script = remember(binge) { context.assets.open(if (binge) "tv-bingebang-player.js" else "tv-web-player.js").bufferedReader().use { it.readText() } }
     var browser by remember { mutableStateOf<WebView?>(null) }
     var error by remember(source.url) { mutableStateOf<String?>(null) }
     var fullScreen by remember { mutableStateOf<View?>(null) }
@@ -120,8 +121,12 @@ fun EmbeddedPlayer(source: ProviderStream, title: String, initialPosition: Long 
                     override fun onHideCustomView() { fullScreen = null; fullScreenCallback = null }
                 }
                 webViewClient = object : WebViewClient() {
-                    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean =
-                        request.url.scheme != "https" || (request.isForMainFrame && request.url.host != android.net.Uri.parse(source.url).host)
+                    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                        if (binge && request.isForMainFrame && request.url.host == "bingebang.st" && request.url.path?.contains("/watch/") == true) {
+                            onBack(); return true
+                        }
+                        return request.url.scheme != "https" || (request.isForMainFrame && request.url.host != android.net.Uri.parse(source.url).host)
+                    }
                     override fun onPageCommitVisible(view: WebView, url: String) {
                         if (supported && android.net.Uri.parse(url).host == android.net.Uri.parse(source.url).host) view.evaluateJavascript("window.cinedbkResume=${initialPosition / 1000.0};\n" + script, null)
                     }

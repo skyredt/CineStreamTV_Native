@@ -15,8 +15,8 @@ data class SearchResults(val titles: List<DesignTitle>, val statuses: List<Provi
 internal fun filterTitles(titles: List<DesignTitle>, filters: SearchFilters): List<DesignTitle> = titles.filter { t ->
     (when (filters.mediaType) { MediaTypeFilter.ALL -> true; MediaTypeFilter.MOVIES -> !t.isTv; MediaTypeFilter.DRAMAS -> t.isTv && !t.isShort; MediaTypeFilter.SHORTS -> t.isShort }) &&
         (filters.year == "All" || t.year.toString() == filters.year) &&
-        (t.provider == "cineby" || filters.genre == "All" || t.genres.any { it.equals(filters.genre, true) }) &&
-        (t.provider == "cineby" || filters.country == "All" || t.countries.any { it.equals(filters.country, true) })
+        (t.provider in listOf("cineby", "bingebang") || filters.genre == "All" || t.genres.any { it.equals(filters.genre, true) }) &&
+        (t.provider in listOf("cineby", "bingebang") || filters.country == "All" || t.countries.any { it.equals(filters.country, true) })
 }
 internal fun sortTitles(titles: List<DesignTitle>, sort: SortOption): List<DesignTitle> = when (sort) {
     SortOption.DEFAULT -> titles

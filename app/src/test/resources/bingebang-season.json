@@ -1,0 +1,92 @@
+{
+  "episodes": [
+    {
+      "id": 2871057,
+      "episode_number": 1,
+      "name": "Pilot",
+      "overview": "After a fatal shooting, Green Lantern Hal Jordan and new recruit John Stewart set out to prove it was an extraterrestrial event.",
+      "still_path": "/eamjkYDnuDcvS1MyynI4B9nE6KL.jpg",
+      "air_date": "2026-08-16",
+      "runtime": 57,
+      "play_url": "/tv/play/lanterns-sne6ck/1/1",
+      "still_url": "https://image.tmdb.org/t/p/w300/eamjkYDnuDcvS1MyynI4B9nE6KL.jpg"
+    },
+    {
+      "id": 2871058,
+      "episode_number": 2,
+      "name": "Trust Fall",
+      "overview": "While John's middling errand ultimately proves eventful, Hal makes waves in Rushville – which only inspires him to dig deeper.",
+      "still_path": "/iHfT5NDzGxQoovTKbqkBPcyZUxJ.jpg",
+      "air_date": "2026-08-23",
+      "runtime": 52,
+      "play_url": "/tv/play/lanterns-sne6ck/1/2",
+      "still_url": "https://image.tmdb.org/t/p/w300/iHfT5NDzGxQoovTKbqkBPcyZUxJ.jpg"
+    },
+    {
+      "id": 2871059,
+      "episode_number": 3,
+      "name": "OutKast",
+      "overview": "When his dad misunderstands a contact attempt from the Guardians, John is put forth as the next best option to fulfill the Green Lantern destiny. Then, after a lifetime of preparation, John finally gets his chance to interview for the Guardians.",
+      "still_path": "/1SH9BxLQa0jyxWSe0qgDZXVzPR8.jpg",
+      "air_date": "2026-08-30",
+      "runtime": 54,
+      "play_url": "/tv/play/lanterns-sne6ck/1/3",
+      "still_url": "https://image.tmdb.org/t/p/w300/1SH9BxLQa0jyxWSe0qgDZXVzPR8.jpg"
+    },
+    {
+      "id": 2871060,
+      "episode_number": 4,
+      "name": "The Weenie",
+      "overview": "As the 48-hour deadline nears, John develops a new theory about the Manhunter's location, leading him and Hal to run their next move by Sheriff Kane. Meanwhile, Hal's visit to Sinestro has consequences.",
+      "still_path": "/i6Wz0LHsnqke3Bw0ZKmVjFfd1du.jpg",
+      "air_date": "2026-09-06",
+      "runtime": 53,
+      "play_url": "/tv/play/lanterns-sne6ck/1/4",
+      "still_url": "https://image.tmdb.org/t/p/w300/i6Wz0LHsnqke3Bw0ZKmVjFfd1du.jpg"
+    },
+    {
+      "id": 2871061,
+      "episode_number": 5,
+      "name": "Lights Out",
+      "overview": "As the Macon family's history unravels, Rushville mobilizes in the face of the escalating threat. As John is placed in an impossible position, Hal risks everything in a final attempt to take down the Manhunter.",
+      "still_path": "/gl01bQzjDH93bbMtYeHiHIuQg3r.jpg",
+      "air_date": "2026-09-13",
+      "runtime": 54,
+      "play_url": "/tv/play/lanterns-sne6ck/1/5",
+      "still_url": "https://image.tmdb.org/t/p/w300/gl01bQzjDH93bbMtYeHiHIuQg3r.jpg"
+    },
+    {
+      "id": 2871062,
+      "episode_number": 6,
+      "name": "Bad Optics",
+      "overview": "Now in business with his brother Marcus, John is on the verge of landing a major investor for his innovative take on panic rooms when an unexpected phone call pulls him back to Rushville - and everything he worked so hard to leave behind.",
+      "still_path": "/lnaPnNgtufzsNjX1V9MbcwlCIqd.jpg",
+      "air_date": "2026-09-20",
+      "runtime": 54,
+      "play_url": "/tv/play/lanterns-sne6ck/1/6",
+      "still_url": "https://image.tmdb.org/t/p/w300/lnaPnNgtufzsNjX1V9MbcwlCIqd.jpg"
+    },
+    {
+      "id": 2871063,
+      "episode_number": 7,
+      "name": "The Jordan Boys' Legacy",
+      "overview": "Finding themselves on another planet, Hal and John must put aside their fractured past to solve a murder. Along their journey, both men are forced to confront the ghosts of their pasts...and the ways their childhoods shaped who they are today.",
+      "still_path": "/2wbrXeU208WfcASX4QM9DZHPfh6.jpg",
+      "air_date": "2026-09-27",
+      "runtime": 48,
+      "play_url": "/tv/play/lanterns-sne6ck/1/7",
+      "still_url": "https://image.tmdb.org/t/p/w300/2wbrXeU208WfcASX4QM9DZHPfh6.jpg"
+    },
+    {
+      "id": 2871064,
+      "episode_number": 8,
+      "name": "Dirt and Stars",
+      "overview": "As John and Hal draw closer to the truth, John comes to an unexpected understanding with Sheriff Kane... just as a chilling new discovery emerges.",
+      "still_path": "/3xZjKw6EsojXfH1cMTzzRfBBka3.jpg",
+      "air_date": "2026-10-04",
+      "runtime": 57,
+      "play_url": "/tv/play/lanterns-sne6ck/1/8",
+      "still_url": "https://image.tmdb.org/t/p/w300/3xZjKw6EsojXfH1cMTzzRfBBka3.jpg"
+    }
+  ]
+}
