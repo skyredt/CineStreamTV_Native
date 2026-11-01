@@ -336,7 +336,7 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
             OutlinedTextField(
                 value = inputQuery,
                 onValueChange = { inputQuery = it },
-                modifier = Modifier.fillMaxWidth().padding(top = 40.dp).testTag("search-input").focusRequester(queryFocus).focusProperties { down = filterFocus },
+                modifier = Modifier.fillMaxWidth().padding(top = if (narrow) 48.dp else 40.dp).testTag("search-input").focusRequester(queryFocus).focusProperties { down = filterFocus },
                 placeholder = { Text("Search titles / 搜索中文片名") },
                 leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Accent) },
                 singleLine = true,

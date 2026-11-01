@@ -20,6 +20,8 @@ import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import java.io.File
@@ -70,13 +72,20 @@ internal fun runSearchLayoutCheck(runner: Instrumentation) = with(runner) {
             state.searchState.results = titles
             activity.setContent {
                 MaterialTheme(colorScheme = darkColorScheme()) {
+                    val inputModeManager = LocalInputModeManager.current
+                    var remoteReady by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        inputModeManager.requestInputMode(InputMode.Keyboard)
+                        remoteReady = true
+                    }
                     var detail by remember { mutableStateOf<DesignTitle?>(null) }
                     var exited by remember { mutableStateOf(false) }
                     BackHandler { if (detail != null) detail = null else exited = true }
                     Surface(Modifier.fillMaxSize()) {
                         DesignShell("search", 0, {}, {}) { compact ->
                             Box(Modifier.fillMaxSize().semantics { testTagsAsResourceId = true }) {
-                                if (exited) Text("Exited search")
+                                if (!remoteReady) Text("Preparing remote input")
+                                else if (exited) Text("Exited search")
                                 else if (detail != null) DesignDetails(detail!!, compact, { detail = null }, {})
                                 else DesignSearch(titles, compact, state) { detail = it }
                             }
