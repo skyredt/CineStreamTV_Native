@@ -104,7 +104,7 @@ fun DesignShell(tab: String, menuSignal: Int, onTab: (String) -> Unit, onTester:
             HorizontalDivider(color = Color(0xFF222222))
             Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(9.dp).clip(CircleShape).background(Color(0xFF10B981)))
-                if (expanded) Text("Cineby · DBKU · BingeBang", Modifier.padding(start = 12.dp), fontSize = 11.sp, color = Muted)
+                if (expanded) Text("Cineby · DBKU · BingeBang · 红果", Modifier.padding(start = 12.dp), fontSize = 11.sp, color = Muted)
             }
         }
         Box(Modifier.align(Alignment.TopEnd).padding(16.dp)) { Action("Stream Extractor API", icon = Icons.Outlined.WifiTethering, dense = true, onClick = onTester) }
@@ -174,7 +174,7 @@ fun DesignHome(catalog: DesignCatalog, tab: String, compact: Boolean, onSelect: 
                 }
             }
         }
-        item { Text("Catalog and playback sources: cineby.ws · dbku.tv · bingebang.st", Modifier.padding(horizontal = if (compact) 24.dp else 64.dp), color = Muted, fontSize = 11.sp) }
+        item { Text("Catalog and playback sources: cineby.ws · dbku.tv · bingebang.st · hongguoduanju.com", Modifier.padding(horizontal = if (compact) 24.dp else 64.dp), color = Muted, fontSize = 11.sp) }
     }
 }
 
@@ -190,7 +190,7 @@ fun DesignPoster(title: DesignTitle, onSelect: (DesignTitle) -> Unit, modifier: 
         Text(title.quality, Modifier.align(Alignment.TopEnd).padding(10.dp).background(Color(0xBF000000), RoundedCornerShape(4.dp)).border(1.dp, Accent.copy(alpha = .3f), RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp), color = Color(0xFF67E8F9), fontSize = 9.sp, fontWeight = FontWeight.ExtraBold)
         Column(Modifier.align(Alignment.BottomStart).padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(title.title, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("★ ${title.rating}", color = Gold, fontSize = 11.sp); Text("${title.year}", color = Muted, fontSize = 11.sp) }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("★ ${title.rating}", color = Gold, fontSize = 11.sp); Text(if (title.provider == "hongguo" && title.year == 0) "—" else "${title.year}", color = Muted, fontSize = 11.sp) }
         }
         if (focused) Box(Modifier.fillMaxSize().background(Color(0x33083642)), contentAlignment = Alignment.Center) { Box(Modifier.size(48.dp).clip(CircleShape).background(Accent), contentAlignment = Alignment.Center) { Icon(Icons.Outlined.PlayArrow, "Open details", tint = Color.Black, modifier = Modifier.size(28.dp)) } }
     }
@@ -206,19 +206,20 @@ fun DesignDetails(title: DesignTitle, compact: Boolean, onBack: () -> Unit, onPl
         item {
             Box(Modifier.fillMaxWidth().height(if (compact) 540.dp else 480.dp)) {
                 CinematicBackdrop(title, Modifier.fillMaxSize())
-                Box(Modifier.align(Alignment.TopStart).padding(start = padding, top = 24.dp)) { Action("Back to Catalog", icon = Icons.Outlined.ArrowBack, dense = true, onClick = onBack) }
+                Box(Modifier.align(Alignment.TopStart).padding(start = padding, top = 24.dp)) { Action("Back to Catalog", icon = Icons.Outlined.ArrowBack, dense = true, requester = if (title.provider == "hongguo") first else null, onClick = onBack) }
                 Column(Modifier.align(Alignment.BottomStart).padding(start = padding, end = padding, bottom = 32.dp).widthIn(max = 740.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Metadata(title, compact, details = true)
                     Text(title.title, fontSize = if (compact) 32.sp else 48.sp, fontWeight = FontWeight.Black, lineHeight = if (compact) 36.sp else 52.sp)
                     Text(title.overview, color = Color.LightGray, fontSize = 14.sp, lineHeight = 22.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
                     Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Action(if (!title.isTv) "Play Movie" else title.seasons.firstOrNull()?.episodes?.firstOrNull()?.let { if (title.provider == "dbku") "Play ${it.title}" else "Play S${it.season}:E${it.number}" } ?: "No episodes available", primary = true, icon = Icons.Outlined.PlayArrow, requester = first) { onPlay(title.seasons.firstOrNull()?.episodes?.firstOrNull()) }
+                        if (title.provider == "hongguo") Text(title.playbackNotice, color = Muted, fontSize = 12.sp)
+                        else Action(if (!title.isTv) "Play Movie" else title.seasons.firstOrNull()?.episodes?.firstOrNull()?.let { if (title.provider == "dbku") "Play ${it.title}" else "Play S${it.season}:E${it.number}" } ?: "No episodes available", primary = true, icon = Icons.Outlined.PlayArrow, requester = first) { onPlay(title.seasons.firstOrNull()?.episodes?.firstOrNull()) }
                         if (!compact) Text("Source: ${title.provider.uppercase()}", color = Muted, fontSize = 11.sp)
                     }
                 }
             }
         }
-        if (title.provider == "dbku" && title.seasons.isNotEmpty()) {
+        if (title.provider in listOf("dbku", "hongguo") && title.seasons.isNotEmpty()) {
             item { DbkuEpisodes(title, onPlay) }
         } else if (title.seasons.isNotEmpty()) {
             item {
@@ -382,6 +383,19 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
 private fun androidx.compose.foundation.lazy.LazyListScope.searchFilterItems(
     inputQuery: String, searchState: SearchState, state: StreamingState, onQuery: (String) -> Unit
 ) {
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("红果分类 · 空关键词浏览", fontSize = 10.sp, color = Muted)
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    HONGGUO_CATEGORIES.forEach { (id, label) ->
+                        FilterPill(label, selected = searchState.filters.hongguoCategory == id) {
+                            state.search(inputQuery, searchState.filters.copy(hongguoCategory = id), 1)
+                        }
+                    }
+                }
+                Text("新剧排序未提供；红果播放暂不支持。", fontSize = 10.sp, color = Muted)
+            }
+        }
         // Search Filters Section
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

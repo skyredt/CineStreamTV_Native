@@ -106,6 +106,7 @@ class BingeBangTest {
     @Test fun failedBingeCatalogDoesNotRemoveExistingProviderRows() = runBlocking<Unit> {
         val repository = ProvidersRepository { url, _ -> when {
             url.startsWith(ProvidersRepository.BINGEBANG) -> throw SocketTimeoutException("catalog timeout")
+            url.startsWith(ProvidersRepository.HONGGUO) -> "<script>_ROUTER_DATA = {\"loaderData\":{\"page\":{\"isSuccess\":true,\"homeSections\":[]}}};</script>"
             url.startsWith(ProvidersRepository.CINEBY) -> "<article class='content-card'><a href='/movie/example'><h3 class='card-title'>Film</h3></a></article>"
             else -> "<div class='myui-panel'><div class='myui-panel__head'><h3 class='title'>陆剧</h3></div><a class='myui-vodlist__thumb' href='/voddetail/1.html' title='剧集'></a></div>"
         } }

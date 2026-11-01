@@ -2,7 +2,7 @@ package com.cinestream.tv
 
 enum class MediaTypeFilter(val label: String) { ALL("All"), MOVIES("Movies"), DRAMAS("Dramas"), SHORTS("Shorts") }
 enum class SortOption(val label: String) { DEFAULT("Provider order"), RATING("Rating"), YEAR("Newest release"), TITLE("Title") }
-data class SearchFilters(val mediaType: MediaTypeFilter = MediaTypeFilter.ALL, val genre: String = "All", val year: String = "All", val country: String = "All", val sort: SortOption = SortOption.DEFAULT) {
+data class SearchFilters(val mediaType: MediaTypeFilter = MediaTypeFilter.ALL, val genre: String = "All", val year: String = "All", val country: String = "All", val sort: SortOption = SortOption.DEFAULT, val hongguoCategory: String = "real-drama") {
     val isActive get() = this != SearchFilters()
 }
 object FilterOptions {
@@ -15,8 +15,8 @@ data class SearchResults(val titles: List<DesignTitle>, val statuses: List<Provi
 internal fun filterTitles(titles: List<DesignTitle>, filters: SearchFilters): List<DesignTitle> = titles.filter { t ->
     (when (filters.mediaType) { MediaTypeFilter.ALL -> true; MediaTypeFilter.MOVIES -> !t.isTv; MediaTypeFilter.DRAMAS -> t.isTv && !t.isShort; MediaTypeFilter.SHORTS -> t.isShort }) &&
         (filters.year == "All" || t.year.toString() == filters.year) &&
-        (t.provider in listOf("cineby", "bingebang") || filters.genre == "All" || t.genres.any { it.equals(filters.genre, true) }) &&
-        (t.provider in listOf("cineby", "bingebang") || filters.country == "All" || t.countries.any { it.equals(filters.country, true) })
+        (t.provider in listOf("cineby", "bingebang", "hongguo") || filters.genre == "All" || t.genres.any { it.equals(filters.genre, true) }) &&
+        (t.provider in listOf("cineby", "bingebang", "hongguo") || filters.country == "All" || t.countries.any { it.equals(filters.country, true) })
 }
 internal fun sortTitles(titles: List<DesignTitle>, sort: SortOption): List<DesignTitle> = when (sort) {
     SortOption.DEFAULT -> titles

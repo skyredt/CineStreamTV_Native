@@ -19,6 +19,7 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
         const val CINEBY = "https://cineby.ws"
         const val DBKU = "https://www.dbku.tv"
         const val BINGEBANG = "https://bingebang.st"
+        const val HONGGUO = "https://hongguoduanju.com"
         const val AGENT = "Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 Chrome/130.0.0.0 Mobile Safari/537.36 CineStream/1.1"
     }
     private val detailsCache = mutableMapOf<String, DesignTitle>()
@@ -38,7 +39,8 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
                 DesignRow("bingebang-$type", name, "BingeBang", parseBingeList(request("$BINGEBANG/api/list/trending_${type}_week?limit=24")))
             }.filter { it.titles.isNotEmpty() }
         } }
-        val rows = cine.await().getOrElse { if (it is CancellationException) throw it; warnings += "Cineby: ${it.message}"; emptyList() } + dbku.await().getOrElse { if (it is CancellationException) throw it; warnings += "DBKU: ${it.message}"; emptyList() } + binge.await().getOrElse { if (it is CancellationException) throw it; warnings += "BingeBang: ${it.message}"; emptyList() }
+        val hongguo = async { runCatching { parseHongguoHome(request("$HONGGUO/")) } }
+        val rows = cine.await().getOrElse { if (it is CancellationException) throw it; warnings += "Cineby: ${it.message}"; emptyList() } + dbku.await().getOrElse { if (it is CancellationException) throw it; warnings += "DBKU: ${it.message}"; emptyList() } + binge.await().getOrElse { if (it is CancellationException) throw it; warnings += "BingeBang: ${it.message}"; emptyList() } + hongguo.await().getOrElse { if (it is CancellationException) throw it; warnings += "Hongguo: ${it.message}"; emptyList() }
         if (rows.isEmpty()) error(warnings.joinToString("\n").ifBlank { "The providers returned no catalog entries." })
         val titles = rows.flatMap { it.titles }.distinctBy { it.id }.toMutableList()
         if (titles.none { it.featured }) titles[0] = titles[0].copy(featured = true)
@@ -48,6 +50,7 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
         synchronized(detailsCache) { detailsCache[title.id] } ?: run {
             val doc = Jsoup.parse(request(title.pageUrl), title.pageUrl)
             val value = when (title.provider) {
+                "hongguo" -> parseHongguoDetails(title, doc.outerHtml())
                 "bingebang" -> {
                     val data = JSONObject(doc.selectFirst("script[data-detail-payload]")?.data() ?: error("BingeBang detail payload was not found."))
                     val detail = parseBingeDetails(title, data)
@@ -75,7 +78,7 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
     suspend fun searchWithFilters(query: String, filters: SearchFilters = SearchFilters(), page: Int = 1, nextPages: Map<String, String> = emptyMap()): SearchResults = withContext(Dispatchers.IO) {
         val value = URLEncoder.encode(query.trim(), "UTF-8")
         val dbkuBrowse = filters.genre != "All" || filters.country != "All"
-        val initial = mutableMapOf("cineby" to "$CINEBY/search?q=$value&type=all", "bingebang" to "$BINGEBANG/api/search/multi?query=$value")
+        val initial = mutableMapOf("cineby" to "$CINEBY/search?q=$value&type=all", "bingebang" to "$BINGEBANG/api/search/multi?query=$value", "hongguo" to hongguoSearchUrl(query, filters.hongguoCategory))
         if (dbkuBrowse) {
             val types = when (filters.mediaType) { MediaTypeFilter.MOVIES -> listOf(1); MediaTypeFilter.DRAMAS -> listOf(2, 4); MediaTypeFilter.SHORTS -> listOf(21); else -> listOf(1, 2, 4, 21) }
             types.forEach { type -> initial["dbku:$type"] = dbkuFilterUrl(type, filters) }
@@ -88,7 +91,8 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
                 requireProviderPage(provider, url)
                 val html = request(url)
                 val doc = Jsoup.parse(html, url)
-                var titles = if (provider == "bingebang") parseBingeList(html) else if (provider == "cineby") parseCinebySearch(html) else if (provider.startsWith("dbku:")) parseDbkuBrowse(doc, provider.substringAfter(':').toInt(), filters).filter { query.isBlank() || it.title.contains(query.trim(), true) } else parseDbkuSearch(html)
+                val hongguoResult = if (provider == "hongguo") parseHongguoSearch(html, url) else null
+                var titles = if (hongguoResult != null) hongguoResult.first else if (provider == "bingebang") parseBingeList(html) else if (provider == "cineby") parseCinebySearch(html) else if (provider.startsWith("dbku:")) parseDbkuBrowse(doc, provider.substringAfter(':').toInt(), filters).filter { query.isBlank() || it.title.contains(query.trim(), true) } else parseDbkuSearch(html)
                 var metadataFailures = 0
                 if (provider.startsWith("dbku") && ((metadataNeeded && !dbkuBrowse) || filters.year != "All" || filters.sort == SortOption.YEAR)) titles = coroutineScope { titles.map { title -> async {
                     permits.acquire()
@@ -96,7 +100,7 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
                     catch (_: Exception) { synchronized(permits) { metadataFailures++ }; title }
                     finally { permits.release() }
                 } }.awaitAll() }
-                Triple(titles, ProviderSearchStatus(provider, titles.size, message = if (metadataFailures > 0) "$metadataFailures title details unavailable" else null), if (provider == "bingebang") null else nextSearchPage(doc, provider, url))
+                Triple(titles, ProviderSearchStatus(provider, titles.size, message = if (provider == "hongguo") "红果：暂不支持播放；新剧排序与逐集锁定状态未提供。分类仅用于空关键词浏览。" else if (metadataFailures > 0) "$metadataFailures title details unavailable" else null), if (provider == "hongguo") hongguoResult?.second else if (provider == "bingebang") null else nextSearchPage(doc, provider, url))
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) { Triple(emptyList(), ProviderSearchStatus(provider, 0, error = e.message ?: "Request failed"), url.takeIf { page > 1 }) }
         } }.awaitAll()
@@ -104,12 +108,13 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
         val titles = responses.flatMap { it.first }.distinctBy { it.id }
         val next = responses.mapNotNull { it.third?.let { url -> it.second.provider to url } }.toMap()
         SearchResults(sortTitles(filterTitles(titles, filters), filters.sort), statuses,
-            if (filters.isActive) "Country and Chinese genre: DBKU only. In this mode DBKU searches title text within filtered catalog pages; load more for older titles. Cineby and BingeBang ignore these two filters. BingeBang returns one search batch; remote pagination is not provided. Other filters/sorting apply to loaded results." else null, next)
+            if (filters.isActive) "Country and Chinese genre: DBKU only. In this mode DBKU searches title text within filtered catalog pages; load more for older titles. Cineby, BingeBang and Hongguo ignore these two filters. BingeBang returns one search batch; remote pagination is not provided. Other filters/sorting apply to loaded results." else null, next)
     }
 
     suspend fun search(query: String): List<DesignTitle> = searchWithFilters(query).titles
 
     suspend fun sources(title: DesignTitle, episode: DesignEpisode?): List<ProviderStream> = withContext(Dispatchers.IO) {
+        require(title.provider != "hongguo") { HONGGUO_NOTICE }
         val detail = details(title)
         if (title.provider == "bingebang") return@withContext listOf(bingeStream(detail, episode))
         val sources = if (title.provider == "dbku") {
@@ -236,7 +241,7 @@ internal fun parseDbkuDetails(title: DesignTitle, doc: Document): DesignTitle {
 
 internal fun requireProviderPage(provider: String, url: String) {
     val uri = URI(url)
-    val host = when (provider) { "cineby" -> "cineby.ws"; "bingebang" -> "bingebang.st"; else -> "www.dbku.tv" }
+    val host = when (provider) { "cineby" -> "cineby.ws"; "bingebang" -> "bingebang.st"; "hongguo" -> "hongguoduanju.com"; else -> "www.dbku.tv" }
     require(uri.scheme == "https" && uri.host == host && uri.userInfo == null) { "Invalid provider page URL" }
 }
 internal fun nextSearchPage(doc: Document, provider: String, current: String): String? {

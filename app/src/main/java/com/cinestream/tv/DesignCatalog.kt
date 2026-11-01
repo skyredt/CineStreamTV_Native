@@ -5,9 +5,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 data class DesignCast(val name: String, val role: String, val image: String)
-data class DesignEpisode(val id: String, val number: Int, val season: Int, val title: String, val overview: String, val image: String, val minutes: Int, val date: String, val pageUrl: String = "")
+data class DesignEpisode(val id: String, val number: Int, val season: Int, val title: String, val overview: String, val image: String, val minutes: Int, val date: String, val pageUrl: String = "", val availability: String = "")
 data class DesignSeason(val number: Int, val name: String, val episodes: List<DesignEpisode>)
-data class DesignTitle(val id: String, val title: String, val tagline: String, val overview: String, val poster: String, val backdrop: String, val year: Int, val rating: String, val quality: String, val genres: List<String>, val isTv: Boolean, val featured: Boolean, val minutes: Int, val cast: List<DesignCast>, val seasons: List<DesignSeason>, val provider: String = "", val pageUrl: String = "", val playbackPage: String = "", val countries: List<String> = emptyList(), val isShort: Boolean = false)
+data class DesignTitle(val id: String, val title: String, val tagline: String, val overview: String, val poster: String, val backdrop: String, val year: Int, val rating: String, val quality: String, val genres: List<String>, val isTv: Boolean, val featured: Boolean, val minutes: Int, val cast: List<DesignCast>, val seasons: List<DesignSeason>, val provider: String = "", val pageUrl: String = "", val playbackPage: String = "", val countries: List<String> = emptyList(), val isShort: Boolean = false, val playbackNotice: String = "")
 data class DesignRow(val id: String, val title: String, val tag: String, val titles: List<DesignTitle>)
 data class DesignCatalog(val titles: List<DesignTitle>, val rows: List<DesignRow>) {
     companion object {

@@ -17,6 +17,7 @@ fun DbkuEpisodes(title: DesignTitle, onPlay: (DesignEpisode?) -> Unit) {
     var page by rememberSaveable(title.id, group) { mutableIntStateOf(0) }
     var jump by rememberSaveable(title.id) { mutableStateOf("") }
     var jumpError by remember { mutableStateOf<String?>(null) }
+    val catalogOnly = title.provider == "hongguo"
     val seasons = title.seasons
     val episodes = seasons[group.coerceIn(seasons.indices)].episodes
     val pages = episodes.chunked(EPISODES_PER_PAGE)
@@ -34,6 +35,10 @@ fun DbkuEpisodes(title: DesignTitle, onPlay: (DesignEpisode?) -> Unit) {
             }
         }
         jumpError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+        if (catalogOnly) {
+            Text(title.playbackNotice, color = Muted)
+            episodes.firstOrNull { it.number == jump.toIntOrNull() }?.let { Text("${it.title} · ${it.availability}", color = Accent) }
+        }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(pages.size) { index ->
                 val range = pages[index]
@@ -42,7 +47,7 @@ fun DbkuEpisodes(title: DesignTitle, onPlay: (DesignEpisode?) -> Unit) {
         }
         pages.getOrNull(page)?.chunked(5)?.forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                row.forEach { episode -> Action(episode.title, Modifier.weight(1f), primary = episode.number == jump.toIntOrNull(), dense = true) { onPlay(episode) } }
+                row.forEach { episode -> Action(episode.title, Modifier.weight(1f), primary = episode.number == jump.toIntOrNull(), dense = true) { if (catalogOnly) jump = episode.number.toString() else onPlay(episode) } }
                 repeat(5 - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }

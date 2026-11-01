@@ -1,0 +1,141 @@
+{
+  "loaderData": {
+    "page": {
+      "isSuccess": true,
+      "homeSections": [
+        {
+          "tab_type": "all",
+          "tab_name": "热播短剧",
+          "video_list": [
+            {
+              "series_id": "7690961604636052505",
+              "episode_cnt": 46,
+              "pay_type": 0,
+              "series_title": "军需处长的账本",
+              "series_intro": "",
+              "series_cover": "https://p3-novel.byteimg.com/novel-pic/b64c314274460ede0cc7bddc1b7cea58~tplv-shrink:640:0.image",
+              "vid_list": []
+            },
+            {
+              "series_id": "7683373426689461273",
+              "episode_cnt": 63,
+              "pay_type": 0,
+              "series_title": "扁担银行",
+              "series_intro": "",
+              "series_cover": "https://p3-novel.byteimg.com/novel-pic/d83f5907ac9dfb0ca40110b1663b16f3~tplv-shrink:640:0.image",
+              "vid_list": []
+            },
+            {
+              "series_id": "7695727473111092286",
+              "episode_cnt": 90,
+              "pay_type": 0,
+              "series_title": "一个人的长征",
+              "series_intro": "",
+              "series_cover": "https://p6-novel.byteimg.com/novel-pic/8ff10b53078f292f001ca2a386e859b9~tplv-shrink:640:0.image",
+              "vid_list": []
+            }
+          ]
+        },
+        {
+          "tab_type": "human",
+          "tab_name": "热播真人剧",
+          "video_list": [
+            {
+              "series_id": "7701935931787316286",
+              "episode_cnt": 102,
+              "pay_type": 0,
+              "series_title": "十八岁太奶奶驾到，重整家族荣耀第五部",
+              "series_intro": "",
+              "series_cover": "https://p6-novel.byteimg.com/novel-pic/84a71f1a5d7ef5c9c16a73b74011ef75~tplv-shrink:640:0.image",
+              "vid_list": []
+            },
+            {
+              "series_id": "7701334722449787928",
+              "episode_cnt": 96,
+              "pay_type": 0,
+              "series_title": "一念沉沦，霍总心动了",
+              "series_intro": "",
+              "series_cover": "https://p6-novel.byteimg.com/novel-pic/adef31dd5cafc28d1cb9d52b0c5e2818~tplv-shrink:640:0.image",
+              "vid_list": []
+            },
+            {
+              "series_id": "7699683909419666457",
+              "episode_cnt": 78,
+              "pay_type": 0,
+              "series_title": "归路",
+              "series_intro": "",
+              "series_cover": "https://p6-novel.byteimg.com/novel-pic/38921e1ebf5bfbda4a8b987580c414cb~tplv-shrink:640:0.image",
+              "vid_list": []
+            }
+          ]
+        },
+        {
+          "tab_type": "comic",
+          "tab_name": "热播漫剧",
+          "video_list": [
+            {
+              "series_id": "7701226234214108185",
+              "episode_cnt": 300,
+              "pay_type": 0,
+              "series_title": "聚宝仙盆之杂灵根才是真BOSS第十五季",
+              "series_intro": "",
+              "series_cover": "https://p6-novel.byteimg.com/novel-pic/63068305b1260ed6e32da41a60f539e5~tplv-shrink:640:0.image",
+              "vid_list": []
+            },
+            {
+              "series_id": "7698294694886788121",
+              "episode_cnt": 987,
+              "pay_type": 0,
+              "series_title": "和离后我带女儿横扫魔域",
+              "series_intro": "",
+              "series_cover": "https://p3-novel.byteimg.com/novel-pic/c37eb63db868db08eb95e0d8bacd0129~tplv-shrink:640:0.image",
+              "vid_list": []
+            },
+            {
+              "series_id": "7701567939715025944",
+              "episode_cnt": 272,
+              "pay_type": 0,
+              "series_title": "满院亲戚全是上古大妖第六季",
+              "series_intro": "",
+              "series_cover": "https://p6-novel.byteimg.com/novel-pic/fb1c1c48fe7d5e4069ccdd2b0f2b9387~tplv-shrink:640:0.image",
+              "vid_list": []
+            }
+          ]
+        },
+        {
+          "tab_type": "ai",
+          "tab_name": "热播AI剧",
+          "video_list": [
+            {
+              "series_id": "7697622096326708286",
+              "episode_cnt": 100,
+              "pay_type": 0,
+              "series_title": "退役归来，这个保镖不好惹",
+              "series_intro": "",
+              "series_cover": "https://p3-novel.byteimg.com/novel-pic/8824990000958fbdb28fb29dca9da667~tplv-shrink:640:0.image",
+              "vid_list": []
+            },
+            {
+              "series_id": "7697612795184958489",
+              "episode_cnt": 106,
+              "pay_type": 0,
+              "series_title": "备用联系人（完）",
+              "series_intro": "",
+              "series_cover": "https://p3-novel.byteimg.com/novel-pic/f68c6dc9abe69af4b32848b17afd8f1d~tplv-shrink:640:0.image",
+              "vid_list": []
+            },
+            {
+              "series_id": "7698311709634595864",
+              "episode_cnt": 155,
+              "pay_type": 0,
+              "series_title": "分家没我份，破院枯井全是金条",
+              "series_intro": "",
+              "series_cover": "https://p6-novel.byteimg.com/novel-pic/26b468fe5006ab210b6024b0c9f15f40~tplv-shrink:640:0.image",
+              "vid_list": []
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
