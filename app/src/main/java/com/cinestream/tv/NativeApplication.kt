@@ -28,6 +28,13 @@ import kotlinx.coroutines.*
 
 class CineStreamApp : Application() { val providers = ProvidersRepository() }
 class MainActivity : ComponentActivity() {
+    var webPlayerKeyHandler: ((android.view.KeyEvent) -> Boolean)? = null
+    // AndroidX core annotates its public Activity override as library-only; TV key routing requires this framework hook.
+    @android.annotation.SuppressLint("RestrictedApi")
+    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+        if (webPlayerKeyHandler?.invoke(event) == true) return true
+        return super.dispatchKeyEvent(event)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN, android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -178,7 +185,7 @@ fun TvAppNavigation(state: StreamingState) {
                 else PlayerScreen(stream.url, state.playingTitle, headers = if (stream.referer.isBlank()) emptyMap() else mapOf("Referer" to stream.referer), initialPosition = state.playbackPosition, onPosition = { state.playbackPosition = it }, onFailure = state::sourceFailed, onBack = { state.back() })
             }
             state.sourceNotice?.let { message -> Text(message, Modifier.align(Alignment.TopCenter).padding(top = 70.dp).background(Color(0xEE101010)).padding(12.dp), color = Accent) }
-            if (state.streams.size > 1) Box(Modifier.align(Alignment.TopEnd).padding(16.dp)) { Action("Source: ${stream.name}", dense = true) { sourcePicker = true } }
+            if (state.streams.size > 1 && !stream.embedded) Box(Modifier.align(Alignment.TopEnd).padding(16.dp)) { Action("Source: ${stream.name}", dense = true) { sourcePicker = true } }
         } else {
             DesignShell(state.tab, menuSignal, onTab = state::navigate, onTester = { tester = true }) { compact ->
                 when {

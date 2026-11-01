@@ -10,9 +10,11 @@ import android.view.accessibility.AccessibilityNodeInfo
 
 /** Device smoke test using the actual TV UI, live providers, and Unicode accessibility input. */
 class TvSmokeRunner : Instrumentation() {
+    private var mediaUrl: String? = null
     private val passed = mutableListOf<String>()
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); start() }
+    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); mediaUrl = arguments?.getString("mediaUrl"); start() }
     override fun onStart() {
+        mediaUrl?.let { runWebPlayerCheck(this, it); return }
         val report = Bundle()
         try {
             startActivitySync(Intent().setClassName(targetContext.packageName, "${targetContext.packageName}.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))

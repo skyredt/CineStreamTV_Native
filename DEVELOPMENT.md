@@ -1,9 +1,7 @@
-# CineDBKTV 1.3.1
+# CineDBKTV 1.3.2
 
-Debug APK compiled successfully; 16 unit tests passed and Android lint reports 0 errors. This is a TV testing candidate, not a claim of complete device verification. See VERIFICATION.md for the precise limits.
+Cineby Xpass uses one fullscreen provider player. Physical remote arrows navigate actual controls; Center activates them. The selected timeline alone receives seek arrows. Quality and subtitle choices come from the source. No on-screen remote graphic. DBKU native playback and catalog design are unchanged. Phone and TV launchers retained.
 
-Implemented: compact DBKU episode ranges and jump field; shared draggable timeline for native media and supported Cineby Xpass playback; Cineby remote volume, scrubbing and play/pause; Menu source selection; same-selection source fallback with a notice; DBKU-only country and Chinese genre filters; CineDBKTV display name.
+Build and 16 unit tests pass; lint has no errors. Emulator confirms fullscreen layout and remote access to the actual quality menu. See VERIFICATION.md for unfinished physical-TV checks. This is a test candidate, not a claim that all sources work.
 
-Private signing keys, APKs, caches, emulator captures and local SDK configuration are excluded from source control. The original main commit remains in repository history. Source is maintained on development/cinedbktv-1.3 and synchronized to main after build verification.
-
-Version 1.3.1 restores the phone launcher and makes Leanback optional. TV launcher and landscape interface are retained. Version code increments to 8 for installation over 1.3.0. Main remains unchanged; this development branch contains the updates.
+Source is maintained on development/cinedbktv-1.3. Main remains unchanged. APKs, keys, caches and temporary provider URLs are excluded from source control.

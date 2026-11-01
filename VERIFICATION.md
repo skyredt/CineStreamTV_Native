@@ -1,22 +1,15 @@
-# CineDBKTV 1.3.1 — phone launcher update
+# CineDBKTV 1.3.2 verification — 1 November 2026
 
-- Build succeeded: assembleDebug, testDebugUnitTest, lintDebug. The 16 existing tests remain passing (up-to-date); Android lint reports 0 errors and 14 warnings.
-- APK binary inspected with aapt: version code 8, version 1.3.1, application label CineDBKTV, both standard LAUNCHER and LEANBACK_LAUNCHER activities present, Leanback optional.
-- APK signature verified with apksigner. Application ID and signing identity unchanged so this updates the existing app. TV interface and landscape orientation unchanged.
-- This revision was not installed or tested on a phone by the agent. The launcher configuration was verified in the compiled APK.
-- APK SHA256: c72bfe30846bcc1fc75d4f224440fc194811846777154efa218cebe5cef3c416
+- assembleDebug, testDebugUnitTest and lintDebug completed successfully in build-1.3.2-verified.log. 16 tests, 0 failures; lint 0 errors, 14 warnings.
+- APK installed in Android TV API 34 emulator. Production EmbeddedPlayer loaded a real published Cineby/Xpass episode source. Playback advanced; source buffering was also observed.
+- Final packaged APK: Android remote key events moved through Pause, Forward, Rewind, Mute, Servers and Settings without entering the timeline. Center opened the actual quality menu showing Auto, 1080p and 720p.
+- Player measured 961.995 x 540.998 CSS pixels against viewport 962 x 541. Video preserves aspect ratio and encoded black bars.
+- Earlier component inspection successfully changed actual JW quality to 720p; final packaged APK quality-change and Back recheck were interrupted when the emulator stopped. These remain physical-TV acceptance checks.
+- Tested source reported captions Off only. No missing tracks are invented. Other sources, subtitle selection, timeline interaction, phone touch behavior and DBKU regression playback require further device testing.
+- No on-screen D-pad is rendered (FloatingRemote has no call sites). Native duplicate timeline/header and global Cineby arrow-volume mapping removed. Arrows on a selected timeline may seek; arrows over buttons navigate.
+- Live transcription is not implemented. Existing provider subtitle options remain provider-dependent.
+- No physical TV tested by the agent. This is a debug TV test candidate, version 1.3.2 / code 9. Phone launcher retained. No private signing key created or changed.
+- SHA256: ccf2376a0ce2587dabbdc2f5c6cb05ebeb8146fa7cd33f48875fd3a90a8a93d5
 
-Previous revision verification follows.
-
-# CineDBKTV 1.3.0 verification — 1 November 2026 (Singapore)
-
-- Final build: BUILD SUCCESSFUL. Tasks: assembleDebug, testDebugUnitTest, lintDebug, assembleDebugAndroidTest. See build-1.3-delivery.log locally.
-- Unit tests: 16 passed; 0 failures/errors. Covers provider mapping, captured Lanterns and Chinese search results, exact episode links, DBKU-only filter scope, episode ranges, seek bounds/acceleration, and source failover exhaustion.
-- Android lint: 0 errors, 14 warnings. Warnings mainly concern available dependency upgrades, TV resource densities, fixed landscape, WebView JavaScript and backup declarations.
-- Final APK signature verified with apksigner. Package com.cinestream.tv, version code 7, version 1.3.0, label CineDBKTV, minimum SDK 26, target/compile SDK 35, TV launcher.
-- Emulator: APK installation and startup succeeded. Live search and Lanterns details were visually observed. The full accessibility-based smoke suite did NOT complete; it was stopped after slow navigation to respect the requested budget. Process-crashed output in the smoke log followed deliberate test termination and is not evidence of a spontaneous application crash. The final remote-focus adjustments were compiled and checked, but have NOT been verified on a device.
-- Physical TV: not tested for version 1.3.0. User testing remains required for Cineby remote volume, seeking, source fallback, and very long DBKU episode lists.
-- Native playback and the Cineby Xpass host share a timeline. Other embedded hosts retain provider controls. App source-switch notices cannot observe a provider's internal CDN/source changes. DBKU filtered search checks loaded filtered catalog pages, with explicit load-more support.
-- Original archive and existing native project preserved. Source backup: ../backups/v1.2.0_20261101_043808. No release signing key generated or changed.
-
-APK SHA256: b37372c6c74bcf3da7ce46878efbbf7749fd2edaea4cb609b37391b77cc3ba52
+Build with Java 17 and D: SDK/cache: .\gradlew.bat --offline --no-daemon --console=plain assembleDebug testDebugUnitTest lintDebug
+Install: D:\AndroidSdk\platform-tools\adb.exe install -r CineDBKTV-1.3.2.apk
