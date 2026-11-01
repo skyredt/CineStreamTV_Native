@@ -49,6 +49,11 @@ class MainActivity : ComponentActivity() {
 }
 
 class SearchState {
+    var filtersExpanded by mutableStateOf(true)
+    var scrollIndex = 0
+    var scrollOffset = 0
+    var focusedResultId by mutableStateOf<String?>(null)
+    var restoreResultFocus by mutableStateOf(false)
     var query by mutableStateOf("")
     var filters by mutableStateOf(SearchFilters())
     var results by mutableStateOf<List<DesignTitle>>(emptyList())

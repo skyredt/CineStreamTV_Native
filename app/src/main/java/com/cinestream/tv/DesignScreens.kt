@@ -1,11 +1,13 @@
 package com.cinestream.tv
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,6 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -72,7 +76,7 @@ fun DesignShell(tab: String, menuSignal: Int, onTab: (String) -> Unit, onTester:
         val navFocus = remember { FocusRequester() }
         LaunchedEffect(menuSignal) { if (menuSignal > 0) { expanded = true; withFrameNanos { }; navFocus.requestFocus() } }
         val railWidth = if (compact) 56.dp else 80.dp
-        Box(Modifier.fillMaxSize().padding(start = railWidth)) { content(compact) }
+        Box(Modifier.fillMaxSize().padding(start = if (tab == "search" && expanded) 256.dp else railWidth)) { content(compact) }
         Column(Modifier.fillMaxHeight().width(if (expanded) 256.dp else railWidth)
             .background(Color(0xF90A0A0A)).border(BorderStroke(1.dp, Color(0xFF242424)))
             .onFocusChanged { expanded = it.hasFocus }.focusGroup()) {
@@ -175,10 +179,10 @@ fun DesignHome(catalog: DesignCatalog, tab: String, compact: Boolean, onSelect: 
 }
 
 @Composable
-fun DesignPoster(title: DesignTitle, onSelect: (DesignTitle) -> Unit) {
+fun DesignPoster(title: DesignTitle, onSelect: (DesignTitle) -> Unit, modifier: Modifier = Modifier) {
     var focused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(if (focused) 1.08f else 1f, label = "poster focus")
-    Box(Modifier.width(160.dp).height(240.dp).onFocusChanged { focused = it.isFocused }.graphicsLayer { scaleX = scale; scaleY = scale; translationY = if (focused) -4.dp.toPx() else 0f }
+    Box(modifier.width(160.dp).height(240.dp).onFocusChanged { focused = it.isFocused }.graphicsLayer { scaleX = scale; scaleY = scale; translationY = if (focused) -4.dp.toPx() else 0f }
         .shadow(if (focused) 24.dp else 0.dp, RoundedCornerShape(12.dp), ambientColor = Accent, spotColor = Accent)
         .clip(RoundedCornerShape(12.dp)).border(if (focused) 4.dp else 1.dp, if (focused) Accent else Color.White.copy(alpha = .1f), RoundedCornerShape(12.dp)).clickable { onSelect(title) }) {
         OriginalArtwork(title.poster, title.title, Modifier.fillMaxSize())
@@ -287,56 +291,97 @@ fun FilterPill(label: String, selected: Boolean, onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingState, onSelect: (DesignTitle) -> Unit) {
     val searchState = state.searchState
     var inputQuery by rememberSaveable { mutableStateOf(searchState.query) }
-
+    val queryFocus = remember { FocusRequester() }
+    val filterFocus = remember { FocusRequester() }
+    val resultFocus = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+    val imeVisible = WindowInsets.isImeVisible
+    val posterState = rememberLazyListState()
+    val resultsState = rememberLazyListState(searchState.scrollIndex, searchState.scrollOffset)
+    DisposableEffect(resultsState) {
+        onDispose {
+            searchState.scrollIndex = resultsState.firstVisibleItemIndex
+            searchState.scrollOffset = resultsState.firstVisibleItemScrollOffset
+        }
+    }
+    val results = if (searchState.query.isBlank() && !searchState.filters.isActive && searchState.results.isEmpty()) titles.take(8) else searchState.results
+    val focusResultId = searchState.focusedResultId?.takeIf { id -> results.any { it.id == id } } ?: results.firstOrNull()?.id
     LaunchedEffect(inputQuery) {
         if (inputQuery != searchState.query) {
             delay(500)
             state.search(inputQuery, searchState.filters, 1)
         }
     }
-
-    val results = if (searchState.query.isBlank() && !searchState.filters.isActive && searchState.results.isEmpty()) {
-        titles.take(8)
-    } else {
-        searchState.results
+    LaunchedEffect(Unit) {
+        if (searchState.restoreResultFocus && focusResultId != null) {
+            posterState.scrollToItem(results.indexOfFirst { it.id == focusResultId }.coerceAtLeast(0))
+            withFrameNanos { }
+            resultFocus.requestFocus()
+            searchState.restoreResultFocus = false
+        } else filterFocus.requestFocus()
     }
-
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(if (compact) 24.dp else 48.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        item {
+    BackHandler(imeVisible) {
+        keyboard?.hide()
+        filterFocus.requestFocus()
+    }
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val narrow = compact || maxWidth < 600.dp || maxHeight < 480.dp
+        val padding = if (narrow) 16.dp else 24.dp
+        Column(Modifier.fillMaxSize().padding(padding), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             OutlinedTextField(
                 value = inputQuery,
                 onValueChange = { inputQuery = it },
-                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 40.dp).testTag("search-input").focusRequester(queryFocus).focusProperties { down = filterFocus },
                 placeholder = { Text("Search titles / 搜索中文片名") },
                 leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Accent) },
                 singleLine = true,
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
-                keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { state.search(inputQuery, searchState.filters) }),
+                keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { state.search(inputQuery, searchState.filters); keyboard?.hide(); filterFocus.requestFocus() }),
                 shape = RoundedCornerShape(16.dp)
             )
-        }
-
-        item {
-            Column(Modifier.widthIn(max = 420.dp).background(Color(0xFF101010), RoundedCornerShape(16.dp)).border(1.dp, Color(0xFF262626), RoundedCornerShape(16.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Chinese input: select the search box and use your TV’s Chinese keyboard.", color = Muted, fontSize = 11.sp)
-                Text("ANDROID TV ON-SCREEN KEYBOARD", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.Bold)
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toList().chunked(6).forEach { row ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        row.forEach { letter -> Action(letter.toString(), Modifier.weight(1f), dense = true) { inputQuery += letter } }
-                    }
+            val toggle: @Composable () -> Unit = {
+                Action(if (searchState.filtersExpanded) "Hide filters" else "Filters",
+                    Modifier.testTag("search-filter-toggle").focusProperties {
+                        up = queryFocus
+                        if (results.isNotEmpty() && (!narrow || !searchState.filtersExpanded)) right = resultFocus
+                    }, dense = true, requester = filterFocus) {
+                    filterFocus.requestFocus()
+                    searchState.filtersExpanded = !searchState.filtersExpanded
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Action("SPACE", Modifier.weight(1f), dense = true) { inputQuery += " " }
-                    Action("DEL", Modifier.weight(1f), dense = true) { inputQuery = inputQuery.dropLast(1) }
-                    Action("CLEAR", Modifier.weight(1f), dense = true) { inputQuery = ""; state.search("", SearchFilters()) }
+            }
+            if (narrow) {
+                toggle()
+                LazyColumn(Modifier.fillMaxWidth().weight(1f).testTag("search-compact"), state = resultsState, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    if (searchState.filtersExpanded) searchFilterItems(inputQuery, searchState, state) { inputQuery = it }
+                    searchResultItems(results, searchState, state, onSelect, posterState, focusResultId, resultFocus, queryFocus, filterFocus)
+                }
+            } else {
+                Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    Column(Modifier.width(if (searchState.filtersExpanded) 300.dp else 80.dp).fillMaxHeight().testTag("search-sidebar").focusGroup(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        toggle()
+                        if (searchState.filtersExpanded) {
+                            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                                searchFilterItems(inputQuery, searchState, state) { inputQuery = it }
+                            }
+                        }
+                    }
+                    LazyColumn(Modifier.weight(1f).fillMaxHeight().testTag("search-results").focusGroup(), state = resultsState, verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                        searchResultItems(results, searchState, state, onSelect, posterState, focusResultId, resultFocus, queryFocus, filterFocus)
+                    }
                 }
             }
         }
+    }
+}
 
+private fun androidx.compose.foundation.lazy.LazyListScope.searchFilterItems(
+    inputQuery: String, searchState: SearchState, state: StreamingState, onQuery: (String) -> Unit
+) {
         // Search Filters Section
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -443,6 +488,31 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
             }
         }
 
+        item {
+            Column(Modifier.widthIn(max = 420.dp).background(Color(0xFF101010), RoundedCornerShape(16.dp)).border(1.dp, Color(0xFF262626), RoundedCornerShape(16.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("Chinese input: select the search box and use your TV’s Chinese keyboard.", color = Muted, fontSize = 11.sp)
+                Text("ANDROID TV ON-SCREEN KEYBOARD", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.Bold)
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toList().chunked(6).forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        row.forEach { letter -> Action(letter.toString(), Modifier.weight(1f), dense = true) { onQuery(inputQuery + letter) } }
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Action("SPACE", Modifier.weight(1f), dense = true) { onQuery(inputQuery + " ") }
+                    Action("DEL", Modifier.weight(1f), dense = true) { onQuery(inputQuery.dropLast(1)) }
+                    Action("CLEAR", Modifier.weight(1f), dense = true) { onQuery(""); state.search("", SearchFilters()) }
+                }
+            }
+        }
+
+
+}
+
+private fun androidx.compose.foundation.lazy.LazyListScope.searchResultItems(
+    results: List<DesignTitle>, searchState: SearchState, state: StreamingState, onSelect: (DesignTitle) -> Unit,
+    posterState: androidx.compose.foundation.lazy.LazyListState, focusResultId: String?, resultFocus: FocusRequester,
+    queryFocus: FocusRequester, filterFocus: FocusRequester
+) {
         // Provider Status badges & notices
         if (searchState.providerStatuses.isNotEmpty()) {
             item {
@@ -526,8 +596,20 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
         // Posters Row / Grid
         if (results.isNotEmpty()) {
             item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(vertical = 12.dp)) {
-                    items(results, key = { it.id }) { DesignPoster(it, onSelect) }
+                LazyRow(state = posterState, modifier = Modifier.testTag("search-posters").focusGroup(), horizontalArrangement = Arrangement.spacedBy(20.dp), contentPadding = PaddingValues(vertical = 12.dp)) {
+                    items(results, key = { it.id }) { title ->
+                        DesignPoster(title, { selected ->
+                            searchState.focusedResultId = selected.id
+                            searchState.restoreResultFocus = true
+                            onSelect(selected)
+                        }, Modifier
+                            .then(if (title.id == focusResultId) Modifier.focusRequester(resultFocus) else Modifier)
+                            .onFocusChanged { if (it.isFocused) searchState.focusedResultId = title.id }
+                            .focusProperties {
+                                up = queryFocus
+                                if (title.id == results.firstOrNull()?.id) left = filterFocus
+                            })
+                    }
                 }
             }
         }
@@ -543,6 +625,6 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
                 )
             }
         }
-    }
+
 }
 

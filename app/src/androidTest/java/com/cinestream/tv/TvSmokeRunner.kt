@@ -11,9 +11,11 @@ import android.view.accessibility.AccessibilityNodeInfo
 /** Device smoke test using the actual TV UI, live providers, and Unicode accessibility input. */
 class TvSmokeRunner : Instrumentation() {
     private var mediaUrl: String? = null
+    private var searchLayout = false
     private val passed = mutableListOf<String>()
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); mediaUrl = arguments?.getString("mediaUrl"); start() }
+    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); mediaUrl = arguments?.getString("mediaUrl"); searchLayout = arguments?.getString("searchLayout") == "true"; start() }
     override fun onStart() {
+        if (searchLayout) { runSearchLayoutCheck(this); return }
         mediaUrl?.let { runWebPlayerCheck(this, it); return }
         val report = Bundle()
         try {
