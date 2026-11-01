@@ -1,5 +1,7 @@
 # CineDBKTV Phase 5J handover — 2 November 2026 (Asia/Singapore)
 
+**Latest continuation:** See section 12 for the subsequent community media-preparation review, current repository baseline and latest resource accounting. Sections 1–11 preserve the earlier evidence and historical readings. Playback is still disabled; no application source was changed in the latest continuation.
+
 ## 1. Status and stopping point
 
 - **Playback working inside CineDBKTV: NO. Hongguo playback enabled: NO.**
@@ -135,3 +137,53 @@ Build environment, if later needed: Java `D:\BuildTools\jdk17\jdk-17.0.21.0.2+1`
 ## 11. Next Codex prompt
 
 > Continue CineDBKTV Phase 5J only after reading `D:\CineStreamTV\cinedbktv-development\PHASE_5J_HANDOVER.md` and checking actual limits/Git. Branch `feature/hongguo-single-apk`, implemented registration commit `ef8275d95935ca1c6e8295b80903de8e6600cc58`; latest successor is handover documentation. Mandatory one APK, no companion/backend; preserve providers/APKs/branches/PR. Registration and episode 1 metadata access work, but playback remains disabled. Initial AND fallback video rows directly contain `spade_a` and other key fields; older nested-only false-negative diagnostics are wrong. Four qualities have CENC-encrypted MP4 tracks. No supported licence/key-handling workflow or clear alternative has been established. Investigate only that dependency, without extracting protected keys, bypassing DRM/locks or copying unlicensed code. Do not repeat solved registration/browser/community tests. If a supported source is established, reuse Media3 and test episodes 1/51/88/90 for at most 30 seconds each inside CineDBKTV. Preserve at least 5% five-hour allowance; stop early for handover. Do not push, merge, publish or proceed to Phase 6 without authorization.
+
+## 12. Latest continuation: community encrypted-media architecture review
+
+### Current status and repository
+
+- **Playback working: NO. Hongguo playback enabled: NO.** Last completed application implementation remains the independent registration component at `ef8275d95935ca1c6e8295b80903de8e6600cc58`.
+- Latest continuation started with clean Git on `feature/hongguo-single-apk`, HEAD `4c856450610fd5895e9c5f92adf47e96a53f5660` (previous handover commit). This update is documentation only; its successor SHA is available with `git log -1 --format=%H -- PHASE_5J_HANDOVER.md` and in the final response.
+- No registration or live metadata/media requests were repeated. No application code, dependency, player, provider routing or APK was changed. No build, test, emulator, push, merge, publication or deployment was performed.
+- PR #1 was not re-fetched in this short pass. Its latest verified status, from the previous continuation, remains open/draft/unmerged with development head `87e5e90`; this continuation performed no GitHub mutations.
+
+### Evidence and what it establishes
+
+1. The pinned community `release-minireel.go` cache identifies `miniReelDecodeContentKey` (line 1277), metadata key handling (around line 1050), and `prepareMiniReelMedia` (line 433). The preparation path conditionally calls `decryptMiniReelMP4` when a source key exists (around lines 483–485), then exposes the prepared local file. The key-decoding algorithm was not executed or ported.
+2. Its cached `minireel_range.go` indexes initialization/sample information and carries a source key into an on-demand transform stage. The inspected code includes an explicit error for an encrypted track without a CENC key. This is local media preparation, not evidence of an Android licence-server exchange. That older cache was used only for corroboration; current pinned documentation below confirms the architecture.
+3. The pinned [Range playback documentation](https://github.com/aston314/hongguo-tv/blob/e1af6e0/docs/range-playback-experiment.md) explicitly describes local CENC sample decryption before the player reads the stream, with a full-file preparation fallback. Thus community playback success does not demonstrate direct playback of the original encrypted CDN URL by an unconfigured Media3 player.
+4. The cached pinned Android `release-PlayerBridge.java`, around lines 171–186, constructs a normal MP4/HLS media item and starts ExoPlayer. The inspected bridge has no standard DRM/licence configuration. The upstream core is responsible for preparing its media.
+5. The pinned [standard Media3 documentation](https://github.com/aston314/hongguo-tv/blob/e1af6e0/docs/standard-media3.md) describes HTML5-first playback with bounded Media3 decoder fallback. It mentions newer Media3/NextLib software decoding and GPL-3.0 distribution obligations for that dependency. Decoder fallback and those licensing notes do not establish a provider grant for protected-content key processing. No dependency was imported into CineDBKTV.
+6. [Official Media3 DRM documentation](https://developer.android.com/media/media3/exoplayer/drm) describes Android MediaDrm sessions with an identified DRM scheme and appropriate configuration. Its format table lists Widevine CENC with DASH/FMP4 HLS and ClearKey CENC with DASH. The currently observed progressive MP4 plus proprietary wrapped fields is not an already-verified configuration from that table. A simple DRM switch or guessed ClearKey assignment is not justified; actual scheme, provisioning and format compatibility must be established.
+
+The two pinned community documents are cached locally at `.tmp/phase5j-evidence/standard-media3.md` and `.tmp/phase5j-evidence/range-playback-experiment.md`. Initial web-tool retrieval failed; ordinary public raw-file retrieval succeeded. No protected service request, key value or video content was involved in these documentation reads.
+
+### Missing dependency and minimum justified implementation
+
+- A provider-supported or otherwise verified permitted key-provisioning/licence workflow has **not** been established. No such grant or documented licence exchange was identified in the specific architecture documents reviewed. This is not a claim that none exists elsewhere or that every form of CENC processing is prohibited.
+- A legitimately accessible clear-media alternative remains **unverified**. No additional episodes, qualities or speculative endpoints were requested in this pass. Existing evidence still identifies CENC on all four sampled qualities of episode 1.
+- The community method depends on custom key handling plus local CENC media preparation before normal playback. Implementing that protected portion would require establishing permission and a usable integration contract first; the community application's operation alone does not satisfy this gate.
+- After that gate, the smallest production components would be: (a) an isolated metadata resolver using the existing registered identity, direct-row key/protection metadata and real expiry/error fields; (b) a supported protection/session handler and compatible packaging, or an approved component that provides genuinely playable media; (c) connection to the existing Media3/player/episode navigation. No independent need for a Go language component, companion app, extra backend or player rewrite has been demonstrated.
+
+### Changes, tests and preservation
+
+- Tracked change: this handover update only. Application implementation, regression behavior and existing APK files were untouched. Previous branch/APK/hash preservation evidence remains in section 9; hashes were not recalculated in this documentation-only pass.
+- Prior results remain **41 passing unit tests; successful debug build; lint 0 errors / 6 warnings**. These were not rerun and should not be presented as new results.
+- Episodes **1, 51, 88 and 90: all in-CineDBKTV playback acceptance tests NOT PERFORMED**. No video rendering, audible output, 30-second observation, pause/resume, seek, fullscreen or progression was newly tested. No full episode was played. No new regression is established by this read-only review, but live existing-provider regressions were not retested.
+- No uncommitted application changes exist. Only the handover is intended for a local successor commit. Do not reset/delete `ef8275d`, previous branches or APKs; rollback considerations remain in section 9.
+
+### Latest resource ledger and stopping rule
+
+- Actual start: **11% five-hour / 76% weekly remaining**, 04:30:29 Singapore time, 2 November 2026. The prior reported 12% was historical.
+- Investigation stop snapshot: **10% / 76% remaining**, consumption **1 / 0 percentage points**. Investigation was stopped proactively for handover; no build/emulator work was launched.
+- Final closeout before the documentation commit: **9% five-hour / 75% weekly remaining**; measured consumption **2 / 1 percentage points**. The protected 5% reserve remains safe. No further investigation, implementation, build or test follows this handover; only the local documentation commit/status confirmation and final response remain.
+- Readings are account-wide rounded balances. They are not continuous or exact per-operation measurements. The focused investigation ended within its first five-minute interval; interim balances were reported before the interval elapsed. Final 5% remains protected; do not resume automatically after handover.
+
+### Exact next continuation steps
+
+1. Check actual usage/Git and read sections 5, 7 and 12. Preserve the 5% reserve. Do not repeat registration, header inspection or community playback acceptance.
+2. Establish the provider's permitted key/protection integration contract or a genuinely clear alternative. An implementation instruction alone must not be treated as provider authorization for custom protected-key extraction. Avoid another broad endpoint/source search.
+3. If the contract provides standard MediaDrm playback, verify its actual scheme, licence provisioning and packaging against CineDBKTV's Media3 version before wiring routing. If it instead requires proprietary preparation, establish reuse/implementation rights and permission for that handling before writing it. Do not copy the community decryptor or guess a ClearKey conversion.
+4. Only after a permitted usable source is verified, implement the minimal resolver/handler and then the four requested in-app tests, capped at 30 seconds each. Otherwise preserve the disabled state and report the precise unresolved dependency. No push/merge/publish without authorization.
+
+Next prompt: **Continue from section 12 of `PHASE_5J_HANDOVER.md` on `feature/hongguo-single-apk`. Registration works; playback is disabled. Community playback prepares/decrypts CENC locally before ordinary HTML5/Media3 playback; it does not demonstrate a reusable standard licence exchange. Verify a permitted protection/key contract or clear source before implementing. Do not repeat solved investigations or extract protected keys. Check actual limits and preserve at least 5% five-hour remaining; update handover early. No companion/backend, pushes, merges or publication.**
