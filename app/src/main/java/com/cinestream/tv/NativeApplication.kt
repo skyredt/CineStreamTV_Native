@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,13 @@ import kotlinx.coroutines.*
 
 class CineStreamApp : Application() { val providers = ProvidersRepository() }
 class MainActivity : ComponentActivity() {
+    var webPlayerKeyHandler: ((android.view.KeyEvent) -> Boolean)? = null
+    // AndroidX core annotates its public Activity override as library-only; TV key routing requires this framework hook.
+    @android.annotation.SuppressLint("RestrictedApi")
+    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+        if (webPlayerKeyHandler?.invoke(event) == true) return true
+        return super.dispatchKeyEvent(event)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN, android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -40,6 +49,11 @@ class MainActivity : ComponentActivity() {
 }
 
 class SearchState {
+    var filtersExpanded by mutableStateOf(true)
+    var scrollIndex = 0
+    var scrollOffset = 0
+    var focusedResultId by mutableStateOf<String?>(null)
+    var restoreResultFocus by mutableStateOf(false)
     var query by mutableStateOf("")
     var filters by mutableStateOf(SearchFilters())
     var results by mutableStateOf<List<DesignTitle>>(emptyList())
@@ -48,6 +62,7 @@ class SearchState {
     var localFilterNotice by mutableStateOf<String?>(null)
     var page by mutableIntStateOf(1)
     var hasMore by mutableStateOf(false)
+    var nextPages: Map<String, String> = emptyMap()
     var searchError by mutableStateOf<String?>(null)
 }
 
@@ -61,6 +76,9 @@ class StreamingState(val repository: ProvidersRepository) : ViewModel() {
     var resolving by mutableStateOf(false); private set
     var error by mutableStateOf<String?>(null)
     var streams by mutableStateOf<List<ProviderStream>>(emptyList()); private set
+    var playbackPosition by mutableLongStateOf(0L)
+    var sourceNotice by mutableStateOf<String?>(null)
+    private val attemptedSources = mutableSetOf<Int>()
     var sourceIndex by mutableIntStateOf(0)
     var playingTitle by mutableStateOf(""); private set
     val searchState = SearchState()
@@ -84,15 +102,26 @@ class StreamingState(val repository: ProvidersRepository) : ViewModel() {
         }
     }
     fun play(title: DesignTitle, episode: DesignEpisode?) {
-        cancel(); resolving = true
+        if (title.provider == "hongguo") { error = HONGGUO_NOTICE; return }
+        cancel(); resolving = true; playbackPosition = 0; sourceNotice = null; attemptedSources.clear()
         playingTitle = if (episode == null) title.title else "${title.title} · ${if (title.provider == "cineby") "S${episode.season}:E${episode.number} · " else ""}${episode.title}"
         job = viewModelScope.launch {
-            try { streams = repository.sources(title, episode); sourceIndex = 0 }
+            try { streams = repository.sources(title, episode); sourceIndex = 0; attemptedSources += 0 }
             catch (e: CancellationException) { throw e } catch (e: Exception) { error = "Could not load this selection: ${e.message}" }
             finally { if (currentCoroutineContext().isActive) resolving = false }
         }
     }
-    fun direct(url: String, name: String) { cancel(); playingTitle = name; sourceIndex = 0; streams = listOf(ProviderStream("Direct media", url, false, "")) }
+    fun direct(url: String, name: String) { cancel(); playbackPosition = 0; sourceNotice = null; attemptedSources.clear(); playingTitle = name; sourceIndex = 0; streams = listOf(ProviderStream("Direct media", url, false, "")) }
+    fun sourceFailed(reason: String): Boolean {
+        if (streams.getOrNull(sourceIndex)?.referer?.contains("cineby.ws") != true) return false
+        attemptedSources += sourceIndex
+        val next = nextSourceIndex(sourceIndex, attemptedSources, streams.size)
+        if (next == null) { sourceNotice = "No remaining source for this selection. Choose a source to retry."; return false }
+        val previous = streams[sourceIndex].name
+        sourceIndex = next; attemptedSources += next
+        sourceNotice = "$previous unavailable. Switched to ${streams[next].name} for the same episode."
+        return true
+    }
     fun cancel() { job?.cancel(); loadingDetails = false; resolving = false }
     fun back() { cancel(); when { streams.isNotEmpty() -> streams = emptyList(); selected != null -> selected = null; else -> tab = "home" } }
     fun home() { cancel(); streams = emptyList(); selected = null; tab = "home" }
@@ -102,12 +131,11 @@ class StreamingState(val repository: ProvidersRepository) : ViewModel() {
         searchJob?.cancel()
         searchState.query = query
         searchState.filters = filters
-        searchState.page = page
         searchState.searching = true
         searchState.searchError = null
         searchJob = viewModelScope.launch {
             try {
-                val res = repository.searchWithFilters(query, filters, page)
+                val res = repository.searchWithFilters(query, filters, page, searchState.nextPages)
                 if (page == 1) {
                     searchState.results = res.titles
                 } else {
@@ -115,7 +143,10 @@ class StreamingState(val repository: ProvidersRepository) : ViewModel() {
                 }
                 searchState.providerStatuses = res.statuses
                 searchState.localFilterNotice = res.localFilterNotice
-                searchState.hasMore = res.titles.isNotEmpty()
+                searchState.page = page
+                searchState.nextPages = res.nextPages
+                searchState.hasMore = res.nextPages.isNotEmpty()
+                searchState.searchError = if (res.statuses.any { it.error != null }) "Some providers could not be searched. Results may be incomplete." else null
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -148,21 +179,27 @@ fun TvAppNavigation(state: StreamingState) {
     val selected = state.selected
     val stream = state.streams.getOrNull(state.sourceIndex)
     BackHandler(stream != null || selected != null || state.tab != "home" || state.resolving) { state.back() }
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize().onPreviewKeyEvent { event ->
+        if (stream != null && state.streams.size > 1 && event.nativeKeyEvent.keyCode == android.view.KeyEvent.KEYCODE_MENU) {
+            if (event.nativeKeyEvent.action == android.view.KeyEvent.ACTION_DOWN) sourcePicker = true
+            true
+        } else false
+    }) {
         if (stream != null) {
             key(stream.url) {
-                if (stream.embedded) EmbeddedPlayer(stream, state.playingTitle, onBack = { state.back() })
-                else PlayerScreen(stream.url, state.playingTitle, headers = if (stream.referer.isBlank()) emptyMap() else mapOf("Referer" to stream.referer), onBack = { state.back() })
+                if (stream.embedded) EmbeddedPlayer(stream, state.playingTitle, initialPosition = state.playbackPosition, onPosition = { state.playbackPosition = it }, onFailure = state::sourceFailed, onBack = { state.back() })
+                else PlayerScreen(stream.url, state.playingTitle, headers = if (stream.referer.isBlank()) emptyMap() else mapOf("Referer" to stream.referer), initialPosition = state.playbackPosition, onPosition = { state.playbackPosition = it }, onFailure = state::sourceFailed, onBack = { state.back() })
             }
-            if (state.streams.size > 1) Box(Modifier.align(Alignment.TopEnd).padding(16.dp)) { Action("Source: ${stream.name}", dense = true) { sourcePicker = true } }
+            state.sourceNotice?.let { message -> Text(message, Modifier.align(Alignment.TopCenter).padding(top = 70.dp).background(Color(0xEE101010)).padding(12.dp), color = Accent) }
+            if (state.streams.size > 1 && !stream.embedded) Box(Modifier.align(Alignment.TopEnd).padding(16.dp)) { Action("Source: ${stream.name}", dense = true) { sourcePicker = true } }
         } else {
             DesignShell(state.tab, menuSignal, onTab = state::navigate, onTester = { tester = true }) { compact ->
                 when {
                     selected != null -> DesignDetails(selected, compact, onBack = state::back, onPlay = { state.play(selected, it) })
                     catalog == null -> Column(Modifier.fillMaxSize().padding(48.dp), verticalArrangement = Arrangement.Center) {
-                        Text("CINESTREAM TV", color = Accent, style = MaterialTheme.typography.headlineLarge)
+                        Text("CineDBKTV", color = Accent, style = MaterialTheme.typography.headlineLarge)
                         Spacer(Modifier.height(24.dp))
-                        if (state.catalogError == null) { CircularProgressIndicator(color = Accent); Text("Loading Cineby and DBKU…", Modifier.padding(top = 16.dp)) }
+                        if (state.catalogError == null) { CircularProgressIndicator(color = Accent); Text("Loading Cineby, DBKU, BingeBang and 红果…", Modifier.padding(top = 16.dp)) }
                         else { Text(state.catalogError.orEmpty()); Action("Retry catalog") { state.reload() } }
                     }
                     state.tab == "search" -> DesignSearch(catalog.titles, compact, state, onSelect = state::open)
@@ -179,13 +216,13 @@ fun TvAppNavigation(state: StreamingState) {
     }
     state.error?.let { message -> AlertDialog(onDismissRequest = { state.error = null }, title = { Text("Unable to load selection") }, text = { Text(message) }, confirmButton = { Action("Close") { state.error = null } }) }
     if (sourcePicker) AlertDialog(onDismissRequest = { sourcePicker = false }, title = { Text("Playback sources", color = Accent) }, confirmButton = { Action("Close") { sourcePicker = false } }, text = {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) { state.streams.forEachIndexed { index, source -> item { Action((if (index == state.sourceIndex) "✓ " else "") + source.name) { state.sourceIndex = index; sourcePicker = false } } } }
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) { state.streams.forEachIndexed { index, source -> item { Action((if (index == state.sourceIndex) "✓ " else "") + source.name) { state.sourceIndex = index; state.sourceNotice = null; sourcePicker = false } } } }
     })
     if (tester) Dialog(onDismissRequest = { tester = false }) {
         Surface(shape = RoundedCornerShape(20.dp), color = Color(0xFF101010), border = BorderStroke(1.dp, Accent.copy(alpha = .4f))) {
             LazyColumn(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 item { Text("Stream Extractor API", style = MaterialTheme.typography.titleLarge, color = Accent) }
-                item { Text("Catalog providers: cineby.ws and dbku.tv. Enter a direct media URL for an independent player test.") }
+                item { Text("Catalog providers: cineby.ws, dbku.tv, bingebang.st and hongguoduanju.com. Enter a direct media URL for an independent player test.") }
                 item { OutlinedTextField(input, { input = it; validation = null }, Modifier.fillMaxWidth(), label = { Text("HTTPS MP4, HLS or DASH URL") }, singleLine = true, isError = validation != null) }
                 validation?.let { message -> item { Text(message, color = MaterialTheme.colorScheme.error) } }
                 item { Action("Play entered URL", primary = true) { validation = MediaUrl.validate(input); if (validation == null) { tester = false; state.direct(input.trim(), "User-provided media") } } }
@@ -196,3 +233,4 @@ fun TvAppNavigation(state: StreamingState) {
         }
     }
 }
+

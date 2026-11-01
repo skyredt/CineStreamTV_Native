@@ -4,3 +4,14 @@
 local.properties
 *.jks
 *.keystore
+
+.extractor/
+.kotlin/
+*.log
+hs_err_*
+replay_*
+.idea/
+*.apk
+
+/tv-smoke*.png
+/tv-smoke-results.txt

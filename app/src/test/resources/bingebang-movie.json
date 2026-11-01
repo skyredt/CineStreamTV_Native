@@ -1,0 +1,95 @@
+{
+  "id": 2,
+  "media_type": "movie",
+  "title": "Obsession",
+  "original_title": "Obsession",
+  "overview": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
+  "poster_path": "/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
+  "backdrop_path": "/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
+  "backdrop_titled_path": "/e1qJyp8AE5ejXAaQjxWPTsWeTb.jpg",
+  "logo_path": "/2y6qVk9YIPxTzO43anxUQ9iTuh4.png",
+  "release_date": "2026-05-13",
+  "year": 2026,
+  "runtime": 109,
+  "certification": "R",
+  "vote_average": 8.2,
+  "vote_count": 6437,
+  "popularity": 103.276,
+  "genre_ids": [
+    27,
+    53
+  ],
+  "url": "/movie/watch/obsession-2026-fzqb1g",
+  "play_url": "/movie/play/obsession-2026-fzqb1g",
+  "tagline": "Be careful who you wish for…",
+  "status": "Released",
+  "original_language": "en",
+  "homepage": "http://www.focusfeatures.com/obsession",
+  "budget": 750000,
+  "revenue": 525089752,
+  "trailer_key": "gMC8kkwbIQQ",
+  "production_companies": [
+    {
+      "tmdb_id": 155758,
+      "name": "Tea Shop Productions"
+    },
+    {
+      "tmdb_id": 273145,
+      "name": "Under the Shell"
+    },
+    {
+      "tmdb_id": 154063,
+      "name": "Capstone Pictures"
+    },
+    {
+      "tmdb_id": 3172,
+      "name": "Blumhouse Productions"
+    }
+  ],
+  "production_countries": [
+    {
+      "code": "US",
+      "name": "United States of America"
+    },
+    {
+      "code": "GB",
+      "name": "United Kingdom"
+    }
+  ],
+  "genres": [
+    {
+      "id": 27,
+      "name": "Horror"
+    },
+    {
+      "id": 53,
+      "name": "Thriller"
+    }
+  ],
+  "credits": {
+    "cast": [
+      {
+        "id": 76,
+        "media_type": "person",
+        "name": "Michael Johnston",
+        "profile_path": "/fbpcCkBzu43kMdlXxEAMuLhseL8.jpg",
+        "known_for_department": "Acting",
+        "popularity": 2.705,
+        "url": "/person/michael-johnston-eawp93",
+        "character": "Bear",
+        "order": 0
+      },
+      {
+        "id": 77,
+        "media_type": "person",
+        "name": "Inde Navarrette",
+        "profile_path": "/qlNBUGON8FebgzcqVhhRSVFYSa5.jpg",
+        "known_for_department": "Acting",
+        "popularity": 12.321,
+        "url": "/person/inde-navarrette-4jt5bc",
+        "character": "Nikki",
+        "order": 1
+      }
+    ]
+  }
+}

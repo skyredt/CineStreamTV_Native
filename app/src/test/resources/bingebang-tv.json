@@ -1,0 +1,113 @@
+{
+  "id": 21696,
+  "media_type": "tv",
+  "name": "Lanterns",
+  "original_name": "Lanterns",
+  "overview": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
+  "poster_path": "/rb94rKVIzLyfWufIN7WqLvadBDH.jpg",
+  "backdrop_path": "/6gqezQJ2mkm4jreWwLyOZy2Vf6i.jpg",
+  "backdrop_titled_path": "/jMCAu91V7fsnHNUvabOPMBLaLaj.jpg",
+  "logo_path": "/kANHXGvFKW13UEkZbYwl9nIJeEl.png",
+  "first_air_date": "2026-08-16",
+  "year": 2026,
+  "number_of_seasons": 1,
+  "certification": "TV-MA",
+  "vote_average": 8.2,
+  "vote_count": 840,
+  "popularity": 63.666,
+  "genre_ids": [
+    18,
+    9648,
+    10765
+  ],
+  "url": "/tv/watch/lanterns-sne6ck",
+  "play_url": "/tv/play/lanterns-sne6ck",
+  "tagline": "Only one can wear the ring.",
+  "status": "Returning Series",
+  "original_language": "en",
+  "homepage": "https://www.hbo.com/content/lanterns",
+  "last_air_date": "2026-10-04",
+  "number_of_episodes": 8,
+  "trailer_key": "7UIBOsuUwc4",
+  "networks": [
+    {
+      "tmdb_id": 49,
+      "name": "HBO",
+      "logo_path": "/tuomPhY2UtuPTqqFnKMVHvSb724.png"
+    }
+  ],
+  "production_companies": [
+    {
+      "tmdb_id": 184898,
+      "name": "DC Studios"
+    },
+    {
+      "tmdb_id": 3268,
+      "name": "HBO"
+    },
+    {
+      "tmdb_id": 1957,
+      "name": "Warner Bros. Television"
+    },
+    {
+      "tmdb_id": 66224,
+      "name": "Man, Woman & Child Productions"
+    }
+  ],
+  "production_countries": [
+    {
+      "code": "US",
+      "name": "United States of America"
+    }
+  ],
+  "genres": [
+    {
+      "id": 18,
+      "name": "Drama"
+    },
+    {
+      "id": 9648,
+      "name": "Mystery"
+    },
+    {
+      "id": 10765,
+      "name": "Sci-Fi & Fantasy"
+    }
+  ],
+  "credits": {
+    "cast": [
+      {
+        "id": 113929,
+        "media_type": "person",
+        "name": "Kyle Chandler",
+        "profile_path": "/66n7XNj1dyYkzCBWR3Lq8Vz4PJ1.jpg",
+        "known_for_department": "Acting",
+        "popularity": 5.053,
+        "url": "/person/kyle-chandler-7rcbsf",
+        "character": "Hal Jordan / Halogram",
+        "order": 0
+      },
+      {
+        "id": 83687,
+        "media_type": "person",
+        "name": "Aaron Pierre",
+        "profile_path": "/hNwZWdT2KxKj1YLbipvtUhNjfAp.jpg",
+        "known_for_department": "Acting",
+        "popularity": 3.666,
+        "url": "/person/aaron-pierre-53743m",
+        "character": "John Stewart",
+        "order": 1
+      }
+    ]
+  },
+  "seasons": [
+    {
+      "season_number": 1,
+      "name": "Season 1",
+      "poster_path": "/j9PTWG0Xn0NeIRhGGFJbciNYWvS.jpg",
+      "air_date": "2026-08-16",
+      "episode_count": 8,
+      "available_episodes": 8
+    }
+  ]
+}

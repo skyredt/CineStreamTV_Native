@@ -13,16 +13,19 @@ import java.util.Base64
 data class ProviderStream(val name: String, val url: String, val embedded: Boolean, val referer: String)
 data class LiveCatalog(val catalog: DesignCatalog, val warnings: List<String>)
 
-/** Public page adapters for the two user-selected providers. No guessed stream API or sample fallback. */
-class ProvidersRepository {
+/** Public page adapters for the user-selected providers. No guessed stream API or sample fallback. */
+class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? = null) {
     companion object {
         const val CINEBY = "https://cineby.ws"
         const val DBKU = "https://www.dbku.tv"
+        const val BINGEBANG = "https://bingebang.st"
+        const val HONGGUO = "https://hongguoduanju.com"
         const val AGENT = "Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 Chrome/130.0.0.0 Mobile Safari/537.36 CineStream/1.1"
     }
     private val detailsCache = mutableMapOf<String, DesignTitle>()
     private fun request(url: String, ajax: Boolean = false): String {
         require(URI(url).scheme == "https") { "Provider returned a non-HTTPS URL" }
+        fetchPage?.let { return it(url, ajax) }
         val connection = Jsoup.connect(url).userAgent(AGENT).timeout(20000).maxBodySize(3 * 1024 * 1024).ignoreContentType(true)
         if (ajax) connection.header("X-Requested-With", "XMLHttpRequest").header("Accept", "application/json")
         return connection.execute().body()
@@ -31,7 +34,13 @@ class ProvidersRepository {
         val warnings = mutableListOf<String>()
         val cine = async { runCatching { parseCinebyHome(request("$CINEBY/home")) } }
         val dbku = async { runCatching { parseDbkuHome(request("$DBKU/")) } }
-        val rows = cine.await().getOrElse { if (it is CancellationException) throw it; warnings += "Cineby: ${it.message}"; emptyList() } + dbku.await().getOrElse { if (it is CancellationException) throw it; warnings += "DBKU: ${it.message}"; emptyList() }
+        val binge = async { runCatching {
+            listOf("movie" to "BingeBang Movies", "tv" to "BingeBang TV").map { (type, name) ->
+                DesignRow("bingebang-$type", name, "BingeBang", parseBingeList(request("$BINGEBANG/api/list/trending_${type}_week?limit=24")))
+            }.filter { it.titles.isNotEmpty() }
+        } }
+        val hongguo = async { runCatching { parseHongguoHome(request("$HONGGUO/")) } }
+        val rows = cine.await().getOrElse { if (it is CancellationException) throw it; warnings += "Cineby: ${it.message}"; emptyList() } + dbku.await().getOrElse { if (it is CancellationException) throw it; warnings += "DBKU: ${it.message}"; emptyList() } + binge.await().getOrElse { if (it is CancellationException) throw it; warnings += "BingeBang: ${it.message}"; emptyList() } + hongguo.await().getOrElse { if (it is CancellationException) throw it; warnings += "Hongguo: ${it.message}"; emptyList() }
         if (rows.isEmpty()) error(warnings.joinToString("\n").ifBlank { "The providers returned no catalog entries." })
         val titles = rows.flatMap { it.titles }.distinctBy { it.id }.toMutableList()
         if (titles.none { it.featured }) titles[0] = titles[0].copy(featured = true)
@@ -40,120 +49,74 @@ class ProvidersRepository {
     suspend fun details(title: DesignTitle): DesignTitle = withContext(Dispatchers.IO) {
         synchronized(detailsCache) { detailsCache[title.id] } ?: run {
             val doc = Jsoup.parse(request(title.pageUrl), title.pageUrl)
-            val value = if (title.provider == "dbku") parseDbkuDetails(title, doc) else parseCinebyDetails(title, doc)
+            val value = when (title.provider) {
+                "hongguo" -> parseHongguoDetails(title, doc.outerHtml())
+                "bingebang" -> {
+                    val data = JSONObject(doc.selectFirst("script[data-detail-payload]")?.data() ?: error("BingeBang detail payload was not found."))
+                    val detail = parseBingeDetails(title, data)
+                    val available = data.optJSONArray("seasons")
+                    val seasons = if (!detail.isTv || available == null) emptyList() else coroutineScope {
+                        val permits = kotlinx.coroutines.sync.Semaphore(4)
+                        (0 until available.length()).map { available.getJSONObject(it) }
+                            .filter { it.optInt("available_episodes") > 0 }.map { season -> async {
+                                permits.acquire()
+                                try {
+                                    val number = season.getInt("season_number")
+                                    val episodes = parseBingeEpisodes(request("$BINGEBANG/api/tv/${data.getLong("id")}/season/$number"), number, detail.playbackPage)
+                                    DesignSeason(number, season.optString("name", "Season $number"), episodes)
+                                } finally { permits.release() }
+                            } }.awaitAll()
+                    }
+                    detail.copy(seasons = seasons)
+                }
+                "dbku" -> parseDbkuDetails(title, doc)
+                else -> parseCinebyDetails(title, doc)
+            }
             synchronized(detailsCache) { detailsCache[title.id] = value }; value
         }
     }
-    suspend fun searchWithFilters(query: String, filters: SearchFilters = SearchFilters(), page: Int = 1): SearchResults = withContext(Dispatchers.IO) {
-        val cleanQuery = query.trim()
-        val value = URLEncoder.encode(cleanQuery, "UTF-8")
-        val statuses = mutableListOf<ProviderSearchStatus>()
-        var localNotice: String? = null
-
-        val cine = async {
-            if (filters.mediaType == MediaTypeFilter.SHORTS) {
-                Pair(emptyList<DesignTitle>(), ProviderSearchStatus("cineby", 0, isUnsupported = true, message = "Cineby does not host short-form drama series"))
-            } else {
-                runCatching {
-                    val typeParam = when (filters.mediaType) {
-                        MediaTypeFilter.MOVIES -> "movie"
-                        MediaTypeFilter.DRAMAS -> "tv"
-                        else -> "all"
-                    }
-                    val url = if (cleanQuery.isNotBlank()) {
-                        "$CINEBY/search?q=$value&type=$typeParam"
-                    } else {
-                        when (filters.mediaType) {
-                            MediaTypeFilter.MOVIES -> "$CINEBY/movies"
-                            MediaTypeFilter.DRAMAS -> "$CINEBY/tv"
-                            else -> "$CINEBY/movies"
-                        }
-                    }
-                    val titles = if (cleanQuery.isNotBlank()) {
-                        parseCinebySearch(request(url))
-                    } else {
-                        parseCinebyHome(request(url), true).flatMap { it.titles }.distinctBy { it.id }
-                    }
-                    Pair(titles, ProviderSearchStatus("cineby", titles.size))
-                }.fold(
-                    onSuccess = { it },
-                    onFailure = {
-                        if (it is CancellationException) throw it
-                        Pair(emptyList(), ProviderSearchStatus("cineby", 0, error = it.message ?: "Request failed"))
-                    }
-                )
-            }
-        }
-
-        val dbku = async {
-            runCatching {
-                val dbkuType = filters.mediaType.dbkuId
-                val url = if (cleanQuery.isNotBlank()) {
-                    if (dbkuType.isNotEmpty()) {
-                        "$DBKU/vodsearch/${dbkuType}-------------.html?wd=$value${if (page > 1) "&page=$page" else ""}"
-                    } else {
-                        "$DBKU/vodsearch/-------------.html?wd=$value${if (page > 1) "&page=$page" else ""}"
-                    }
-                } else {
-                    val area = when (filters.country) {
-                        "Mainland China (大陆)" -> URLEncoder.encode("大陆", "UTF-8")
-                        "Hong Kong & Taiwan (港台)" -> URLEncoder.encode("台湾", "UTF-8")
-                        "Korea (韩国)" -> URLEncoder.encode("韩国", "UTF-8")
-                        "Japan (日本)" -> URLEncoder.encode("日本", "UTF-8")
-                        "Thailand (泰国)" -> URLEncoder.encode("泰国", "UTF-8")
-                        "Singapore (新加坡)" -> URLEncoder.encode("新加坡", "UTF-8")
-                        else -> ""
-                    }
-                    val by = filters.sort.dbkuBy
-                    val year = if (filters.year != "All" && filters.year.toIntOrNull() != null) filters.year else ""
-                    val typeId = if (dbkuType.isNotEmpty()) dbkuType else "2"
-                    "$DBKU/vodshow/${typeId}-${area}-${by}------${page}---${year}.html"
-                }
-                val doc = Jsoup.parse(request(url), DBKU)
-                val titles = doc.select("a.myui-vodlist__thumb[href*=/voddetail/]").map { a ->
-                    val li = a.closest("li") ?: a
-                    val score = rating(li.select(".pic-tag-top, .pic-tag").text())
-                    val isShort = dbkuType == "21" || a.absUrl("href").contains("21")
-                    liveTitle(
-                        provider = "dbku",
-                        url = a.absUrl("href"),
-                        name = a.attr("title"),
-                        image = a.absUrl("data-original"),
-                        score = score,
-                        tv = if (isShort) true else !a.absUrl("href").contains("/1-") && !a.attr("title").contains("电影"),
-                        genres = if (isShort) listOf("短剧") else emptyList()
-                    )
-                }.distinctBy { it.id }
-                Pair(titles, ProviderSearchStatus("dbku", titles.size))
-            }.fold(
-                onSuccess = { it },
-                onFailure = {
-                    if (it is CancellationException) throw it
-                    Pair(emptyList(), ProviderSearchStatus("dbku", 0, error = it.message ?: "Request failed"))
-                }
-            )
-        }
-
-        val (cTitles, cStatus) = cine.await()
-        val (dTitles, dStatus) = dbku.await()
-        statuses += cStatus
-        statuses += dStatus
-
-        if (filters.country != "All") {
-            localNotice = "Country filter (${filters.country}) applied locally to loaded results. Cineby does not provide server-side country queries."
-        }
-
-        val combined = (cTitles + dTitles).distinctBy { it.id }
-        val filtered = filterTitles(combined, filters)
-        val sorted = sortTitles(filtered, filters.sort)
-
-        SearchResults(sorted, statuses, localNotice)
+    suspend fun searchWithFilters(query: String, filters: SearchFilters = SearchFilters(), page: Int = 1, nextPages: Map<String, String> = emptyMap()): SearchResults = withContext(Dispatchers.IO) {
+        val value = URLEncoder.encode(query.trim(), "UTF-8")
+        val dbkuBrowse = filters.genre != "All" || filters.country != "All"
+        val initial = mutableMapOf("cineby" to "$CINEBY/search?q=$value&type=all", "bingebang" to "$BINGEBANG/api/search/multi?query=$value", "hongguo" to hongguoSearchUrl(query, filters.hongguoCategory))
+        if (dbkuBrowse) {
+            val types = when (filters.mediaType) { MediaTypeFilter.MOVIES -> listOf(1); MediaTypeFilter.DRAMAS -> listOf(2, 4); MediaTypeFilter.SHORTS -> listOf(21); else -> listOf(1, 2, 4, 21) }
+            types.forEach { type -> initial["dbku:$type"] = dbkuFilterUrl(type, filters) }
+        } else initial["dbku"] = "$DBKU/vodsearch/-------------.html?wd=$value"
+        val requests = if (page == 1) initial else nextPages
+        val metadataNeeded = filters.genre != "All" || filters.country != "All" || filters.mediaType != MediaTypeFilter.ALL
+        val permits = kotlinx.coroutines.sync.Semaphore(4)
+        val responses = requests.map { (provider, url) -> async {
+            try {
+                requireProviderPage(provider, url)
+                val html = request(url)
+                val doc = Jsoup.parse(html, url)
+                val hongguoResult = if (provider == "hongguo") parseHongguoSearch(html, url) else null
+                var titles = if (hongguoResult != null) hongguoResult.first else if (provider == "bingebang") parseBingeList(html) else if (provider == "cineby") parseCinebySearch(html) else if (provider.startsWith("dbku:")) parseDbkuBrowse(doc, provider.substringAfter(':').toInt(), filters).filter { query.isBlank() || it.title.contains(query.trim(), true) } else parseDbkuSearch(html)
+                var metadataFailures = 0
+                if (provider.startsWith("dbku") && ((metadataNeeded && !dbkuBrowse) || filters.year != "All" || filters.sort == SortOption.YEAR)) titles = coroutineScope { titles.map { title -> async {
+                    permits.acquire()
+                    try { details(title) } catch (e: CancellationException) { throw e }
+                    catch (_: Exception) { synchronized(permits) { metadataFailures++ }; title }
+                    finally { permits.release() }
+                } }.awaitAll() }
+                Triple(titles, ProviderSearchStatus(provider, titles.size, message = if (provider == "hongguo") "红果：暂不支持播放；新剧排序与逐集锁定状态未提供。分类仅用于空关键词浏览。" else if (metadataFailures > 0) "$metadataFailures title details unavailable" else null), if (provider == "hongguo") hongguoResult?.second else if (provider == "bingebang") null else nextSearchPage(doc, provider, url))
+            } catch (e: CancellationException) { throw e }
+            catch (e: Exception) { Triple(emptyList(), ProviderSearchStatus(provider, 0, error = e.message ?: "Request failed"), url.takeIf { page > 1 }) }
+        } }.awaitAll()
+        val statuses = responses.map { it.second }
+        val titles = responses.flatMap { it.first }.distinctBy { it.id }
+        val next = responses.mapNotNull { it.third?.let { url -> it.second.provider to url } }.toMap()
+        SearchResults(sortTitles(filterTitles(titles, filters), filters.sort), statuses,
+            if (filters.isActive) "Country and Chinese genre: DBKU only. In this mode DBKU searches title text within filtered catalog pages; load more for older titles. Cineby, BingeBang and Hongguo ignore these two filters. BingeBang returns one search batch; remote pagination is not provided. Other filters/sorting apply to loaded results." else null, next)
     }
 
     suspend fun search(query: String): List<DesignTitle> = searchWithFilters(query).titles
 
     suspend fun sources(title: DesignTitle, episode: DesignEpisode?): List<ProviderStream> = withContext(Dispatchers.IO) {
+        require(title.provider != "hongguo") { HONGGUO_NOTICE }
         val detail = details(title)
+        if (title.provider == "bingebang") return@withContext listOf(bingeStream(detail, episode))
         val sources = if (title.provider == "dbku") {
             val page = episode?.pageUrl?.takeIf { it.isNotBlank() } ?: detail.playbackPage
             require(page.isNotBlank()) { "DBKU did not provide a playback link for this title." }
@@ -223,7 +186,7 @@ internal fun parseDbkuHome(html: String): List<DesignRow> {
             liveTitle("dbku", a.absUrl("href"), a.attr("title"), a.absUrl("data-original"), score = rating(li.select(".pic-tag-top, .pic-tag").text()), tv = !heading.contains("电影"), genres = listOf(heading))
         }.distinctBy { it.id }
         if (cards.isEmpty() || heading.isBlank()) return@mapNotNull null
-        val id = when { heading.contains("陆剧") -> "mainland"; heading.contains("日韩") -> "japan_korea"; heading.contains("台泰") || heading.contains("港台") -> "hk_taiwan"; heading.contains("动漫") -> "anime"; heading.contains("综艺") -> "variety"; heading.contains("电影") -> "dbku-movies"; heading.contains("短剧") -> "dbku-shorts"; else -> "dbku-hot" }
+        val id = when { heading.contains("陆剧") -> "mainland"; heading.contains("日韩") -> "japan_korea"; heading.contains("台泰") -> "taiwan_thailand"; heading.contains("港台") -> "hk_taiwan"; heading.contains("动漫") -> "anime"; heading.contains("综艺") -> "variety"; heading.contains("电影") -> "dbku-movies"; heading.contains("短剧") -> "dbku-shorts"; else -> "dbku-hot" }
         DesignRow(id, heading, "DBKU", cards)
     }.distinctBy { it.id }
     require(rows.isNotEmpty()) { "DBKU catalog markup was not recognized." }
@@ -247,6 +210,9 @@ internal fun parseCinebyDetails(title: DesignTitle, doc: Document): DesignTitle 
         poster = poster.ifBlank { title.poster }, backdrop = doc.selectFirst("#playerBackdrop img, img[src*=backdrops]")?.absUrl("src")?.takeIf { it.isNotBlank() } ?: title.backdrop,
         year = json?.optString("datePublished")?.let { year(it) }?.takeIf { it > 0 } ?: title.year, rating = json?.optJSONObject("aggregateRating")?.optString("ratingValue")?.takeIf { it.isNotBlank() } ?: title.rating,
         genres = if (genres != null) (0 until genres.length()).map { genres.getString(it) } else title.genres,
+        countries = json?.opt("countryOfOrigin")?.let { value -> when (value) {
+            is JSONObject -> listOf(value.optString("name")); is org.json.JSONArray -> (0 until value.length()).map { index -> val item = value.get(index); if (item is JSONObject) item.optString("name") else item.toString() }; else -> listOf(value.toString())
+        } }?.filter { it.isNotBlank() } ?: title.countries,
         cast = if (actors != null) (0 until actors.length()).map { DesignCast(actors.getJSONObject(it).getString("name"), "", "") } else emptyList(), seasons = seasons)
 }
 
@@ -262,59 +228,52 @@ internal fun parseDbkuDetails(title: DesignTitle, doc: Document): DesignTitle {
     val firstData = detail?.selectFirst("p.data")
     val cast = detail?.select("p.data")?.firstOrNull { it.text().contains("主演：") }?.select("a")?.map { DesignCast(it.text(), "", "") }.orEmpty()
     val category = firstData?.selectFirst("a")?.text().orEmpty()
+    val publishedGenres = doc.select("meta[name=keywords]").attr("content").split(',', '，', '、').map { it.trim() }.filter { it in FilterOptions.GENRES && it != "All" }
     return title.copy(title = detail?.select("h1")?.text()?.takeIf { it.isNotBlank() } ?: title.title,
         isTv = if (category.isNotBlank()) category != "电影" else title.isTv,
         overview = doc.select("#desc").text().ifBlank { detail?.select("p.data")?.firstOrNull { it.text().contains("简介：") }?.text().orEmpty() },
         rating = detail?.select(".branch")?.text()?.takeIf { it.isNotBlank() } ?: title.rating,
         year = year(firstData?.text().orEmpty()), poster = doc.selectFirst(".myui-content__thumb img")?.absUrl("data-original")?.takeIf { it.isNotBlank() } ?: title.poster,
-        genres = firstData?.select("a")?.take(1)?.map { it.text() }.orEmpty(), cast = cast, seasons = groups,
+        genres = (listOfNotNull(category.takeIf { it.isNotBlank() }) + doc.select(".myui-content__detail a[href*=/vodshow/]").map { it.text() } + publishedGenres + title.genres).distinct(), countries = firstData?.select("a")?.getOrNull(1)?.text()?.let { listOf(it) } ?: title.countries, isShort = category.contains("短剧"), cast = cast, seasons = groups,
         playbackPage = groups.firstOrNull()?.episodes?.firstOrNull()?.pageUrl.orEmpty())
 }
 
 
+internal fun requireProviderPage(provider: String, url: String) {
+    val uri = URI(url)
+    val host = when (provider) { "cineby" -> "cineby.ws"; "bingebang" -> "bingebang.st"; "hongguo" -> "hongguoduanju.com"; else -> "www.dbku.tv" }
+    require(uri.scheme == "https" && uri.host == host && uri.userInfo == null) { "Invalid provider page URL" }
+}
+internal fun nextSearchPage(doc: Document, provider: String, current: String): String? {
+    val next = doc.select("a[rel=next], .pagination a, .myui-page a").firstOrNull {
+        it.attr("rel") == "next" || it.text().trim() in listOf("Next", "Next Page", "下一页", "»", "›")
+    } ?: return null
+    if (next.hasClass("disabled") || next.parent()?.hasClass("disabled") == true) return null
+    val url = next.absUrl("href")
+    if (url.isBlank() || url == current || next.attr("href").startsWith("#")) return null
+    return url.takeIf { runCatching { requireProviderPage(provider, it) }.isSuccess }
+}
 internal fun parseCinebySearch(html: String): List<DesignTitle> {
     val doc = Jsoup.parse(html, ProvidersRepository.CINEBY)
-    val elements = doc.select("article, .content-card, div[class*=card], a[href*=/movie/], a[href*=/tv/], a[href*=/series/]")
-    val titles = mutableListOf<DesignTitle>()
-    val seenUrls = mutableSetOf<String>()
-
-    for (el in elements) {
-        val linkEl = if (el.tagName() == "a") el else el.selectFirst("a[href*=/movie/], a[href*=/tv/], a[href*=/series/]")
-        val href = linkEl?.absUrl("href").orEmpty()
-        if (href.isBlank() || href in seenUrls) continue
-        if (!href.contains("/movie/") && !href.contains("/tv/") && !href.contains("/series/")) continue
-
-        val titleText = el.selectFirst(".card-title, .title, h2, h3, h4, .name")?.text()
-            ?.takeIf { it.isNotBlank() }
-            ?: linkEl.attr("title").takeIf { it.isNotBlank() }
-            ?: el.selectFirst("img")?.attr("alt")?.takeIf { it.isNotBlank() }
-            ?: href.substringAfterLast("/").replace("-", " ").split(" ").filter { it.isNotBlank() }.joinToString(" ") { word -> word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } }
-
-        val img = el.selectFirst("img")?.let {
-            it.absUrl("data-original").ifBlank { it.absUrl("data-src") }.ifBlank { it.absUrl("src") }
-        }.orEmpty()
-
-        val ratingText = rating(
-            el.select(".rating-badge, [class*=rating], span:contains(★), div:contains(★)").text()
-        )
-
-        val yearText = year(el.select("time, .year, [class*=year], .card-meta").text())
-
-        val isTv = href.contains("/tv/") || href.contains("/series/") || el.select("*:containsOwn(TV)").isNotEmpty()
-
-        seenUrls.add(href)
-        titles.add(
-            liveTitle(
-                provider = "cineby",
-                url = href,
-                name = titleText,
-                image = img,
-                year = yearText,
-                score = ratingText,
-                tv = isTv,
-                genres = if (isTv) listOf("TV Series") else listOf("Movie")
-            )
-        )
-    }
-    return titles
+    val cards = doc.select("article.content-card")
+    require(cards.isNotEmpty() || doc.selectFirst(".search-results-count") != null) { "Cineby search markup was not recognized; this is not a confirmed empty result." }
+    return cards.mapNotNull { card ->
+        val a = card.selectFirst("a[href*=/movie/], a[href*=/tv/]") ?: return@mapNotNull null
+        val name = card.select(".card-title").text().ifBlank { a.attr("title") }
+        if (name.isBlank()) return@mapNotNull null
+        liveTitle("cineby", a.absUrl("href"), name, card.image(), year(card.select("time").text()), rating(card.select(".rating-badge").text()), URI(a.absUrl("href")).path.startsWith("/tv/"))
+    }.distinctBy { it.id }
+}
+internal fun parseDbkuSearch(html: String): List<DesignTitle> {
+    val doc = Jsoup.parse(html, ProvidersRepository.DBKU)
+    val list = doc.selectFirst("#searchList")
+    require(list != null || doc.text().contains("没有找到") || doc.text().contains("暂无")) { "DBKU search markup was not recognized; this is not a confirmed empty result." }
+    return list?.select("a.myui-vodlist__thumb[href*=/voddetail/]")?.map { a ->
+        val li = a.closest("li") ?: a
+        val meta = li.select("p").firstOrNull { it.text().contains("分类：") }?.text().orEmpty()
+        val category = Regex("分类：\\s*(.*?)\\s*地区：").find(meta)?.groupValues?.get(1).orEmpty()
+        val country = Regex("地区：\\s*(.*?)\\s*年份：").find(meta)?.groupValues?.get(1).orEmpty()
+        liveTitle("dbku", a.absUrl("href"), a.attr("title"), a.absUrl("data-original"), year(meta), rating(li.select(".pic-tag-top").text()), !category.contains("电影"), genres = listOfNotNull(category.takeIf { it.isNotBlank() }))
+            .copy(countries = listOfNotNull(country.takeIf { it.isNotBlank() }), isShort = category.contains("短剧"))
+    }?.distinctBy { it.id }.orEmpty()
 }
