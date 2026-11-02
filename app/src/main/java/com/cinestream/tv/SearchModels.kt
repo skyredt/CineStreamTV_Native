@@ -10,7 +10,7 @@ object FilterOptions {
     val COUNTRIES = listOf("All", "大陆", "香港", "台湾", "韩国", "日本", "泰国", "新加坡", "美国", "英国")
     val GENRES = listOf("All", "古装", "武侠", "科幻", "悬疑", "都市", "爱情", "战争", "青春", "偶像", "喜剧", "家庭", "奇幻", "剧情", "乡村", "年代", "警匪", "谍战", "历险", "罪案", "宫廷", "经典", "动作", "惊悚", "历史", "穿越", "同性")
 }
-data class ProviderSearchStatus(val provider: String, val count: Int, val error: String? = null, val isUnsupported: Boolean = false, val message: String? = null)
+data class ProviderSearchStatus(val provider: String, val count: Int, val error: String? = null, val isUnsupported: Boolean = false, val message: String? = null, val failureKind: SearchFailureKind? = null)
 data class SearchResults(val titles: List<DesignTitle>, val statuses: List<ProviderSearchStatus>, val localFilterNotice: String? = null, val nextPages: Map<String, String> = emptyMap())
 internal fun filterTitles(titles: List<DesignTitle>, filters: SearchFilters): List<DesignTitle> = titles.filter { t ->
     (when (filters.mediaType) { MediaTypeFilter.ALL -> true; MediaTypeFilter.MOVIES -> !t.isTv; MediaTypeFilter.DRAMAS -> t.isTv && !t.isShort; MediaTypeFilter.SHORTS -> t.isShort }) &&

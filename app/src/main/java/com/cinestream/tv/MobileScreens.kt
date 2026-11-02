@@ -70,42 +70,7 @@ private fun MobilePoster(title: DesignTitle, onSelect: (DesignTitle) -> Unit) {
 
 @Composable
 fun MobileCatalogue(state: StreamingState) {
-    val catalog = state.catalog
-    var category by rememberSaveable(state.catalogueMode) { mutableStateOf("home") }
-    if (catalog == null) {
-        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            if (state.catalogError == null) { CircularProgressIndicator(); Text("Loading catalogue…") }
-            else { Text(state.catalogError.orEmpty()); Button(state::reload) { Text("Retry") } }
-        }
-        return
-    }
-    val browse = state.tab == "browse"
-    val rows = catalogueRows(catalog, if (browse) category else "home")
-    val titles = rows.flatMap { it.titles }.distinctBy { it.id }
-    val featured = catalog.titles.firstOrNull { it.featured } ?: catalog.titles.firstOrNull()
-    LazyVerticalGrid(columns = GridCells.Fixed(mobilePosterColumns(LocalConfiguration.current.screenWidthDp)),
-        modifier = Modifier.fillMaxSize().testTag("mobile-catalogue-grid"), contentPadding = PaddingValues(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        if (!browse && featured != null) item(span = { GridItemSpan(maxLineSpan) }) {
-            Card(onClick = { state.open(featured) }) {
-                OriginalArtwork(featured.backdrop, featured.title, Modifier.fillMaxWidth().aspectRatio(16f / 9f))
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(featured.title, style = MaterialTheme.typography.headlineSmall)
-                    Text(featured.provider.uppercase(), color = Accent)
-                    if (featured.overview.isNotBlank()) Text(featured.overview, maxLines = 3, overflow = TextOverflow.Ellipsis)
-                    Text("View details & play", color = Accent)
-                }
-            }
-        }
-        if (browse) item(span = { GridItemSpan(maxLineSpan) }) {
-            val choices = mobileCategories(catalog, state.catalogueMode ?: CatalogueMode.ENGLISH)
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { items(choices) { choice -> FilterChip(category == choice.id, { category = choice.id }, label = { Text(choice.label) }) } }
-        }
-        if (state.warnings.isNotEmpty()) item(span = { GridItemSpan(maxLineSpan) }) {
-            Column { state.warnings.forEach { Text(it, color = Gold) }; TextButton(state::reload) { Text("Retry catalogue") } }
-        }
-        if (titles.isEmpty()) item(span = { GridItemSpan(maxLineSpan) }) { Text("No titles available in this category.") }
-        items(titles, key = { it.id }) { MobilePoster(it, state::open) }
-    }
+    if (state.tab == "home") DiscoveryHome(state, false) else CatalogueBrowse(state, false)
 }
 
 @Composable
@@ -149,7 +114,7 @@ fun MobileSearch(state: StreamingState) {
         }
         if (search.searching) item(span = { GridItemSpan(maxLineSpan) }) { LinearProgressIndicator(Modifier.fillMaxWidth()) }
         search.providerStatuses.forEach { status -> item(span = { GridItemSpan(maxLineSpan) }) {
-            Text("${status.provider.uppercase()}: ${status.error ?: "${status.count} results"}", color = if (status.error != null) Gold else Muted)
+            Text("${status.provider.uppercase()}: ${status.error ?: status.message ?: "${status.count} results"}", color = if (status.error != null) Gold else Muted)
         } }
         search.searchError?.let { message -> item(span = { GridItemSpan(maxLineSpan) }) {
             Column { Text(message, color = Gold); TextButton({ state.search(input) }) { Text("Retry") } }
@@ -243,6 +208,6 @@ fun MobileSettings(state: StreamingState) {
         item { Text("Catalogue: ${state.catalogueMode?.label}") }
         item { Button({ state.navigate("catalogue") }) { Text("English / 中文") } }
         item { OutlinedButton(state::reload) { Text("Reload catalogue") } }
-        item { Text("CineDBKTV 1.5.0 · Shared providers, history and playback. Subtitle and server options depend on each player.") }
+        item { Text("CineDBKTV 1.6.0 · Shared providers, history and playback. Subtitle and server options depend on each player.") }
     }
 }

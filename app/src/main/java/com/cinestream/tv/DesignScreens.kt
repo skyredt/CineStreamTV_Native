@@ -87,7 +87,8 @@ fun DesignShell(tab: String, menuSignal: Int, onTab: (String) -> Unit, onTester:
                         if (expanded) Column(Modifier.padding(start = 12.dp)) { Text("CineDBKTV", fontWeight = FontWeight.Black); Text("ANDROID TV", color = Accent, fontSize = 10.sp) }
                     }
                 }
-                val tabs = listOf(Tab("home", if (mode == CatalogueMode.ENGLISH) "Home" else "首页", Icons.Outlined.Home)) +
+                val tabs = listOf(Tab("home", if (mode == CatalogueMode.ENGLISH) "Home" else "首页", Icons.Outlined.Home),
+                    Tab("browse", if (mode == CatalogueMode.ENGLISH) "Browse" else "分类", Icons.Outlined.GridView)) +
                     (if (mode == CatalogueMode.ENGLISH) listOf(Tab("movies", "Movies", Icons.Outlined.LocalMovies), Tab("series", "TV Series", Icons.Outlined.Tv)) +
                         (if (rows.any { it.id.startsWith("bingebang-") }) listOf(Tab("trending", "Trending", Icons.Outlined.TrendingUp)) else emptyList()) +
                         (if (rows.any { it.id == "new-releases" }) listOf(Tab("new", "New Releases", Icons.Outlined.NewReleases)) else emptyList())

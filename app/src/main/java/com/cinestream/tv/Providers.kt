@@ -89,7 +89,8 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
         val requests = (if (page == 1) initial else nextPages).filterKeys { key -> key != "hongguo" && (mode == null || mode.accepts(key.substringBefore(':'))) }
         val metadataNeeded = filters.genre != "All" || filters.country != "All" || filters.mediaType != MediaTypeFilter.ALL
         val permits = kotlinx.coroutines.sync.Semaphore(4)
-        val responses = requests.map { (provider, url) -> async {
+        val skippedCineby = query.isBlank() && requests.containsKey("cineby")
+        val responses = requests.filterKeys { it != "cineby" || !skippedCineby }.map { (provider, url) -> async {
             try {
                 requireProviderPage(provider, url)
                 val html = request(url)
@@ -105,9 +106,13 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
                 } }.awaitAll() }
                 Triple(titles, ProviderSearchStatus(provider, titles.size, message = if (provider == "hongguo") "红果：暂不支持播放；新剧排序与逐集锁定状态未提供。分类仅用于空关键词浏览。" else if (metadataFailures > 0) "$metadataFailures title details unavailable" else null), if (provider == "hongguo") hongguoResult?.second else if (provider == "bingebang") null else nextSearchPage(doc, provider, url))
             } catch (e: CancellationException) { throw e }
-            catch (e: Exception) { Triple(emptyList(), ProviderSearchStatus(provider, 0, error = e.message ?: "Request failed"), url.takeIf { page > 1 }) }
+            catch (e: Exception) {
+                val detected = searchFailureKind(e)
+                val kind = if (detected == SearchFailureKind.INPUT_REQUIRED && query.isNotBlank()) SearchFailureKind.UNRECOGNIZED else detected
+                Triple(emptyList(), ProviderSearchStatus(provider, 0, error = searchFailureMessage(kind), failureKind = kind), url.takeIf { page > 1 })
+            }
         } }.awaitAll()
-        val statuses = responses.map { it.second }
+        val statuses = responses.map { it.second } + if (skippedCineby) listOf(ProviderSearchStatus("cineby", 0, message = "Enter a title to search Cineby.")) else emptyList()
         val titles = responses.flatMap { it.first }.distinctBy { it.id }
         val next = responses.mapNotNull { it.third?.let { url -> it.second.provider to url } }.toMap()
         SearchResults(sortTitles(filterTitles(titles, filters), filters.sort), statuses,
@@ -264,15 +269,30 @@ internal fun nextSearchPage(doc: Document, provider: String, current: String): S
 }
 internal fun parseCinebySearch(html: String): List<DesignTitle> {
     val doc = Jsoup.parse(html, ProvidersRepository.CINEBY)
+    val headings = listOf(doc.title(), doc.select("h1").text()).map { it.trim().lowercase() }
+    if (doc.selectFirst("#challenge-form, #cf-challenge-running, iframe[src*=captcha], [data-sitekey]") != null ||
+        headings.any { heading -> listOf("just a moment", "access denied", "verify you are human", "attention required").any { heading.startsWith(it) } })
+        throw SearchResponseException(SearchFailureKind.ACCESS)
     val cards = doc.select("article.content-card")
-    require(cards.isNotEmpty() || doc.selectFirst(".search-results-count") != null) { "Cineby search markup was not recognized; this is not a confirmed empty result." }
-    return cards.mapNotNull { card ->
+    if (cards.isEmpty()) {
+        val count = doc.select(".search-results-count").text()
+        if (Regex("^\\s*0\\s+results?\\b", RegexOption.IGNORE_CASE).containsMatchIn(count)) return emptyList()
+        if (doc.selectFirst("form.search-form input[name=q]") != null && doc.text().contains("Search Our Library", true))
+            throw SearchResponseException(SearchFailureKind.INPUT_REQUIRED)
+        throw SearchResponseException(SearchFailureKind.UNRECOGNIZED)
+    }
+    val titles = cards.mapNotNull { card ->
         val a = card.selectFirst("a[href*=/movie/], a[href*=/tv/]") ?: return@mapNotNull null
+        val url = a.absUrl("href")
+        if (runCatching { requireProviderPage("cineby", url) }.isFailure) return@mapNotNull null
         val name = card.select(".card-title").text().ifBlank { a.attr("title") }
         if (name.isBlank()) return@mapNotNull null
-        liveTitle("cineby", a.absUrl("href"), name, card.image(), year(card.select("time").text()), rating(card.select(".rating-badge").text()), URI(a.absUrl("href")).path.startsWith("/tv/"))
+        liveTitle("cineby", url, name, card.image(), year(card.select("time").text()), rating(card.select(".rating-badge").text()), URI(url).path.startsWith("/tv/"))
     }.distinctBy { it.id }
+    if (titles.isEmpty()) throw SearchResponseException(SearchFailureKind.UNRECOGNIZED)
+    return titles
 }
+
 internal fun parseDbkuSearch(html: String): List<DesignTitle> {
     val doc = Jsoup.parse(html, ProvidersRepository.DBKU)
     val list = doc.selectFirst("#searchList")

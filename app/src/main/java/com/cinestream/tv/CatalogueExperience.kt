@@ -22,7 +22,7 @@ enum class CatalogueMode(val label: String) {
     fun accepts(provider: String) = if (this == ENGLISH) provider in setOf("cineby", "bingebang") else provider == "dbku"
 }
 
-data class ViewingEntry(val title: DesignTitle, val episodeId: String?, val position: Long, val updated: Long)
+data class ViewingEntry(val title: DesignTitle, val episodeId: String?, val position: Long, val updated: Long, val episodeLabel: String = "")
 
 /** Local provider-qualified identities; embedded players only resume when they report position. */
 class CataloguePreferences(context: Context) {
@@ -36,14 +36,14 @@ class CataloguePreferences(context: Context) {
             val item = data.getJSONObject(index)
             val title = liveTitle(item.getString("provider"), item.getString("url"), item.getString("title"), item.optString("poster"), tv = item.optBoolean("tv"))
                 .copy(id = item.getString("id"))
-            ViewingEntry(title, item.optString("episode").takeIf { it.isNotBlank() }, item.optLong("position"), item.optLong("updated"))
+            ViewingEntry(title, item.optString("episode").takeIf { it.isNotBlank() }, item.optLong("position"), item.optLong("updated"), item.optString("episodeLabel"))
         }.filter { it.title.provider in setOf("cineby", "bingebang", "dbku") }
     }.getOrDefault(emptyList())
     fun writeHistory(entries: List<ViewingEntry>) {
         val data = JSONArray()
         entries.take(100).forEach { entry -> data.put(JSONObject().put("id", entry.title.id).put("provider", entry.title.provider)
             .put("url", entry.title.pageUrl).put("title", entry.title.title).put("poster", entry.title.poster).put("tv", entry.title.isTv)
-            .put("episode", entry.episodeId.orEmpty()).put("position", entry.position).put("updated", entry.updated)) }
+            .put("episode", entry.episodeId.orEmpty()).put("position", entry.position).put("updated", entry.updated).put("episodeLabel", entry.episodeLabel)) }
         prefs.edit().putString("history", data.toString()).apply()
     }
 }

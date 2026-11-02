@@ -39,18 +39,19 @@ internal fun runCatalogueExperienceCheck(runner: Instrumentation) = with(runner)
         key(KeyEvent.KEYCODE_DPAD_DOWN)
         key(KeyEvent.KEYCODE_DPAD_UP)
         key(KeyEvent.KEYCODE_DPAD_CENTER)
-        waitFor("English home") { nodes().any { it.text?.toString() == "Details & Play" } }
+        waitFor("English home") { nodes().any { it.text?.toString() == "More details" } }
         check(CataloguePreferences(targetContext).mode == CatalogueMode.ENGLISH)
         passed += "First launch; D-pad/OK selects English; live home renders"
+        key(KeyEvent.KEYCODE_DPAD_RIGHT)
         key(KeyEvent.KEYCODE_DPAD_CENTER)
         waitFor("native details") { nodes().any { it.text?.toString()?.startsWith("Play ") == true } && nodes().none { it.text?.toString() == "Loading details and episodes…" } }
         key(KeyEvent.KEYCODE_BACK)
-        waitFor("return to home") { nodes().any { it.text?.toString() == "Details & Play" } }
+        waitFor("return to home") { nodes().any { it.text?.toString() == "More details" } }
         check(nodes().any { it.isFocused })
         passed += "Poster/featured action opens native details; Back restores home focus"
         runOnMainSync { activity.finish() }
         activity = launch()
-        waitFor("persisted English") { nodes().any { it.text?.toString() == "Details & Play" } }
+        waitFor("persisted English") { nodes().any { it.text?.toString() == "More details" } }
         check(nodes().none { it.text?.contains("Choose your catalogue") == true })
         passed += "Catalogue preference persists across activity restart"
         // Actual sidebar traversal, with no pointer input.
@@ -67,7 +68,7 @@ internal fun runCatalogueExperienceCheck(runner: Instrumentation) = with(runner)
         waitFor("catalogue switch chooser") { nodes().any { it.text?.contains("Choose your catalogue") == true } }
         key(KeyEvent.KEYCODE_DPAD_DOWN)
         key(KeyEvent.KEYCODE_DPAD_CENTER)
-        waitFor("Chinese home") { CataloguePreferences(targetContext).mode == CatalogueMode.CHINESE && nodes().any { it.text?.toString() == "Details & Play" } }
+        waitFor("Chinese home") { CataloguePreferences(targetContext).mode == CatalogueMode.CHINESE && nodes().any { it.text?.toString() == "More details" } }
         passed += "D-pad sidebar switches to Chinese without restart; DBKU home renders"
         val repository = ProvidersRepository()
         runBlocking {
@@ -82,9 +83,10 @@ internal fun runCatalogueExperienceCheck(runner: Instrumentation) = with(runner)
             check(detail.directors.isNotEmpty() && detail.cast.isNotEmpty() && detail.seasons.first().episodes.size == 40)
             passed += "Live DBKU reference details include cast, director and 40 episodes"
             val saved = CataloguePreferences(targetContext)
-            saved.writeHistory(listOf(ViewingEntry(detail, detail.seasons.first().episodes[1].id, 123000, 1)))
+            saved.writeHistory(listOf(ViewingEntry(detail, detail.seasons.first().episodes[1].id, 123000, 1, detail.seasons.first().episodes[1].title)))
             val read = CataloguePreferences(targetContext).readHistory().single()
             check(read.title.id == detail.id && read.position == 123000L && read.episodeId == detail.seasons.first().episodes[1].id)
+            check(read.episodeLabel == detail.seasons.first().episodes[1].title)
             saved.writeHistory(emptyList())
             passed += "History round-trip preserves provider identity, exact episode and reported progress"
         }

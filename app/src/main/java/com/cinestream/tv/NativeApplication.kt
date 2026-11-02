@@ -89,7 +89,7 @@ class StreamingState(val repository: ProvidersRepository, private val preference
     fun clearHistory() { history = history.filterNot { catalogueMode?.accepts(it.title.provider) == true }; preferences?.writeHistory(history) }
     private fun recordPosition(position: Long) {
         val title = playingSelection ?: return
-        history = (listOf(ViewingEntry(title, playingEpisode?.id, position.coerceAtLeast(0), System.currentTimeMillis())) + history.filterNot { it.title.id == title.id }).take(100)
+        history = (listOf(ViewingEntry(title, playingEpisode?.id, position.coerceAtLeast(0), System.currentTimeMillis(), playingEpisode?.title.orEmpty())) + history.filterNot { it.title.id == title.id }).take(100)
         preferences?.writeHistory(history)
     }
     private var lastSavedPosition = -10000L
@@ -102,6 +102,17 @@ class StreamingState(val repository: ProvidersRepository, private val preference
         val episode = title.seasons.flatMap { it.episodes }.find { it.id == entry?.episodeId }
         if (title.isTv && entry?.episodeId != null && episode == null) { error = "The previously selected episode is no longer listed. Select an available episode."; return }
         play(title, episode, resume = true)
+    }
+    fun discoverPlay(title: DesignTitle, resume: Boolean = false) {
+        cancel(); selected = title; loadingDetails = true
+        job = viewModelScope.launch {
+            try {
+                val detail = repository.details(title)
+                selected = detail; loadingDetails = false
+                if (resume) continueWatching(detail) else play(detail, if (detail.isTv) detail.seasons.firstOrNull()?.episodes?.firstOrNull() else null)
+            } catch (e: CancellationException) { throw e }
+            catch (_: Exception) { loadingDetails = false; error = "Could not load this title. Open details or retry." }
+        }
     }
     var catalog by mutableStateOf<DesignCatalog?>(null); private set
     var catalogError by mutableStateOf<String?>(null); private set
@@ -264,11 +275,11 @@ fun TvAppNavigation(state: StreamingState) {
                         if (state.catalogError == null) { CircularProgressIndicator(color = Accent); Text("Loading selected catalogue…", Modifier.padding(top = 16.dp)) }
                         else { Text(state.catalogError.orEmpty()); Action("Retry catalog") { state.reload() } }
                     }
-                    else -> CatalogueHome(catalog, state.tab, state)
+                    state.tab == "home" -> DiscoveryHome(state, true)
+                    else -> CatalogueBrowse(state, true)
                 }
                 }
             }
-            if (state.warnings.isNotEmpty()) Text(state.warnings.joinToString("\n"), Modifier.align(Alignment.BottomStart).padding(start = 112.dp, bottom = 12.dp), color = Color(0xFFFFB300))
         }
     }
     if (state.loadingDetails || state.resolving) Dialog(onDismissRequest = state::cancel) {
