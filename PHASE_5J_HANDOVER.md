@@ -1,12 +1,20 @@
 # CineDBKTV Phase 5J — authoritative handover
 
-Updated 2 November 2026 (Asia/Singapore). Scope: **Attempt 1 only**.
+Updated 2 November 2026 (Asia/Singapore). Scope: **Attempt 1 verified; Attempt 2 requested but not implemented**.
 
-## Result
+## Attempt 2 request — no playback implementation performed
+
+The user requested real playback after Attempt 1. Baseline was verified clean on `feature/hongguo-single-apk`, HEAD `62a7e90b7309cb0fbdd54a3095cc3a77102c03ef`. Live balance snapshot: **39% five-hour / 66% weekly remaining**. Only the baseline documents, Git state and usage were checked.
+
+No real preparation request was sent, no protected key/media handling was executed, and no playback code, build, test, emulator or new APK was produced. The known custom protected-key/CENC-clearing route was not wired up or invoked as a way around content protection. Community-code reuse permission remains accepted as reported. Integration can proceed with a provider-authorized playable source or supported DRM session configuration; no such usable path was established here. This is a limitation on the requested implementation path, not evidence of a new server denial, proven unavailable entitlement or universal technical impossibility.
+
+Episodes **1, 51, 88 and 90: NOT PERFORMED**, including all video, audio, seeking, fullscreen and control acceptance. Actual engine remains integrated from Attempt 1, but was not executed in this continuation. Hongguo playback remains disabled. Only this handover/history status is changed and committed locally; no push/distribution. Attempt 1 results below remain historical verified evidence, not Attempt 2 success.
+
+## Attempt 1 result
 
 **Real-engine integration: PASS. Hongguo video playback: NOT TESTED / disabled.**
 
-The actual unchanged Hongguo Go executable is packaged in CineDBKTV's development APK. On an Android 35 x86_64 emulator, CineDBKTV verified its installed hash, launched its own child, parsed its readiness/status, checked its exact version, communicated with its real localhost API, stopped it, restarted it, forcibly terminated it, observed failure and cleanup, and successfully started/stopped a replacement child. No fixture substituted for these acceptance tests. No valid episode-preparation request, protected-media decryption or access-control workaround was invoked. Attempt 2 / Phase 6 is not authorized.
+The actual unchanged Hongguo Go executable is packaged in CineDBKTV's development APK. On an Android 35 x86_64 emulator, CineDBKTV verified its installed hash, launched its own child, parsed its readiness/status, checked its exact version, communicated with its real localhost API, stopped it, restarted it, forcibly terminated it, observed failure and cleanup, and successfully started/stopped a replacement child. No fixture substituted for these acceptance tests. No valid episode-preparation request, protected-media decryption or access-control workaround was invoked. Attempt 2 was subsequently requested; Phase 6 remains outside scope.
 
 | Acceptance | Result |
 | --- | --- |
@@ -82,4 +90,4 @@ Runtime entry is `HongguoCoreInstallation.runtime(context)` followed by `start()
 
 Attempt 1 has no remaining blocking engineering issue for the tested x86_64 lifecycle/API scope. Media preparation and live protected playback remain separate, unperformed gates. Accept the user's reported community-developer modification/reuse permission; do not repeatedly reopen general permission or feasibility discussions. Do not infer upstream content authorization or bypass restrictions. No protected keys were extracted and no protected-video preparation was requested here.
 
-Start balances at 05:51:54 UTC: **50% five-hour / 68% weekly remaining**. Checkpoints: **47%/67%** (3/1 consumed), **44%/67%** (6/1 consumed), pre-closeout **41%/66%** (9/2 consumed). Values are rounded account-wide snapshots, not continuous/task-exclusive accounting. Reserve and weekly threshold remain intact. Final closeout snapshot is reported in the final response. Do not start Attempt 2, Phase 6, push, merge or distribute without authorization.
+Start balances at 05:51:54 UTC: **50% five-hour / 68% weekly remaining**. Checkpoints: **47%/67%** (3/1 consumed), **44%/67%** (6/1 consumed), pre-closeout **41%/66%** (9/2 consumed). Values are rounded account-wide snapshots, not continuous/task-exclusive accounting. Reserve and weekly threshold remain intact. Final closeout snapshot is reported in the final response. The subsequent user prompt authorizes Attempt 2 within its restrictions; no Phase 6, push, merge or distribution is authorized.
