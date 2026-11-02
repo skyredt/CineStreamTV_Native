@@ -1,6 +1,6 @@
 # CineDBKTV Phase 5J handover — 2 November 2026 (Asia/Singapore)
 
-**Latest continuation:** See section 12 for the subsequent community media-preparation review, current repository baseline and latest resource accounting. Sections 1–11 preserve the earlier evidence and historical readings. Playback is still disabled; no application source was changed in the latest continuation.
+**Latest investigation:** See section 13 for the function-level encryption/key-association trace, current baseline and latest resource accounting. Sections 1–12 preserve earlier evidence and historical readings. Playback is still disabled; no application source was changed in the latest investigation.
 
 ## 1. Status and stopping point
 
@@ -187,3 +187,71 @@ The two pinned community documents are cached locally at `.tmp/phase5j-evidence/
 4. Only after a permitted usable source is verified, implement the minimal resolver/handler and then the four requested in-app tests, capped at 30 seconds each. Otherwise preserve the disabled state and report the precise unresolved dependency. No push/merge/publish without authorization.
 
 Next prompt: **Continue from section 12 of `PHASE_5J_HANDOVER.md` on `feature/hongguo-single-apk`. Registration works; playback is disabled. Community playback prepares/decrypts CENC locally before ordinary HTML5/Media3 playback; it does not demonstrate a reusable standard licence exchange. Verify a permitted protection/key contract or clear source before implementing. Do not repeat solved investigations or extract protected keys. Check actual limits and preserve at least 5% five-hour remaining; update handover early. No companion/backend, pushes, merges or publication.**
+
+## 13. Encryption investigation — 2 November 2026, 09:33 Singapore time
+
+### Outcome and scope
+
+- **Encryption identified: YES, `cenc`. Community preparation process understood: YES at function/data-flow level. Usable permitted key/licence mechanism established: NO. CineDBKTV playback working/enabled: NO.**
+- Start: clean `feature/hongguo-single-apk` at `2671a05462dc0e813092469ac33b648be8783033`. Last application implementation remains `ef8275d`; this investigation changes only the handover. The local successor documentation commit is returned in the final response and is discoverable with `git log -1 --format=%H -- PHASE_5J_HANDOVER.md`.
+- No registration tests, live metadata discovery, media requests, key decoding, video decryption, builds, emulator runs or application edits were performed. Source excerpts were read from the existing cache and checked where needed against revision `e1af6e0` through the connected GitHub read-only tool. No protected keys or credentials were obtained or disclosed.
+
+### A. Confirmed scheme versus missing initialization evidence
+
+The existing sanitized `registration-structural-protection.json` records `encv`, `frma`, `schm` with value **`cenc`**, and `tenc` for all four episode-1 qualities. This confirms the reported protection scheme for those sampled tracks; `cbcs` was not reported. The community documentation describes its supported path as CENC/AES-CTR. Neither observation establishes a specific DRM product or authorization grant.
+
+The retained metadata schema contains a row field named `kid`, plus direct `spade_a`, `encryption_method`, `encrypt`, `gear_des_key` and model `key_seed`. **Actual KID values, `tenc.default_KID`, PSSH contents/system IDs and DRM UUIDs were not retained in these diagnostics.** No key-ID match or DRM-initialization match can therefore be claimed from the saved evidence. A `tenc` marker is not itself a PSSH/licence endpoint. Absence of PSSH from this limited saved summary does not establish absence from the complete media. The current source file's sample-encryption layout is also not fully established by those retained markers.
+
+### B. Function-level community call chain
+
+Source references below are pinned to `e1af6e0`; they describe the community implementation, not executed CineDBKTV playback. They intentionally omit key-decoding/decryption recipes and protected values.
+
+| Stage | Function/reference | Responsibility and dependency |
+| --- | --- | --- |
+| Local playback request | [`server.playInfo`, main.go:374](https://github.com/aston314/hongguo-tv/blob/e1af6e0/core/cmd/hongguotv/main.go#L374) | Normalizes requested quality/codec mode and dispatches full or Range preparation. This is the app's local route, not a provider licence server. |
+| Full-path adapter | [`hongguoClient.PlayInfoQualityMode`, hongguo_client.go:881](https://github.com/aston314/hongguo-tv/blob/e1af6e0/core/cmd/hongguotv/hongguo_client.go#L881), `embeddedMiniReelPlayInfo`:948 | Default internal callback leads to `resolveMiniReelMediaQuality`; explicit codec handling leads to `resolveMiniReelMediaQualityMode`. Returns prepared path and media/quality metadata. |
+| Range adapter | [`PlayInfoRangeQualityMode`, hongguo_client.go:927](https://github.com/aston314/hongguo-tv/blob/e1af6e0/core/cmd/hongguotv/hongguo_client.go#L927) | Calls `resolveMiniReelMediaRangeQualityMode`. |
+| Preparation job dispatch | `resolveMiniReelMediaQualityMode` / `resolveMiniReelMediaWithMode` / `resolveMiniReelMediaWithTokenMode`, minireel.go:307/318/333; Range counterpart minireel_range.go:55 | Selects preparation callback, coordinates locally cached jobs and bounded waiting; does not itself establish upstream rights. |
+| Metadata retrieval | `miniReelNativeOptions` :802 -> `miniReelNativeOptionsWithIdentityCache` :818 -> device-aware attempt chain -> `miniReelNativeOptionsAttemptWithClientMode` :912 | Uses registered identity; fetches episode model, parses its JSON-encoded `video_model`, lists source rows. Registration is already solved in CineDBKTV and was not repeated. |
+| Source/model interpretation | minireel.go around :980–1084, `miniReelFetchFallbackModelWithClient`, `miniReelMapsFromAny` :1891 | Selects model rows, optionally follows returned fallback only when no initial rows exist, builds options with media URL, codec, dimensions, quality, duration and optional locally decoded key. The maps helper only enumerates rows; it does not normalize key-field placement. |
+| Quality choice | `selectMiniReelQuality`, minireel.go:785 | Chooses an offered quality or allowed fallback, retaining that option's associated URL/key. |
+| Full-file preparation | `prepareMiniReelMedia`, minireel.go:433 | Resolves options, selects one, downloads media into private cache and conditionally invokes its proprietary preparation path when an option key exists. This work precedes the player. |
+| Range preparation | `prepareMiniReelRangeMedia`, minireel_range.go:83 -> `openMiniReelRangeSource` -> [`indexMiniReelRangeMP4` :268](https://github.com/aston314/hongguo-tv/blob/e1af6e0/core/cmd/hongguotv/minireel_range.go#L268) | Checks supported Range/container prerequisites and associates the selected option key with a source/sample index. Unsupported encrypted layout or absent required key is an error; this is not an automatic MediaDrm session. |
+| Prepared media delivery | `handleMiniReelMedia`, minireel.go:244 -> `serveMiniReelRangeMedia`, minireel_range.go:532 -> `readAndTransform`, or prepared file serving | Exposes app-local `/minireel-proxy/media/...mp4`. In the encrypted path, this is media prepared by the local core, not the original protected CDN source. |
+| Android rendering | cached pinned `PlayerBridge.startCandidate`, around :171–186 | Creates an ordinary MP4/HLS MediaItem for the prepared source and invokes ExoPlayer. No reviewed bridge licence exchange or `MediaItem.DrmConfiguration` handles the original wrapped metadata. HTML5 follows the same prepared-media contract. |
+
+The metadata parser, Range indexer, route dispatcher and client adapters were corroborated with direct pinned GitHub excerpts. Relevant Git blob IDs returned by that read: `minireel.go` `80ade25fd161027353d290165f78517e1876954c`; `minireel_range.go` `07cb408001767f0482f6a44958dddd343afa2df2`; `main.go` `7c06ded4def018e6d3132f276d6f67b61106ab08`; `hongguo_client.go` `c531f73761a4074b3dc2ff3202f7a3b78f581344`. Existing cached line references outside these excerpts are supporting source evidence, not a full independent audit.
+
+### C. Key handling and newly identified compatibility gaps
+
+- **Application-specific workflow:** metadata handling invokes `miniReelDecodeContentKey` for an encoded field and attaches a resulting key to a selected source option. No standard licence-service exchange was identified in that reviewed path. The decoder was not run or copied; no protected key was recovered. This source architecture alone does not establish permission to reproduce it.
+- **Server-provided information:** source/quality/protection fields and wrapped metadata, plus the original MP4 protection structures. **Locally generated/derived information:** anonymous client identity (already implemented), source selection, cache/job identifiers, file/sample indexing and application-specific preparation state. Cache tokens are not proof of upstream authorization. Do not confuse a locally derived content key with a locally generated unrelated decryption key.
+- **Schema mismatch confirmed:** pinned minireel.go reads nested `row.encrypt_info.spade_a` around lines 1011/1050. CineDBKTV's retained initial and fallback responses instead have direct row `spade_a`. `miniReelMapsFromAny` simply enumerates objects. Therefore the reference parser is not a drop-in adapter for CineDBKTV's observed response. This does NOT prove the community APK is broken: its upstream response may differ, and the successful APK behavior remains historical external-app evidence.
+- **Association is source-option/file based, not a verified KID registry:** the same selected option key is supplied to preparation for the media file and its supported encrypted tracks. The inspected Range indexer iterates encrypted tracks and requires a suitable key, but does not compare track `default_KID` against the metadata `kid` or implement a KID-to-key licence map. The inspected full-file preparation has the same single selected-key association. No key-rotation or multi-key-track support was established. Do not adopt this assumption for CineDBKTV without a verified contract/fixture.
+- A missing nested field must never be interpreted as proof of clear media. The source's clear-path branch and the live diagnostic's direct-field schema do not establish an accessible clear alternative. Existing evidence still says the sampled four qualities are encrypted.
+
+### D. Android compatibility and exact unresolved questions
+
+CineDBKTV's current `Playback.kt:61–65` supplies a plain URI to `DefaultMediaSourceFactory` and has no Hongguo protection handler; `Providers.kt:117` still guards Hongguo playback. Ordinary decoder/remote/fullscreen controls can be reused once playable media exists. The community's Go language is not an inherent requirement; its missing functional role is media/protection preparation, not UI or a new catalogue service.
+
+The [official Media3 DRM documentation](https://developer.android.com/media/media3/exoplayer/drm), already reviewed in section 12, requires an actual DRM scheme/session setup for protected playback and lists supported scheme/container combinations. It does not establish compatibility with these proprietary fields. No guessed ClearKey UUID, custom key extraction or DRM workaround was introduced.
+
+Unresolved questions are now specific:
+
+1. What provider-authorized key-provisioning/licence contract applies to `spade_a`/`kid` for this independent client, if any?
+2. Is there a standard MediaDrm scheme, initialization payload and compatible source format, or an approved in-APK preparation component with established reuse rights?
+3. What are the actual track KIDs, their association with source metadata, and the supported key-rotation/multi-track behavior? Retained schema names cannot answer this.
+4. Does a legitimately accessible clear source exist? None was demonstrated; no new service requests were made here.
+
+**One smallest next action:** obtain the provider-supported provisioning specification (or an authorized integration/test fixture) for the returned `spade_a`/`kid` format, including the track-key association and permitted playback handling. This is the missing dependency to resolve before an in-app proof of concept. Another player library or a wholesale Go port does not supply that contract.
+
+If that gate succeeds, independently implement only (1) the correctly shaped metadata resolver using existing registration, (2) the verified authorized protection/session or approved media adapter, and (3) existing player/episode routing. Until then, keep playback disabled. No compatible permitted mechanism was established in this investigation, so the user's proof-of-concept gate was not reached.
+
+### Tests, preservation and resource closeout
+
+- Source/data-flow inspection only. No new application/unit/build/lint/emulator tests. Prior 41 passing tests, successful debug build and 0-error/6-warning lint remain historical verified results.
+- Episodes **1, 51, 88, 90: all in-CineDBKTV 30-second playback acceptance tests NOT PERFORMED**, including video/audio, seeking, pause/resume and error handling. No entire episode was played.
+- Only this documentation changes. Existing providers, search UI, registration implementation, APKs, branches and Git history are untouched. No push/merge/publish or GitHub mutation; PR draft/unmerged status remains the previously verified status, not a newly fetched claim.
+- Actual starting balances: **100% five-hour / 75% weekly remaining** at 09:33:52 Singapore time. The five-hour window had reset; the previous 9% figure was historical. No usage-reset credit was invoked by this investigation.
+- Investigation stop snapshot: **97% / 75%**, observed consumption **3 / 0 percentage points**. Protected 5% reserve is safe. Continuous measurement is unavailable; account-wide rounded balances were checked conservatively. Investigation stopped within the first five-minute interval; intermediate progress/balances were reported before the interval elapsed.
+- Final closeout before documentation commit: **96% five-hour / 75% weekly remaining**, measured consumption **4 / 0 percentage points**. Protected reserve remains intact. After preparing this handover, only documentation commit/status confirmation and final response remain; no new investigation or development follows automatically.
