@@ -4,6 +4,8 @@ Updated: 2 November 2026 (Asia/Singapore). Authoritative current status. Earlier
 
 ## Current result — Android runtime verified, Hongguo acceptance INCOMPLETE
 
+Verified groundwork is now committed locally as `6611438` (`Verify dormant Hongguo runtime with Android media fixture`). This handover correction is a documentation-only successor. Current full HEAD and clean/dirty state are recorded in the final response; use `git rev-parse HEAD` / `git status --short`. No push or distribution occurred.
+
 Latest continuation started 2 November 2026 at 05:27:39 UTC. User reaffirmed reported permission to modify/reuse the community playback components and authorized closing applications to free memory. The existing application/test APKs were installed in an Android 35 x86_64 emulator and the existing `hongguoRuntime=true` check PASSED:
 
 1. Android-owned test child started; readiness identity/version/authentication checks passed; anonymous status request denied.
@@ -54,8 +56,8 @@ No protected media preparation, key extraction, DRM/payment bypass or community 
 
 - Working directory: `D:\CineStreamTV\cinedbktv-development`.
 - Branch: `feature/hongguo-single-apk`.
-- HEAD unchanged: `506d76055634ea6b600161af03912bc82501333d`.
-- **Working tree is dirty. All work from this session is uncommitted.** This handover and the history appendix are also uncommitted. No push, merge, publication, deployment or PR mutation occurred.
+- Starting HEAD was `506d76055634ea6b600161af03912bc82501333d`; verified groundwork successor is `6611438`. Earlier references to unchanged HEAD/uncommitted work describe the interrupted sessions.
+- Inherited changes were preserved and committed locally after host/build/lint and Android fixture validation. Final status is checked after the documentation successor. No push, merge, publication, deployment or PR mutation occurred.
 - Prior branches, commits, stable/Phase4 APKs and draft PR #1 were not changed. This session did not re-query GitHub PR status.
 - Prior validation APK archived before rebuilding: `CineDBKTV-phase5j-readiness-dev-506d760.apk`, SHA-256 `17328ebe3b07c85d3a23fbd736af2ca0244882d9b4c7afe0094e8c3cab70cac7`.
 
