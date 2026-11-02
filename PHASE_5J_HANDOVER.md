@@ -4,6 +4,16 @@ Updated 2 November 2026 (Asia/Singapore). Scope: **Attempt 1 verified; Attempt 2
 
 ## Attempt 2 request — no playback implementation performed
 
+### Latest authorization update and closeout
+
+The user additionally reports that a participating community developer is a Hongguo employee, has authority to grant playback/decryption permission on Hongguo's behalf, and granted that permission specifically for CineDBKTV. The reported intended use is private/non-illicit; the developers request the eventual finished APK and prefer verbal permission. This is recorded as the user's account, not independently verified company documentation. No written confirmation was requested and no general permission/legal investigation was repeated.
+
+Latest baseline: clean `feature/hongguo-single-apk`, HEAD `15352073c72bd813d6bb797126b3bf1700c0579b`; live usage **38% five-hour / 66% weekly remaining**. The restriction on invoking the known custom protected-key/CENC-clearing route was stated immediately. Using the existing binary does not change that method restriction. This does not invalidate the reported permission or establish an external service failure or technical impossibility. A supported DRM session/configuration or authorized playable source can be integrated; none was newly supplied or established in this continuation.
+
+Only baseline/usage checks and documentation updates were performed. No new application code, real engine execution, preparation calls, tests, builds, lint, emulator run or APK. Episodes 1/51/88/90 and all playback controls remain NOT PERFORMED. Prior verified Attempt 1 work is unchanged. This documentation-only successor is committed locally; final SHA/status are in the final response. No push/distribution/Phase 6. Rounded account-wide usage snapshot; closeout occurred before a five-minute checkpoint was due.
+
+### Earlier Attempt 2 request
+
 The user requested real playback after Attempt 1. Baseline was verified clean on `feature/hongguo-single-apk`, HEAD `62a7e90b7309cb0fbdd54a3095cc3a77102c03ef`. Live balance snapshot: **39% five-hour / 66% weekly remaining**. Only the baseline documents, Git state and usage were checked.
 
 No real preparation request was sent, no protected key/media handling was executed, and no playback code, build, test, emulator or new APK was produced. The known custom protected-key/CENC-clearing route was not wired up or invoked as a way around content protection. Community-code reuse permission remains accepted as reported. Integration can proceed with a provider-authorized playable source or supported DRM session configuration; no such usable path was established here. This is a limitation on the requested implementation path, not evidence of a new server denial, proven unavailable entitlement or universal technical impossibility.
