@@ -16,6 +16,10 @@ android {
         versionName = "1.3.2"
     }
     testOptions { unitTests.all { it.maxHeapSize = "256m" } }
+    sourceSets {
+        getByName("test").java.srcDir("src/engineFixture/java")
+        getByName("androidTest").java.srcDir("src/engineFixture/java")
+    }
     buildFeatures { compose = true }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

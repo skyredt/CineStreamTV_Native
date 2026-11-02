@@ -14,9 +14,11 @@ class TvSmokeRunner : Instrumentation() {
     private var searchLayout = false
     private var bingeProvider = false
     private var hongguoCatalog = false
+    private var hongguoRuntime = false
     private val passed = mutableListOf<String>()
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); mediaUrl = arguments?.getString("mediaUrl"); searchLayout = arguments?.getString("searchLayout") == "true"; bingeProvider = arguments?.getString("bingeProvider") == "true"; hongguoCatalog = arguments?.getString("hongguoCatalog") == "true"; start() }
+    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); mediaUrl = arguments?.getString("mediaUrl"); searchLayout = arguments?.getString("searchLayout") == "true"; bingeProvider = arguments?.getString("bingeProvider") == "true"; hongguoCatalog = arguments?.getString("hongguoCatalog") == "true"; hongguoRuntime = arguments?.getString("hongguoRuntime") == "true"; start() }
     override fun onStart() {
+        if (hongguoRuntime) { runHongguoRuntimeCheck(this); return }
         if (hongguoCatalog) { runHongguoCheck(this); return }
         if (bingeProvider) { runBingeBangCheck(this); return }
         if (searchLayout) { runSearchLayoutCheck(this); return }
