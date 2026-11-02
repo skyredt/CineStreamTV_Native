@@ -12,8 +12,8 @@ android {
         minSdk = 26
         targetSdk = 35
         testInstrumentationRunner = "com.cinestream.tv.TvSmokeRunner"
-        versionCode = 10
-        versionName = "1.4.0"
+        versionCode = 11
+        versionName = "1.5.0"
     }
     testOptions { unitTests.all { it.maxHeapSize = "256m" } }
     sourceSets {

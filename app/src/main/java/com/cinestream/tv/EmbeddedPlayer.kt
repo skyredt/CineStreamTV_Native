@@ -1,6 +1,9 @@
 package com.cinestream.tv
 
 import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.*
@@ -30,6 +33,13 @@ import org.json.JSONObject
 @Composable
 fun EmbeddedPlayer(source: ProviderStream, title: String, initialPosition: Long = 0, onPosition: (Long) -> Unit = {}, onFailure: (String) -> Boolean = { false }, onBack: () -> Unit) {
     val context = LocalContext.current
+    val tv = LocalTvInterface.current
+    var fileCallback by remember { mutableStateOf<ValueCallback<Array<Uri>>?>(null) }
+    val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        fileCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
+        fileCallback = null
+    }
+    DisposableEffect(Unit) { onDispose { fileCallback?.onReceiveValue(null); fileCallback = null } }
     val owner = LocalLifecycleOwner.current
     val binge = android.net.Uri.parse(source.url).host == "bingebang.st"
     val supported = binge || android.net.Uri.parse(source.url).host == "play.xpass.top"
@@ -82,7 +92,7 @@ fun EmbeddedPlayer(source: ProviderStream, title: String, initialPosition: Long 
         onDispose { controller?.show(WindowInsetsCompat.Type.navigationBars()) }
     }
     fun navigateKey(code: Int, action: Int): Boolean {
-        if (!supported || error != null) return false
+        if (!tv || !supported || error != null) return false
         val directions = listOf(KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT)
         if (code !in directions && code !in listOf(KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER)) return false
         if (action == KeyEvent.ACTION_DOWN) {
@@ -117,6 +127,12 @@ fun EmbeddedPlayer(source: ProviderStream, title: String, initialPosition: Long 
                 settings.setSupportMultipleWindows(false)
                 setOnKeyListener { _, code, event -> navigateKey(code, event.action) }
                 webChromeClient = object : WebChromeClient() {
+                    override fun onShowFileChooser(webView: WebView, callback: ValueCallback<Array<Uri>>, params: FileChooserParams): Boolean {
+                        fileCallback?.onReceiveValue(null)
+                        fileCallback = callback
+                        return try { filePicker.launch(params.createIntent()); true }
+                        catch (_: android.content.ActivityNotFoundException) { callback.onReceiveValue(null); fileCallback = null; true }
+                    }
                     override fun onShowCustomView(view: View, callback: CustomViewCallback) { fullScreen = view; fullScreenCallback = callback }
                     override fun onHideCustomView() { fullScreen = null; fullScreenCallback = null }
                 }
@@ -148,6 +164,9 @@ fun EmbeddedPlayer(source: ProviderStream, title: String, initialPosition: Long 
         }, onRelease = { view ->
             fullScreenCallback?.onCustomViewHidden(); view.stopLoading(); view.loadUrl("about:blank"); view.onPause(); view.removeAllViews(); view.destroy(); browser = null
         }, modifier = Modifier.fillMaxSize())
+        if (!tv && error == null) Row(Modifier.align(Alignment.TopStart).safeDrawingPadding().padding(8.dp)) {
+            FilledTonalButton(onClick = { leavePlayer() }) { Text("Back") }
+        }
         fullScreen?.let { custom -> AndroidView(factory = { custom }, modifier = Modifier.fillMaxSize()) }
         error?.let { message ->
             Surface(Modifier.align(Alignment.Center).padding(32.dp).widthIn(max = 520.dp), color = Color(0xF2111111)) {

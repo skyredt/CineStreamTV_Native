@@ -37,12 +37,12 @@ class MainActivity : ComponentActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.setFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN, android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (usesTelevisionInterface(resources.configuration.uiMode)) window.setFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN, android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContent {
             MaterialTheme(colorScheme = darkColorScheme(primary = Accent, background = Background, surface = Color(0xFF161616), onSurface = Color.White)) {
                 val app = application as CineStreamApp
                 val state: StreamingState = viewModel(factory = viewModelFactory { initializer { StreamingState(app.providers, CataloguePreferences(app)) } })
-                Surface(Modifier.fillMaxSize()) { TvAppNavigation(state) }
+                Surface(Modifier.fillMaxSize()) { AdaptiveApplication(state) }
             }
         }
     }
@@ -206,6 +206,7 @@ class StreamingState(val repository: ProvidersRepository, private val preference
 
 @Composable
 fun TvAppNavigation(state: StreamingState) {
+    val tv = LocalTvInterface.current
     var tester by rememberSaveable { mutableStateOf(false) }
     var input by rememberSaveable { mutableStateOf("") }
     var validation by rememberSaveable { mutableStateOf<String?>(null) }
@@ -228,9 +229,21 @@ fun TvAppNavigation(state: StreamingState) {
                 else PlayerScreen(stream.url, state.playingTitle, headers = if (stream.referer.isBlank()) emptyMap() else mapOf("Referer" to stream.referer), initialPosition = state.playbackPosition, onPosition = state::updatePosition, onFailure = state::sourceFailed, onBack = { state.back() })
             }
             state.sourceNotice?.let { message -> Text(message, Modifier.align(Alignment.TopCenter).padding(top = 70.dp).background(Color(0xEE101010)).padding(12.dp), color = Accent) }
-            if (state.streams.size > 1 && !stream.embedded) Box(Modifier.align(Alignment.TopEnd).padding(16.dp)) { Action("Source: ${stream.name}", dense = true) { sourcePicker = true } }
+            if (state.streams.size > 1 && (!stream.embedded || !tv)) Box(Modifier.align(Alignment.TopEnd).padding(16.dp)) { Action("Source: ${stream.name}", dense = true) { sourcePicker = true } }
         } else if (state.catalogueMode == null || state.tab == "catalogue") {
-            CatalogueChooser(state::chooseCatalogue)
+            if (tv) CatalogueChooser(state::chooseCatalogue) else MobileCatalogueChooser(state::chooseCatalogue)
+        } else if (!tv) {
+            MobileShell(state) {
+                screens.SaveableStateProvider(if (selected != null) "mobile-details:${selected.id}" else "mobile:${state.catalogueMode}:${state.catalogueSession}:${state.tab}") {
+                    when {
+                        selected != null -> MobileDetails(selected, state)
+                        state.tab == "search" -> MobileSearch(state)
+                        state.tab == "history" -> MobileHistory(state)
+                        state.tab == "settings" -> MobileSettings(state)
+                        else -> MobileCatalogue(state)
+                    }
+                }
+            }
         } else {
             DesignShell(state.tab, menuSignal, onTab = state::navigate, onTester = { tester = true }, mode = state.catalogueMode!!, rows = catalog?.rows.orEmpty()) { compact ->
                 screens.SaveableStateProvider(if (selected != null) "details:${selected.id}" else "catalogue:${state.catalogueMode}:${state.catalogueSession}:${state.tab}") {
