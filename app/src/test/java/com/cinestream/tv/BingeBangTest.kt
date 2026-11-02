@@ -112,8 +112,8 @@ class BingeBangTest {
         } }
         val result = repository.home()
         assertEquals(setOf("cineby", "dbku"), result.catalog.titles.map { it.provider }.toSet())
-        assertEquals(1, result.warnings.size)
-        assertTrue(result.warnings.single().startsWith("BingeBang:"))
+        assertEquals(2, result.warnings.size)
+        assertTrue(result.warnings.all { it.startsWith("BingeBang") })
     }
 
     @Test fun cancellationIsNotConvertedToAnEmptyProviderResult() {

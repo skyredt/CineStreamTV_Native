@@ -1,6 +1,6 @@
 package com.cinestream.tv
 
-enum class MediaTypeFilter(val label: String) { ALL("All"), MOVIES("Movies"), DRAMAS("Dramas"), SHORTS("Shorts") }
+enum class MediaTypeFilter(val label: String) { ALL("All"), MOVIES("Movies"), DRAMAS("TV Series"), SHORTS("Shorts") }
 enum class SortOption(val label: String) { DEFAULT("Provider order"), RATING("Rating"), YEAR("Newest release"), TITLE("Title") }
 data class SearchFilters(val mediaType: MediaTypeFilter = MediaTypeFilter.ALL, val genre: String = "All", val year: String = "All", val country: String = "All", val sort: SortOption = SortOption.DEFAULT, val hongguoCategory: String = "real-drama") {
     val isActive get() = this != SearchFilters()

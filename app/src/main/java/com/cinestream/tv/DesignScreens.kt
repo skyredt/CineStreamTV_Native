@@ -69,7 +69,7 @@ fun OriginalArtwork(url: String, description: String, modifier: Modifier = Modif
 private data class Tab(val id: String, val title: String, val icon: ImageVector)
 
 @Composable
-fun DesignShell(tab: String, menuSignal: Int, onTab: (String) -> Unit, onTester: () -> Unit, content: @Composable (Boolean) -> Unit) {
+fun DesignShell(tab: String, menuSignal: Int, onTab: (String) -> Unit, onTester: () -> Unit, mode: CatalogueMode = CatalogueMode.ENGLISH, rows: List<DesignRow> = emptyList(), content: @Composable (Boolean) -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding().background(Background)) {
         val compact = maxWidth < 600.dp
         var expanded by remember { mutableStateOf(false) }
@@ -87,7 +87,15 @@ fun DesignShell(tab: String, menuSignal: Int, onTab: (String) -> Unit, onTester:
                         if (expanded) Column(Modifier.padding(start = 12.dp)) { Text("CineDBKTV", fontWeight = FontWeight.Black); Text("ANDROID TV", color = Accent, fontSize = 10.sp) }
                     }
                 }
-                val tabs = listOf(Tab("home", "首页 Home", Icons.Outlined.Home), Tab("mainland", "陆剧 Chinese Dramas", Icons.Outlined.Tv), Tab("taiwan_thailand", "台泰剧 Taiwan / Thailand", Icons.Outlined.LocalMovies), Tab("japan_korea", "日韩剧 Japan & Korea", Icons.Outlined.Public), Tab("anime", "动漫 Anime / Donghua", Icons.Outlined.AutoAwesome), Tab("variety", "综艺 Variety Shows", Icons.Outlined.Mic), Tab("search", "搜索 Search", Icons.Outlined.Search))
+                val tabs = listOf(Tab("home", if (mode == CatalogueMode.ENGLISH) "Home" else "首页", Icons.Outlined.Home)) +
+                    (if (mode == CatalogueMode.ENGLISH) listOf(Tab("movies", "Movies", Icons.Outlined.LocalMovies), Tab("series", "TV Series", Icons.Outlined.Tv)) +
+                        (if (rows.any { it.id.startsWith("bingebang-") }) listOf(Tab("trending", "Trending", Icons.Outlined.TrendingUp)) else emptyList()) +
+                        (if (rows.any { it.id == "new-releases" }) listOf(Tab("new", "New Releases", Icons.Outlined.NewReleases)) else emptyList())
+                    else rows.filter { it.id != "dbku-hot" }.map { Tab(it.id, it.title, Icons.Outlined.Tv) }) +
+                    listOf(Tab("search", if (mode == CatalogueMode.ENGLISH) "Search" else "搜索", Icons.Outlined.Search),
+                        Tab("history", if (mode == CatalogueMode.ENGLISH) "Watch History" else "观看记录", Icons.Outlined.History),
+                        Tab("settings", if (mode == CatalogueMode.ENGLISH) "Settings" else "设置", Icons.Outlined.Settings),
+                        Tab("catalogue", "English / 中文", Icons.Outlined.Language))
                 items(tabs, key = { it.id }) { item ->
                     var focused by remember { mutableStateOf(false) }
                     val selected = tab == item.id
@@ -104,10 +112,10 @@ fun DesignShell(tab: String, menuSignal: Int, onTab: (String) -> Unit, onTester:
             HorizontalDivider(color = Color(0xFF222222))
             Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(9.dp).clip(CircleShape).background(Color(0xFF10B981)))
-                if (expanded) Text("Cineby · DBKU · BingeBang · 红果", Modifier.padding(start = 12.dp), fontSize = 11.sp, color = Muted)
+                if (expanded) Text("Cineby · DBKU · BingeBang", Modifier.padding(start = 12.dp), fontSize = 11.sp, color = Muted)
             }
         }
-        Box(Modifier.align(Alignment.TopEnd).padding(16.dp)) { Action("Stream Extractor API", icon = Icons.Outlined.WifiTethering, dense = true, onClick = onTester) }
+
     }
 }
 
@@ -187,20 +195,23 @@ fun DesignPoster(title: DesignTitle, onSelect: (DesignTitle) -> Unit, modifier: 
         .clip(RoundedCornerShape(12.dp)).border(if (focused) 4.dp else 1.dp, if (focused) Accent else Color.White.copy(alpha = .1f), RoundedCornerShape(12.dp)).clickable { onSelect(title) }) {
         OriginalArtwork(title.poster, title.title, Modifier.fillMaxSize())
         Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0f to Color.Transparent, .5f to Color.Black.copy(alpha = .15f), 1f to Color(0xFF050505))))
-        Text(title.quality, Modifier.align(Alignment.TopEnd).padding(10.dp).background(Color(0xBF000000), RoundedCornerShape(4.dp)).border(1.dp, Accent.copy(alpha = .3f), RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp), color = Color(0xFF67E8F9), fontSize = 9.sp, fontWeight = FontWeight.ExtraBold)
+        Text(title.provider.uppercase().ifBlank { title.quality }, Modifier.align(Alignment.TopEnd).padding(10.dp).background(Color(0xBF000000), RoundedCornerShape(4.dp)).border(1.dp, Accent.copy(alpha = .3f), RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp), color = Color(0xFF67E8F9), fontSize = 9.sp, fontWeight = FontWeight.ExtraBold)
         Column(Modifier.align(Alignment.BottomStart).padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(title.title, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("★ ${title.rating}", color = Gold, fontSize = 11.sp); Text(if (title.provider == "hongguo" && title.year == 0) "—" else "${title.year}", color = Muted, fontSize = 11.sp) }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text(if (title.rating.isBlank()) title.provider.uppercase() else "★ ${title.rating}", color = Gold, fontSize = 11.sp); Text(if (title.year == 0) "—" else "${title.year}", color = Muted, fontSize = 11.sp) }
         }
         if (focused) Box(Modifier.fillMaxSize().background(Color(0x33083642)), contentAlignment = Alignment.Center) { Box(Modifier.size(48.dp).clip(CircleShape).background(Accent), contentAlignment = Alignment.Center) { Icon(Icons.Outlined.PlayArrow, "Open details", tint = Color.Black, modifier = Modifier.size(28.dp)) } }
     }
 }
 
 @Composable
-fun DesignDetails(title: DesignTitle, compact: Boolean, onBack: () -> Unit, onPlay: (DesignEpisode?) -> Unit) {
+fun DesignDetails(title: DesignTitle, compact: Boolean, onBack: () -> Unit, onPlay: (DesignEpisode?) -> Unit, history: ViewingEntry? = null, onContinue: () -> Unit = {}) {
     var seasonIndex by rememberSaveable(title.id) { mutableIntStateOf(0) }
+    var lastEpisode by rememberSaveable(title.id) { mutableStateOf<String?>(null) }
     val first = remember { FocusRequester() }
-    LaunchedEffect(title.id) { withFrameNanos { }; first.requestFocus() }
+    val episodeFocus = remember { FocusRequester() }
+    val playEpisode: (DesignEpisode?) -> Unit = { episode -> lastEpisode = episode?.id; onPlay(episode) }
+    LaunchedEffect(title.id) { withFrameNanos { }; if (lastEpisode == null) first.requestFocus() else if (title.provider != "dbku") runCatching { episodeFocus.requestFocus() } }
     val padding = if (compact) 24.dp else 56.dp
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 64.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         item {
@@ -219,9 +230,29 @@ fun DesignDetails(title: DesignTitle, compact: Boolean, onBack: () -> Unit, onPl
                 }
             }
         }
-        if (title.provider in listOf("dbku", "hongguo") && title.seasons.isNotEmpty()) {
-            item { DbkuEpisodes(title, onPlay) }
-        } else if (title.seasons.isNotEmpty()) {
+        item {
+            Column(Modifier.padding(horizontal = padding), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    OriginalArtwork(title.poster, title.title, Modifier.width(120.dp).height(180.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Source: ${title.provider.uppercase()}")
+                        if (title.originalTitle.isNotBlank()) Text(title.originalTitle)
+                        if (title.countries.isNotEmpty()) Text("Region: ${title.countries.joinToString()}")
+                        if (title.directors.isNotEmpty()) Text("Director: ${title.directors.joinToString()}")
+                        if (title.updatedAt.isNotBlank()) Text("Updated: ${title.updatedAt}")
+                        if (title.rating.isNotBlank()) Text("Rating source: ${title.ratingSource.ifBlank { title.provider.uppercase() }}")
+                        if (history != null) {
+                            Action(if (history.position > 0) "Continue · ${history.position / 60000} min" else "Return to last episode", onClick = onContinue)
+                            Text("Exact resume depends on player progress reporting.", color = Muted)
+                        }
+                    }
+                }
+                Text(title.overview.ifBlank { "Synopsis unavailable." })
+            }
+        }
+        if (title.isTv && title.provider in listOf("dbku", "hongguo") && title.seasons.isNotEmpty()) {
+            item { DbkuEpisodes(title, playEpisode, history, lastEpisode) }
+        } else if (title.isTv && title.seasons.isNotEmpty()) {
             item {
                 Column(Modifier.padding(horizontal = padding), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text("Seasons & Episodes", fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -236,7 +267,7 @@ fun DesignDetails(title: DesignTitle, compact: Boolean, onBack: () -> Unit, onPl
                 LazyRow(contentPadding = PaddingValues(horizontal = padding, vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
                     items(title.seasons.getOrElse(seasonIndex) { title.seasons.first() }.episodes, key = { it.id }) { episode ->
                         var focused by remember { mutableStateOf(false) }
-                        Column(Modifier.width(256.dp).onFocusChanged { focused = it.isFocused }.clip(RoundedCornerShape(12.dp)).background(Color(0xFF171717)).border(if (focused) 4.dp else 1.dp, if (focused) Accent else Color(0xFF262626), RoundedCornerShape(12.dp)).clickable { onPlay(episode) }) {
+                        Column(Modifier.width(256.dp).then(if (episode.id == lastEpisode) Modifier.focusRequester(episodeFocus) else Modifier).onFocusChanged { focused = it.isFocused }.clip(RoundedCornerShape(12.dp)).background(Color(0xFF171717)).border(if (focused) 4.dp else 1.dp, if (focused) Accent else Color(0xFF262626), RoundedCornerShape(12.dp)).clickable { playEpisode(episode) }) {
                             Box(Modifier.fillMaxWidth().height(144.dp)) {
                                 OriginalArtwork(episode.image, episode.title, Modifier.fillMaxSize())
                                 if (episode.minutes > 0) Text("${episode.minutes}m", Modifier.align(Alignment.BottomEnd).padding(8.dp).background(Color.Black.copy(alpha = .8f)).padding(4.dp), fontSize = 10.sp, color = Color.LightGray)
@@ -244,7 +275,7 @@ fun DesignDetails(title: DesignTitle, compact: Boolean, onBack: () -> Unit, onPl
                             }
                             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("EP ${episode.number}", color = Accent, fontSize = 12.sp, fontWeight = FontWeight.Bold); Text(episode.date, color = Muted, fontSize = 10.sp) }
-                                Text(episode.title, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text((if (episode.id == history?.episodeId) "▶ " else "") + episode.title, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(episode.overview, color = Muted, fontSize = 11.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             }
                         }
@@ -383,19 +414,6 @@ fun DesignSearch(titles: List<DesignTitle>, compact: Boolean, state: StreamingSt
 private fun androidx.compose.foundation.lazy.LazyListScope.searchFilterItems(
     inputQuery: String, searchState: SearchState, state: StreamingState, onQuery: (String) -> Unit
 ) {
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("红果分类 · 空关键词浏览", fontSize = 10.sp, color = Muted)
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HONGGUO_CATEGORIES.forEach { (id, label) ->
-                        FilterPill(label, selected = searchState.filters.hongguoCategory == id) {
-                            state.search(inputQuery, searchState.filters.copy(hongguoCategory = id), 1)
-                        }
-                    }
-                }
-                Text("新剧排序未提供；红果播放暂不支持。", fontSize = 10.sp, color = Muted)
-            }
-        }
         // Search Filters Section
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -444,7 +462,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.searchFilterItems(
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("MEDIA TYPE", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
                     Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        MediaTypeFilter.values().forEach { type ->
+                        MediaTypeFilter.values().filter { it != MediaTypeFilter.SHORTS }.forEach { type ->
                             FilterPill(type.label, selected = searchState.filters.mediaType == type) {
                                 state.search(inputQuery, searchState.filters.copy(mediaType = type), 1)
                             }
@@ -477,7 +495,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.searchFilterItems(
                 }
 
                 // Country / Origin Row
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                if (state.catalogueMode == CatalogueMode.CHINESE) Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("COUNTRY / REGION — DBKU ONLY", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
                     Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterOptions.COUNTRIES.forEach { c ->
@@ -489,7 +507,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.searchFilterItems(
                 }
 
                 // Genre Row
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                if (state.catalogueMode == CatalogueMode.CHINESE) Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("CHINESE GENRE — DBKU ONLY", fontSize = 10.sp, color = Muted, fontWeight = FontWeight.SemiBold)
                     Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterOptions.GENRES.forEach { g ->

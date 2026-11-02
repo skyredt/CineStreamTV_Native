@@ -30,21 +30,24 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
         if (ajax) connection.header("X-Requested-With", "XMLHttpRequest").header("Accept", "application/json")
         return connection.execute().body()
     }
-    suspend fun home(): LiveCatalog = withContext(Dispatchers.IO) {
+    suspend fun home(mode: CatalogueMode? = null): LiveCatalog = withContext(Dispatchers.IO) {
         val warnings = mutableListOf<String>()
-        val cine = async { runCatching { parseCinebyHome(request("$CINEBY/home")) } }
-        val dbku = async { runCatching { parseDbkuHome(request("$DBKU/")) } }
+        val cine = async { runCatching { if (mode == CatalogueMode.CHINESE) emptyList() else parseCinebyHome(request("$CINEBY/home")) } }
+        val dbku = async { runCatching { if (mode == CatalogueMode.ENGLISH) emptyList() else parseDbkuHome(request("$DBKU/")) } }
         val binge = async { runCatching {
-            listOf("movie" to "BingeBang Movies", "tv" to "BingeBang TV").map { (type, name) ->
+            if (mode == CatalogueMode.CHINESE) emptyList() else listOf("movie" to "BingeBang Trending Movies", "tv" to "BingeBang Trending TV").map { (type, name) ->
                 DesignRow("bingebang-$type", name, "BingeBang", parseBingeList(request("$BINGEBANG/api/list/trending_${type}_week?limit=24")))
             }.filter { it.titles.isNotEmpty() }
         } }
-        val hongguo = async { runCatching { parseHongguoHome(request("$HONGGUO/")) } }
-        val rows = cine.await().getOrElse { if (it is CancellationException) throw it; warnings += "Cineby: ${it.message}"; emptyList() } + dbku.await().getOrElse { if (it is CancellationException) throw it; warnings += "DBKU: ${it.message}"; emptyList() } + binge.await().getOrElse { if (it is CancellationException) throw it; warnings += "BingeBang: ${it.message}"; emptyList() } + hongguo.await().getOrElse { if (it is CancellationException) throw it; warnings += "Hongguo: ${it.message}"; emptyList() }
-        if (rows.isEmpty()) error(warnings.joinToString("\n").ifBlank { "The providers returned no catalog entries." })
-        val titles = rows.flatMap { it.titles }.distinctBy { it.id }.toMutableList()
+        val newReleases = async { runCatching {
+            if (mode == CatalogueMode.CHINESE) emptyList() else listOf(DesignRow("new-releases", "BingeBang New Releases", "BingeBang", parseBingeList(request("$BINGEBANG/api/list/movie_now_playing?limit=24"))))
+        } }
+        val rows = newReleases.await().getOrElse { if (it is CancellationException) throw it; warnings += "BingeBang new releases: ${it.message}"; emptyList() } + cine.await().getOrElse { if (it is CancellationException) throw it; warnings += "Cineby: ${it.message}"; emptyList() } + dbku.await().getOrElse { if (it is CancellationException) throw it; warnings += "DBKU: ${it.message}"; emptyList() } + binge.await().getOrElse { if (it is CancellationException) throw it; warnings += "BingeBang: ${it.message}"; emptyList() }
+        val availableRows = rows.filter { it.titles.isNotEmpty() }
+        if (availableRows.isEmpty()) error(warnings.joinToString("\n").ifBlank { "The providers returned no catalog entries." })
+        val titles = availableRows.flatMap { it.titles }.distinctBy { it.id }.toMutableList()
         if (titles.none { it.featured }) titles[0] = titles[0].copy(featured = true)
-        LiveCatalog(DesignCatalog(titles, rows), warnings)
+        LiveCatalog(DesignCatalog(titles, availableRows), warnings)
     }
     suspend fun details(title: DesignTitle): DesignTitle = withContext(Dispatchers.IO) {
         synchronized(detailsCache) { detailsCache[title.id] } ?: run {
@@ -75,15 +78,15 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
             synchronized(detailsCache) { detailsCache[title.id] = value }; value
         }
     }
-    suspend fun searchWithFilters(query: String, filters: SearchFilters = SearchFilters(), page: Int = 1, nextPages: Map<String, String> = emptyMap()): SearchResults = withContext(Dispatchers.IO) {
+    suspend fun searchWithFilters(query: String, filters: SearchFilters = SearchFilters(), page: Int = 1, nextPages: Map<String, String> = emptyMap(), mode: CatalogueMode? = null): SearchResults = withContext(Dispatchers.IO) {
         val value = URLEncoder.encode(query.trim(), "UTF-8")
         val dbkuBrowse = filters.genre != "All" || filters.country != "All"
-        val initial = mutableMapOf("cineby" to "$CINEBY/search?q=$value&type=all", "bingebang" to "$BINGEBANG/api/search/multi?query=$value", "hongguo" to hongguoSearchUrl(query, filters.hongguoCategory))
+        val initial = mutableMapOf("cineby" to "$CINEBY/search?q=$value&type=all", "bingebang" to "$BINGEBANG/api/search/multi?query=$value")
         if (dbkuBrowse) {
             val types = when (filters.mediaType) { MediaTypeFilter.MOVIES -> listOf(1); MediaTypeFilter.DRAMAS -> listOf(2, 4); MediaTypeFilter.SHORTS -> listOf(21); else -> listOf(1, 2, 4, 21) }
             types.forEach { type -> initial["dbku:$type"] = dbkuFilterUrl(type, filters) }
         } else initial["dbku"] = "$DBKU/vodsearch/-------------.html?wd=$value"
-        val requests = if (page == 1) initial else nextPages
+        val requests = (if (page == 1) initial else nextPages).filterKeys { key -> key != "hongguo" && (mode == null || mode.accepts(key.substringBefore(':'))) }
         val metadataNeeded = filters.genre != "All" || filters.country != "All" || filters.mediaType != MediaTypeFilter.ALL
         val permits = kotlinx.coroutines.sync.Semaphore(4)
         val responses = requests.map { (provider, url) -> async {
@@ -108,7 +111,7 @@ class ProvidersRepository(private val fetchPage: ((String, Boolean) -> String)? 
         val titles = responses.flatMap { it.first }.distinctBy { it.id }
         val next = responses.mapNotNull { it.third?.let { url -> it.second.provider to url } }.toMap()
         SearchResults(sortTitles(filterTitles(titles, filters), filters.sort), statuses,
-            if (filters.isActive) "Country and Chinese genre: DBKU only. In this mode DBKU searches title text within filtered catalog pages; load more for older titles. Cineby, BingeBang and Hongguo ignore these two filters. BingeBang returns one search batch; remote pagination is not provided. Other filters/sorting apply to loaded results." else null, next)
+            if (filters.isActive) "Country and Chinese genre: DBKU only. In this mode DBKU searches title text within filtered catalog pages; load more for older titles. Cineby and BingeBang ignore these two filters. BingeBang returns one search batch; remote pagination is not provided. Other filters/sorting apply to loaded results." else null, next)
     }
 
     suspend fun search(query: String): List<DesignTitle> = searchWithFilters(query).titles
@@ -174,7 +177,7 @@ internal fun parseCinebyHome(html: String, allowEmpty: Boolean = false): List<De
         liveTitle("cineby", url, card.select(".card-title").text(), card.image(), year(card.select("time").text()), rating(card.select(".rating-badge").text()), url.contains("/tv/"))
     }.distinctBy { it.id }
     require(allowEmpty || featured.isNotEmpty() || cards.isNotEmpty()) { "Cineby catalog markup was not recognized." }
-    return listOf(DesignRow("trending", "热门推荐 (Trending Hits)", "Cineby", (featured + cards).distinctBy { it.id }), DesignRow("cineby-movies", "Popular Movies", "Cineby", cards.filter { !it.isTv }), DesignRow("cineby-tv", "Top TV Series", "Cineby", cards.filter { it.isTv })).filter { it.titles.isNotEmpty() }
+    return listOf(DesignRow("trending", "Cineby Featured & Catalogue", "Cineby", (featured + cards).distinctBy { it.id }), DesignRow("cineby-movies", "Cineby Movies", "Cineby", cards.filter { !it.isTv }), DesignRow("cineby-tv", "Cineby TV Series", "Cineby", cards.filter { it.isTv })).filter { it.titles.isNotEmpty() }
 }
 
 internal fun parseDbkuHome(html: String): List<DesignRow> {
@@ -213,6 +216,9 @@ internal fun parseCinebyDetails(title: DesignTitle, doc: Document): DesignTitle 
         countries = json?.opt("countryOfOrigin")?.let { value -> when (value) {
             is JSONObject -> listOf(value.optString("name")); is org.json.JSONArray -> (0 until value.length()).map { index -> val item = value.get(index); if (item is JSONObject) item.optString("name") else item.toString() }; else -> listOf(value.toString())
         } }?.filter { it.isNotBlank() } ?: title.countries,
+        originalTitle = json?.optString("alternateName").orEmpty(),
+        directors = json?.optJSONArray("director")?.let { names -> (0 until names.length()).mapNotNull { names.optJSONObject(it)?.optString("name") } }.orEmpty(),
+        ratingSource = "Cineby",
         cast = if (actors != null) (0 until actors.length()).map { DesignCast(actors.getJSONObject(it).getString("name"), "", "") } else emptyList(), seasons = seasons)
 }
 
@@ -235,6 +241,9 @@ internal fun parseDbkuDetails(title: DesignTitle, doc: Document): DesignTitle {
         rating = detail?.select(".branch")?.text()?.takeIf { it.isNotBlank() } ?: title.rating,
         year = year(firstData?.text().orEmpty()), poster = doc.selectFirst(".myui-content__thumb img")?.absUrl("data-original")?.takeIf { it.isNotBlank() } ?: title.poster,
         genres = (listOfNotNull(category.takeIf { it.isNotBlank() }) + doc.select(".myui-content__detail a[href*=/vodshow/]").map { it.text() } + publishedGenres + title.genres).distinct(), countries = firstData?.select("a")?.getOrNull(1)?.text()?.let { listOf(it) } ?: title.countries, isShort = category.contains("短剧"), cast = cast, seasons = groups,
+        directors = detail?.select("p.data")?.firstOrNull { it.text().contains("导演：") }?.select("a")?.eachText().orEmpty(),
+        updatedAt = detail?.select("p.data")?.firstOrNull { it.text().contains("更新：") }?.text()?.substringAfter("更新：")?.trim().orEmpty(),
+        ratingSource = "DBKU",
         playbackPage = groups.firstOrNull()?.episodes?.firstOrNull()?.pageUrl.orEmpty())
 }
 

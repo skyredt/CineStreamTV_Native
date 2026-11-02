@@ -73,7 +73,7 @@ class HongguoTest {
         assertEquals(0, requests)
     }
 
-    @Test fun timeoutLeavesAllThreeExistingSearchProvidersUnchanged() = runBlocking<Unit> {
+    @Test fun retiredProviderIsAbsentAndAllThreeActiveSearchProvidersRemainUnchanged() = runBlocking<Unit> {
         val repository = ProvidersRepository { url, _ -> when {
             url.startsWith(ProvidersRepository.HONGGUO) -> throw SocketTimeoutException("catalog timeout")
             url.startsWith(ProvidersRepository.CINEBY) -> fixture("cineby-lanterns.html")
@@ -83,7 +83,7 @@ class HongguoTest {
         val result = repository.searchWithFilters("和离")
         val expected = parseCinebySearch(fixture("cineby-lanterns.html")) + parseBingeList(fixture("bingebang-search.json")) + parseDbkuSearch(fixture("dbku-chinese.html"))
         assertEquals(expected, result.titles)
-        assertNotNull(result.statuses.single { it.provider == "hongguo" }.error)
+        assertTrue(result.statuses.none { it.provider == "hongguo" })
         assertEquals(result.titles.size, result.titles.distinctBy { it.id }.size)
     }
 

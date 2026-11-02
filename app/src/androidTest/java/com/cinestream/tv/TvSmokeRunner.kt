@@ -11,14 +11,16 @@ import android.view.accessibility.AccessibilityNodeInfo
 /** Device smoke test using the actual TV UI, live providers, and Unicode accessibility input. */
 class TvSmokeRunner : Instrumentation() {
     private var mediaUrl: String? = null
+    private var catalogueExperience = false
     private var searchLayout = false
     private var bingeProvider = false
     private var hongguoCatalog = false
     private var hongguoRuntime = false
     private var hongguoRealCore = false
     private val passed = mutableListOf<String>()
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); mediaUrl = arguments?.getString("mediaUrl"); searchLayout = arguments?.getString("searchLayout") == "true"; bingeProvider = arguments?.getString("bingeProvider") == "true"; hongguoCatalog = arguments?.getString("hongguoCatalog") == "true"; hongguoRuntime = arguments?.getString("hongguoRuntime") == "true"; hongguoRealCore = arguments?.getString("hongguoRealCore") == "true"; start() }
+    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments); catalogueExperience = arguments?.getString("catalogueExperience") == "true"; mediaUrl = arguments?.getString("mediaUrl"); searchLayout = arguments?.getString("searchLayout") == "true"; bingeProvider = arguments?.getString("bingeProvider") == "true"; hongguoCatalog = arguments?.getString("hongguoCatalog") == "true"; hongguoRuntime = arguments?.getString("hongguoRuntime") == "true"; hongguoRealCore = arguments?.getString("hongguoRealCore") == "true"; start() }
     override fun onStart() {
+        if (catalogueExperience || (mediaUrl == null && !searchLayout && !bingeProvider && !hongguoCatalog && !hongguoRuntime && !hongguoRealCore)) { runCatalogueExperienceCheck(this); return }
         if (hongguoRealCore) { runHongguoRealCoreCheck(this); return }
         if (hongguoRuntime) { runHongguoRuntimeCheck(this); return }
         if (hongguoCatalog) { runHongguoCheck(this); return }

@@ -40,7 +40,9 @@ internal fun parseBingeDetails(title: DesignTitle, data: JSONObject): DesignTitl
     val genres = data.optJSONArray("genres")
     val countries = data.optJSONArray("production_countries")
     val cast = data.optJSONObject("credits")?.optJSONArray("cast")
-    return parsed.copy(tagline = data.optString("tagline"), minutes = data.optInt("runtime"),
+    val crew = data.optJSONObject("credits")?.optJSONArray("crew")
+    return parsed.copy(originalTitle = data.optString(if (parsed.isTv) "original_name" else "original_title"), ratingSource = "TMDB via BingeBang",
+        directors = if (crew == null) emptyList() else (0 until crew.length()).map { crew.getJSONObject(it) }.filter { it.optString("job") == "Director" }.map { it.optString("name") }, tagline = data.optString("tagline"), minutes = data.optInt("runtime"),
         playbackPage = bingePage(data.getString("play_url"), playback = true),
         genres = if (genres == null) emptyList() else (0 until genres.length()).map { genres.getJSONObject(it).getString("name") },
         countries = if (countries == null) emptyList() else (0 until countries.length()).map { countries.getJSONObject(it).getString("name") },
