@@ -5,7 +5,7 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
-/** Authenticated, bounded loopback transport. A compatible core must enforce the bearer on every route. */
+/** Bounded loopback-only transport. Upstream status has no bearer-authentication contract. */
 internal object HongguoCoreHttp {
     fun get(address: String, headers: Map<String, String>): HongguoCoreEndpoint.Response {
         val url = URL(address)

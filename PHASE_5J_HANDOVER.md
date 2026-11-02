@@ -1,119 +1,85 @@
-# CineDBKTV Phase 5J — current handover
+# CineDBKTV Phase 5J — authoritative handover
 
-Updated: 2 November 2026 (Asia/Singapore). Authoritative current status. Earlier evidence remains in [PHASE_5J_HISTORY.md](PHASE_5J_HISTORY.md).
+Updated 2 November 2026 (Asia/Singapore). Scope: **Attempt 1 only**.
 
-## Current result — Android runtime verified, Hongguo acceptance INCOMPLETE
+## Result
 
-Verified groundwork is now committed locally as `6611438` (`Verify dormant Hongguo runtime with Android media fixture`). This handover correction is a documentation-only successor. Current full HEAD and clean/dirty state are recorded in the final response; use `git rev-parse HEAD` / `git status --short`. No push or distribution occurred.
+**Real-engine integration: PASS. Hongguo video playback: NOT TESTED / disabled.**
 
-Latest continuation started 2 November 2026 at 05:27:39 UTC. User reaffirmed reported permission to modify/reuse the community playback components and authorized closing applications to free memory. The existing application/test APKs were installed in an Android 35 x86_64 emulator and the existing `hongguoRuntime=true` check PASSED:
-
-1. Android-owned test child started; readiness identity/version/authentication checks passed; anonymous status request denied.
-2. Media3 unprotected PCM fixture reached READY; pause/resume and seeking were exercised; playback reached ENDED without a reported player error.
-3. Child process stopped and its private runtime files were removed.
-
-This is **not** community Go-engine startup, rendered Hongguo video, audible-output observation, physical-TV navigation or Hongguo episode acceptance. Episodes 1/51/88/90 remain NOT PERFORMED. Community engine packaged/started NO; actual Hongguo playback NO; four-provider playback in one APK NOT achieved. No new production code or protected-media preparation was invoked in this continuation. The existing fixture was tested without adding infrastructure.
-
-Environment problems were investigated: the original 1 GB emulator launch failed its Windows commit-capacity check; a 512 MB TV launch stalled during boot and ADB shutdown. Per user authorization, graceful close requests were sent to Task Manager, Telegram, Snipping Tool and an application window. No unsaved-work prompt was answered or application force-terminated. Only our stalled TV emulator and its ADB clients were terminated. A replacement 1.5 GB Android 35 phone emulator booted and passed the check; it was shut down afterward. No emulator/build overlap occurred.
-
-Evidence logs (ignored): `phase5j-runtime-emulator-error.log`, `phase5j-runtime-tv.log`, `phase5j-runtime-phone.log`, `phase5j-runtime-android-check.log`. Existing app APK/hash and prior host tests/build/lint remain unchanged. No new live provider-playback regression was run.
-
-Current continuation usage: start **57% five-hour / 69% weekly**; checkpoint **54%/68%**; pre-closeout **51%/68%** (6/1 percentage points consumed). These are rounded account-wide snapshots. No protected reserve or weekly threshold reached.
-
-Reported community-code permission is accepted, including the user's stated completion condition. It is not a substitute for a permitted media-access mechanism. The known protected-key/CENC preparation route was not implemented/invoked; no universal technical impossibility or new server entitlement denial is claimed. A supported authorized protected-playback path remains unverified. Internal real-core packaging/protocol/player-integration gaps remain separate from that boundary.
-
-## Earlier continuation — lint closeout (historical)
-
-The user's Complete and Verify prompt explicitly resumed work after the earlier stop. The history below describing that stop is retained for chronology. This continuation reviewed preserved groundwork and prior protection evidence, checked an official supported-player candidate, and completed interrupted lint. No new application implementation, core packaging, protected-media operation or emulator/playback test was performed.
-
-- **Validation now completed:** `:app:lintDebug` PASS, 0 errors / 6 warnings, no findings in new runtime/fixture files. Log: `phase5j-resumed-lint.log`. Earlier text saying lint has no completed result describes the interrupted run, not current lint status.
-- **Inherited unchanged validation:** 60 tests, 58 passed, 2 skipped; app and instrumentation APK assembly completed in the preceding run. This continuation did not repeat them. APK SHA-256 remains `2e254a8d792920dc3de499e0bad862f06ed42f634998cf6a313de3596e08cfb8`.
-- **Established operation:** existing evidence in history sections 12–13 identifies content-key decoding and local CENC sample decryption before normal playback. This portion was not executed or incorporated. No new service denial, entitlement failure or universal impossibility was established.
-- **Unverified external dependency:** an authorized protected-media access/handling path for CineDBKTV remains unestablished. This is not proof that none exists, that the developers lack any upstream arrangement, or that CENC alone establishes a legal prohibition. Custom protected-key extraction/decryption was not used to fill the gap.
-- **Alternative checked:** the official Volcengine Android demo requires AppId and License to run: https://github.com/volcengine/VEVodDemo-android . No `.lic`/`.license` artifact was found under `app`. These are prerequisites for that SDK candidate, not proof it grants Hongguo content access or is mandatory for a Go executable. Its applicability to the four episodes remains unverified. No SDK or credentials were added.
-- **Internal gaps remain:** the proposed bearer-token contract is not verified against upstream; native packaging, actual core startup, preparation protocol, Range delivery and player/navigation integration remain unimplemented or unverified. These are not classified as external impossibility.
-- **Acceptance:** engine packaged/started NO; actual Hongguo playback NO; episodes 1/51/88/90 all NOT PERFORMED, including video/audio/seek/fullscreen/remote checks. No replacement episode or fixture was counted as acceptance.
-- **Git:** branch and HEAD still `feature/hongguo-single-apk`, `506d76055634ea6b600161af03912bc82501333d`. Automatic approval review rejected the combined documentation/commit command with only “blocked by policy”; that command did not execute. Code is preserved uncommitted. No push, merge, publication, distribution or PR mutation.
-- **Usage:** current continuation started at 61% five-hour / 69% weekly (05:11:31 UTC, 2 November); latest pre-closeout snapshot 59%/69%, consumption 2/0 percentage points. Rounded account-wide snapshots; no reserve or weekly threshold reached. No further implementation or playback investigation follows this closeout.
-
-## Earlier stop instruction (historical; superseded by latest user prompt)
-
-**The user explicitly stopped development to conserve Codex limits. Do not resume development, investigation, builds, testing, emulator startup or integration without a new instruction.** The subsequent request authorized this handover only. The running Gradle processes were terminated. No emulator was started.
-
-## Outcome
+The actual unchanged Hongguo Go executable is packaged in CineDBKTV's development APK. On an Android 35 x86_64 emulator, CineDBKTV verified its installed hash, launched its own child, parsed its readiness/status, checked its exact version, communicated with its real localhost API, stopped it, restarted it, forcibly terminated it, observed failure and cleanup, and successfully started/stopped a replacement child. No fixture substituted for these acceptance tests. No valid episode-preparation request, protected-media decryption or access-control workaround was invoked. Attempt 2 / Phase 6 is not authorized.
 
 | Acceptance | Result |
 | --- | --- |
-| Community Go engine packaged | NO |
-| Community engine starts inside CineDBKTV | NO |
-| Real Hongguo playback | NO — disabled |
-| Single APK with all four working providers | NO |
-| Local unprotected fixture | Host tests and Android 35 emulator runtime/Media3 check PASSED; no Hongguo video acceptance |
-
-No protected media preparation, key extraction, DRM/payment bypass or community core execution occurred. No production Hongguo player call site was enabled. Existing UI, player controls, search, catalog, registration and metadata code were not modified.
+| Real executables present in single application APK | PASS — three payloads match audited upstream hashes |
+| Android-installed executable extraction | PASS — extractNativeLibs=true; nativeLibraryDir launch; x86_64 selected |
+| Real Go child startup and readiness | PASS |
+| Real status HTTP / Kotlin identity/version parsing | PASS — HTTP 200 |
+| Normal shutdown / subsequent restart | PASS |
+| Unexpected child termination / cleanup / recovery | PASS |
+| No orphan CineDBKTV children | PASS — all three captured children dead; final process audit found no additional owned engine |
+| Media endpoint/schema | Pinned-source contract verified; live invalid-quality 400 and POST 405 verified before preparation |
+| Actual-core unprotected fixture / Media3 rendering | NOT PERFORMED — no supported arbitrary-fixture route found in inspected router; no synthetic substitute |
+| Real Hongguo episodes 1 / 51 / 88 / 90 | NOT PERFORMED — separate playback acceptance gate |
 
 ## Repository and preservation
 
-- Working directory: `D:\CineStreamTV\cinedbktv-development`.
-- Branch: `feature/hongguo-single-apk`.
-- Starting HEAD was `506d76055634ea6b600161af03912bc82501333d`; verified groundwork successor is `6611438`. Earlier references to unchanged HEAD/uncommitted work describe the interrupted sessions.
-- Inherited changes were preserved and committed locally after host/build/lint and Android fixture validation. Final status is checked after the documentation successor. No push, merge, publication, deployment or PR mutation occurred.
-- Prior branches, commits, stable/Phase4 APKs and draft PR #1 were not changed. This session did not re-query GitHub PR status.
-- Prior validation APK archived before rebuilding: `CineDBKTV-phase5j-readiness-dev-506d760.apk`, SHA-256 `17328ebe3b07c85d3a23fbd736af2ca0244882d9b4c7afe0094e8c3cab70cac7`.
+- Repository: `D:\CineStreamTV\cinedbktv-development`; branch `feature/hongguo-single-apk`.
+- Starting HEAD: `db0d48e132e9be1af34cc9f23b31f1370c4caa0e`; starting tree was clean.
+- Verified implementation is committed locally at closeout; full successor SHA and final status are recorded in the final response and `git rev-parse HEAD` / `git status --short`.
+- Existing Cineby, DBKU, BingeBang, Hongguo catalog, unified search, navigation and Media3 UI/provider routing were not changed. Existing branches, history, stable/Phase4 APKs and draft PR #1 were not modified; no remote mutation or PR-status recheck occurred.
+- Prior runtime APK archived before rebuild: `CineDBKTV-phase5j-runtime-dev-db0d48e.apk`, SHA-256 `2e254a8d792920dc3de499e0bad862f06ed42f634998cf6a313de3596e08cfb8`. Earlier archives remain untouched.
+- No push, merge, publication, deployment or distribution.
 
-## Implemented, dormant components
+## Exact upstream and package
 
-| File | Work |
-| --- | --- |
-| `app/src/main/java/com/cinestream/tv/HongguoCoreRuntime.kt` | Owned child lifecycle; reuses existing readiness/status bridge; instance/version checks; retained Process ownership; bounded stdout lines; timeout/cancellation cleanup; explicit restart; crash cleanup; private per-run files; installed executable SHA-256 verification. |
-| `app/src/main/java/com/cinestream/tv/HongguoCoreHttp.kt` | Bounded loopback HTTP, bearer headers, disabled redirects. Startup rejects status endpoints accepting missing/incorrect bearer. |
-| `app/src/main/java/com/cinestream/tv/HongguoCoreInstallation.kt` | Dormant Android installation/launcher seam using nativeLibraryDir and parent PID. Requires an audited matching binary/hash/version. **No binary or approved descriptor is supplied.** |
-| `app/src/main/java/com/cinestream/tv/HongguoPreparedMedia.kt` | Preparation interface and adapter with progress, release, selected series/episode checks and same-session local-origin validation. **No actual upstream preparation implementation or wire protocol is installed.** |
-| `app/src/engineFixture/java/com/cinestream/tv/FixtureCore.java` | Independently written test-only authenticated socket server; synthesizes one second of unprotected PCM WAV. Shared by host and instrumentation source sets; absent from application APK. |
-| `app/src/test/java/com/cinestream/tv/HongguoCoreRuntimeTest.kt` | Five host test methods covering real child startup/authentication, fixture media delivery, crash/restart, bad version, unauthenticated server rejection, early exit, timeout, cancellation, bounded log draining, origin/episode rejection and cleanup. |
-| `app/src/androidTest/java/com/cinestream/tv/HongguoRuntimeCheck.kt` | PASSED on Android 35 x86_64 emulator: app_process fixture child plus Media3 READY/pause/resume/seek/ENDED and cleanup checks. Unprotected audio fixture; no Go-core startup or Hongguo video acceptance. |
-| `app/src/androidTest/java/com/cinestream/tv/TvSmokeRunner.kt` | Adds opt-in `hongguoRuntime=true` instrumentation dispatch. |
-| `app/build.gradle.kts` | Shares test-only fixture source across host/instrumentation source sets. |
-| `app/src/debug/AndroidManifest.xml`, `app/src/debug/res/xml/hongguo_fixture_network.xml` | Debug-only cleartext exception for exactly 127.0.0.1; base cleartext denied. Release network policy unchanged. |
+- Source: https://github.com/aston314/hongguo-tv/tree/e1af6e0cbbc018bd198169d7beb4519d7b0a271a
+- Origin release APK v0.2.138: SHA-256 `61a9b355e876a3ebfa9f484bd8b66859bcbac18343c42e8ac736a114755d6ae9`.
+- Exact embedded/runtime-reported version: **`0.2.138-e1af6e0cbbc018bd198169d7beb4519d7b0a271a`**; Go runtime marker `go1.25.14`.
+- Only three core executables and applicable Go/QR-code notices were imported. No community Android UI, MPV, NextLib/FFmpeg decoder bundle, updater, boot receiver, separate application or external backend was added. The executables inherently contain upstream Go-embedded web assets.
 
-The bearer environment variable `CINEDBKTV_CORE_TOKEN` is a proposed compatible-core contract, not a verified upstream feature. Do not assert that the unmodified community binary supports/enforces it. A production core must enforce authentication on media/preparation as well as status routes. Native extraction/ABI packaging settings and real binary packaging remain unimplemented. Android lifecycle behavior is now verified only with the test child; the native community launcher remains unverified.
+| APK path | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `lib/arm64-v8a/libhongguotv.so` | 12,576,488 | `5ec423f97803cb36acedd0fb85925833cfdb37836547e4d61c82a146c7b7d100` |
+| `lib/armeabi-v7a/libhongguotv.so` | 12,476,652 | `88668b4399700e0a3ff7e94c7f760c40d61c67b467d9d8af40908bd35b956a74` |
+| `lib/x86_64/libhongguotv.so` | 13,352,008 | `f68197bfe7e9291039467b79fc15791609ccd4bd29df64802feba357f34ba2ee` |
 
-## Exact blocker
+All three were rehashed inside the final APK. ARM payloads are packaging/integrity-verified but were not device-executed in this task. Upstream provides no 32-bit x86 executable; this native APK targets the three listed ABIs. The earlier x86-only TV AVD is unsuitable; runtime acceptance used x86_64. Physical TV/phone and 16-KB-page device verification remain NOT PERFORMED.
 
-The user reports explicit verbal community-developer permission to modify/reuse their work and integrate it privately. Accept that report; do not repeatedly request written permission or reopen broad licensing investigation.
+## Implemented changes
 
-The separate missing dependency is an established authorized media-access/handling path for the core's CENC-protected preparation. Community-code reuse permission does not establish authorization for Hongguo's protected services/content. The task specifically conditioned invoking that preparation on establishing such a path. No permitted protected-media contract or implementation was established in this session. No further encryption investigation is needed. The endpoint is not currently a ready-to-use Media3 DRM source.
+- `app/src/main/jniLibs/{arm64-v8a,armeabi-v7a,x86_64}/libhongguotv.so`: actual unchanged audited cores.
+- `app/build.gradle.kts`: legacy JNI extraction and no stripping of the executable, preserving exact hashes.
+- `HongguoCoreInstallation.kt`: pinned version and per-ABI hashes; installed nativeLibraryDir execution; actual `-port 0`, generated `-instance-id`, `-parent-pid`, `-data-dir`; real `MINIREEL_CACHE_DIR` and `HONGGUO_TV_DATA_DIR`; private transient cache and persistent no-backup data.
+- `HongguoCoreRuntime.kt`: actual core defaults to no bearer contract; existing child ownership/readiness/version/timeout/cancellation/crash/restart handling reused. Optional bearer mode retained only for earlier independent fixture checks; it is not used by the real engine.
+- `HongguoCoreHttp.kt`: bounded, nonredirecting 127.0.0.1 transport; corrected documentation about upstream authentication.
+- `HongguoRealCoreCheck.kt` plus runner dispatch `hongguoRealCore=true`: real installed core startup/API/normal shutdown/restart/crash/cleanup/recovery acceptance.
+- Existing host and synthetic Android checks explicitly retain their own fixture authentication option; they are not real-engine acceptance evidence.
+- `app/src/main/assets/hongguo-notices/`: provenance, Go BSD licence and go-qrcode MIT licence.
+- `docs/HONGGUO_ENGINE_API.md`: actual startup/status/play-info request and response schemas, observed-vs-source-only boundaries and fixture limitation.
 
-Single-APK architecture is already confirmed technically feasible; the upstream engine is an Android Go executable with loopback HTTP, not JNI. Pinned reference `aston314/hongguo-tv` revision `e1af6e0`; ABI/size and prior source evidence remain in history sections 13–15. Do not repeat completed registration, metadata, encryption or packaging feasibility investigations.
+Runtime entry is `HongguoCoreInstallation.runtime(context)` followed by `start()`/`stop()`. It is demand-driven, not automatically started at boot. No Hongguo player call site or protected-preparation adapter is enabled. The debug build retains the existing cleartext exception for exactly 127.0.0.1; release runtime startup was not tested. Upstream status has no bearer authentication: owned child/UUID/hash/version checks prevent adopting a discovered service, but loopback does not provide application-exclusive peer authentication. Do not claim it does.
 
-## Validation at stop
+## Validation and evidence
 
-- Host tests: **60 total, 58 passed, 2 skipped, 0 failures/errors**. Includes existing Cineby/DBKU/BingeBang regression fixtures and five new runtime tests. Two existing opt-in live upstream tests were skipped.
-- Initial fixture compilation failed because Android test compilation excludes JDK HttpServer/Files.writeString. Replaced with portable Java sockets/file output; subsequent tests passed.
-- Final serialized Gradle invocation completed `:app:testDebugUnitTest`, `:app:assembleDebug` and `:app:assembleDebugAndroidTest` before user cancellation. **The overall invocation was canceled during lint preparation; lint has NO completed result.** Do not reuse the previous session's lint success as current validation.
-- No emulator/device run, Android fixture execution, rendered-video/audio observation, fullscreen/remote verification or fresh live provider playback regression was performed.
-- Logs (ignored): `phase5j-owned-runtime-tests.log`, `phase5j-owned-runtime-build-lint.log`.
-- Constrained environment: JDK `D:\BuildTools\jdk17\jdk-17.0.21.0.2+1`, SDK `D:\AndroidSdk`, Gradle cache `D:\.gradle`, Gradle `D:\CineStreamTV\.tools\gradle-8.9\bin\gradle.bat`; offline/no-daemon/max-workers=1, SerialGC/ActiveProcessorCount=2, tests 512 MiB Gradle heap, final build/lint 768 MiB; `JAVA_TOOL_OPTIONS=-XX:+UseSerialGC -XX:ActiveProcessorCount=2 -Xss512k`. Never overlap builds and emulator work.
+- **60 host tests total: 58 passed, 2 skipped, 0 failures/errors.** Includes Cineby/DBKU/BingeBang provider regression fixtures, Hongguo catalog/registration/metadata/readiness and lifecycle tests. Opt-in live upstream unit tests skipped. No new live playback regression of existing providers was performed.
+- **Debug app build PASS; instrumentation build PASS; Android lint PASS, 0 errors / 6 existing warnings.** No new lint finding in the runtime/real-core check.
+- Actual packaged core acceptance on Android 35 x86_64: **all six reported checks PASS**, three real child launches. Binary hash verification plus generated instance/readiness pipe and actual status response tie the tests to CineDBKTV's own installed core.
+- Live API validation: invalid quality returned 400, POST returned 405. Source checks establish both exit before preparation dispatch. Successful preparation response/Range rendering was intentionally NOT tested.
+- Final process audit showed only the previously installed standalone community application's own core under its own parent (`rocks.aston.hongguotv`), not an orphan CineDBKTV child. That application was not used for acceptance. The test emulator was shut down after verification.
+- Ignored logs: `phase5j-attempt1-validation.log`, `phase5j-attempt1-real-core.log`, `phase5j-attempt1-emulator.log`, `phase5j-attempt1-emulator-error.log`.
+- Build and emulator work were serialized. Constrained Gradle: offline/no-daemon/max-workers=1, 768 MiB heap, SerialGC/ActiveProcessorCount=2, in-process Kotlin. JDK `D:\BuildTools\jdk17\jdk-17.0.21.0.2+1`, SDK `D:\AndroidSdk`, cache `D:\.gradle`, Gradle `D:\CineStreamTV\.tools\gradle-8.9\bin\gradle.bat`. Emulator: existing API35 x86_64 phone AVD, 1536 MiB, 2 cores, no snapshot/window/audio, GPU off.
 
-| Episode | In-CineDBKTV acceptance |
-| --- | --- |
-| 1 | NOT PERFORMED |
-| 51 | NOT PERFORMED |
-| 88 | NOT PERFORMED |
-| 90 | NOT PERFORMED |
+## Development APK
 
-All video/audio, correct-episode playback, pause/resume, seeking, fullscreen and 30-second observations remain unperformed. The host WAV fixture is not a substitute for Hongguo acceptance.
+**`D:\CineStreamTV\cinedbktv-development\CineDBKTV-phase5j-attempt1-engine-dev-20261102.apk`**
 
-## Build artifact
+- Size: **44,287,706 bytes**.
+- SHA-256: **`951b7d73d1df59708aa42786a4d958174370a8febc921e2a45df674110bc18e5`**.
+- Identical build output: `app/build/outputs/apk/debug/app-debug.apk`.
+- Verified for Attempt 1 engine integration only; not verified for Hongguo video playback. No distribution performed. Instrumentation APK is a test harness, not a companion required by the application.
 
-- Locally generated validation APK: `D:\CineStreamTV\cinedbktv-development\app\build\outputs\apk\debug\app-debug.apk`.
-- Size: 27,237,286 bytes; SHA-256 `2e254a8d792920dc3de499e0bad862f06ed42f634998cf6a313de3596e08cfb8`.
-- **Unverified development artifact, not a completed Hongguo integration.** No community binary and no enabled Hongguo playback. Not installed, published or distributed. Do not distribute as verified.
+## Remaining gates and usage
 
-## Usage and future handling
+Attempt 1 has no remaining blocking engineering issue for the tested x86_64 lifecycle/API scope. Media preparation and live protected playback remain separate, unperformed gates. Accept the user's reported community-developer modification/reuse permission; do not repeatedly reopen general permission or feasibility discussions. Do not infer upstream content authorization or bypass restrictions. No protected keys were extracted and no protected-video preparation was requested here.
 
-- Task start: **71% five-hour / 71% weekly remaining**, measured live rather than using historical values.
-- Checkpoints: 68%/71% (3/0 points consumed), 66%/70% (5/1), 63%/70% (8/1).
-- Handover-only follow-up snapshot: **62% five-hour / 70% weekly remaining**, consumption **9/1 percentage points** from task start, before writing this document.
-- Values are rounded account-wide snapshots, not continuous/task-exclusive measurement. Initial exact five-minute timing was unavailable; later UTC snapshots guided checkpoints. The 5% reserve was preserved and the 7-point weekly approval threshold was not reached. Never invent remaining balances.
-- User stopped work; preserve the dirty tree and existing artifacts. No code commit was made. Do not automatically resume, start Phase 6, push, merge or deploy. If later explicitly resumed, first check usage and current tree; review uncommitted changes, complete interrupted validation and Android fixture check only within the newly authorized scope. Real playback still requires resolving the specific protected-media dependency above.
+Start balances at 05:51:54 UTC: **50% five-hour / 68% weekly remaining**. Checkpoints: **47%/67%** (3/1 consumed), **44%/67%** (6/1 consumed), pre-closeout **41%/66%** (9/2 consumed). Values are rounded account-wide snapshots, not continuous/task-exclusive accounting. Reserve and weekly threshold remain intact. Final closeout snapshot is reported in the final response. Do not start Attempt 2, Phase 6, push, merge or distribute without authorization.

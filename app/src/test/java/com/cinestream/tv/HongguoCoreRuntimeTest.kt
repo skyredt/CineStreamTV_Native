@@ -20,7 +20,7 @@ class HongguoCoreRuntimeTest {
                 FixtureCore::class.java.name, instance, mode).directory(work).redirectErrorStream(true).apply {
                 environment()["CINEDBKTV_CORE_TOKEN"] = secret
             }.start().also { child = it }
-        }, timeout)
+        }, timeout, bearerAuthentication = true)
         try { test(runtime) { child!! } }
         finally {
             runtime.stop()

@@ -9,12 +9,13 @@ import java.security.MessageDigest
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-/** Dormant until an approved authenticated core is supplied. Never discovers/reuses another app's core. */
+/** Owns one installed child. Never discovers/reuses another application's local core. */
 internal class HongguoCoreRuntime(
     private val root: File,
     private val version: String,
     private val launch: (instance: String, secret: String, directory: File) -> Process,
     private val startupTimeoutMs: Long = 8_000,
+    private val bearerAuthentication: Boolean = false,
 ) {
     enum class State { STOPPED, STARTING, READY, FAILED }
     @Volatile var state = State.STOPPED
@@ -34,7 +35,7 @@ internal class HongguoCoreRuntime(
         fun requireAlive() { if (!child.isAlive) throw IOException("Hongguo local engine stopped") }
         internal fun headers(): Map<String, String> {
             requireAlive()
-            return mapOf("Authorization" to "Bearer $secret")
+            return if (secret.isEmpty()) emptyMap() else mapOf("Authorization" to "Bearer $secret")
         }
         override fun toString() = "HongguoCoreSession(identity=redacted)"
     }
@@ -46,7 +47,7 @@ internal class HongguoCoreRuntime(
         state = State.STARTING
         try {
             val instance = UUID.randomUUID().toString()
-            val secret = UUID.randomUUID().toString() + UUID.randomUUID().toString()
+            val secret = if (bearerAuthentication) UUID.randomUUID().toString() + UUID.randomUUID().toString() else ""
             val work = File(root, instance).also { check(it.mkdirs()) }
             directory = work
             // Keep ownership even if cancellation arrives while ProcessBuilder.start is returning.
@@ -86,7 +87,7 @@ internal class HongguoCoreRuntime(
             }
             val endpoint = withTimeout(startupTimeoutMs) { ready.await() }
             val result = Session(endpoint, child, secret)
-            withTimeout(startupTimeoutMs) { runInterruptible(Dispatchers.IO) {
+            if (bearerAuthentication) withTimeout(startupTimeoutMs) { runInterruptible(Dispatchers.IO) {
                 for (headers in listOf(emptyMap(), mapOf("Authorization" to "Bearer invalid"))) {
                     if (HongguoCoreHttp.get(endpoint.baseUrl + "api/v1/status", headers).status !in listOf(401, 403))
                         throw IOException("Hongguo engine does not enforce private IPC")

@@ -21,6 +21,7 @@ android {
         getByName("androidTest").java.srcDir("src/engineFixture/java")
     }
     buildFeatures { compose = true }
+    packaging { jniLibs { useLegacyPackaging = true; keepDebugSymbols += "**/libhongguotv.so" } }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

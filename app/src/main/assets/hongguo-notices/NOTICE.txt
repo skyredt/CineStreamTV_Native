@@ -1,0 +1,13 @@
+Bundled Hongguo community core v0.2.138
+Source revision: e1af6e0cbbc018bd198169d7beb4519d7b0a271a
+Source: https://github.com/aston314/hongguo-tv/tree/e1af6e0
+Origin APK SHA-256: 61a9b355e876a3ebfa9f484bd8b66859bcbac18343c42e8ac736a114755d6ae9
+The community developers' modification/reuse permission is reported by the user.
+These executables are unchanged from the audited release APK. They inherently
+include their Go-embedded web assets; no community Android UI, player decoder,
+updater, boot receiver or companion application is included.
+Go runtime: go1.25.14 (BSD license included).
+Go module dependency: github.com/skip2/go-qrcode, da1b6568686e (MIT license included).
+CineDBKTV's own existing Media3 implementation remains unchanged.
+Attempt 1 only verifies engine lifecycle and non-preparation HTTP validation.
+Hongguo protected-video playback is disabled and is not claimed verified.

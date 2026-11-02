@@ -26,7 +26,7 @@ internal fun runHongguoRuntimeCheck(runner: Instrumentation) = with(runner) {
                 environment()["CLASSPATH"] = context.applicationInfo.sourceDir + File.pathSeparator + targetContext.applicationInfo.sourceDir
                 environment()["CINEDBKTV_CORE_TOKEN"] = secret
             }.start().also { child = it }
-    }, 15000)
+    }, 15000, bearerAuthentication = true)
     try {
         runBlocking {
             val session = runtime.start()
