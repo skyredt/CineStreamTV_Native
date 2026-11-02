@@ -1,6 +1,6 @@
 # CineDBKTV Phase 5J handover — 2 November 2026 (Asia/Singapore)
 
-**Latest investigation:** See section 13 for the function-level encryption/key-association trace, current baseline and latest resource accounting. Sections 1–12 preserve earlier evidence and historical readings. Playback is still disabled; no application source was changed in the latest investigation.
+**Latest work:** See section 14 for the reported verbal reuse permission, new isolated metadata resolver, validation and current resource accounting. Sections 1–13 preserve earlier evidence and historical readings. Playback is still disabled; the resolver does not change provider routing or decode protected keys.
 
 ## 1. Status and stopping point
 
@@ -255,3 +255,53 @@ If that gate succeeds, independently implement only (1) the correctly shaped met
 - Actual starting balances: **100% five-hour / 75% weekly remaining** at 09:33:52 Singapore time. The five-hour window had reset; the previous 9% figure was historical. No usage-reset credit was invoked by this investigation.
 - Investigation stop snapshot: **97% / 75%**, observed consumption **3 / 0 percentage points**. Protected 5% reserve is safe. Continuous measurement is unavailable; account-wide rounded balances were checked conservatively. Investigation stopped within the first five-minute interval; intermediate progress/balances were reported before the interval elapsed.
 - Final closeout before documentation commit: **96% five-hour / 75% weekly remaining**, measured consumption **4 / 0 percentage points**. Protected reserve remains intact. After preparing this handover, only documentation commit/status confirmation and final response remain; no new investigation or development follows automatically.
+
+## 14. Reported reuse permission and isolated metadata resolver — 2 November 2026
+
+### Permission record
+
+The user reports a WhatsApp group call with the community application's developers, who verbally permitted modifying their APK and reusing their implementation for CineDBKTV after discussing its multi-provider/multilingual design. This is recorded as user-reported verbal permission; no written grant or independent identity/scope verification was supplied. Its existence is not rejected merely because it was verbal. Public repository visibility alone is not the permission relied on here. The reported developer grant is accepted for planning community-code reuse within rights they control; it is not represented as a separate Hongguo/content-provider authorization or a licence for third-party SDK dependencies.
+
+The new resolver is independently written and imports no community code. No protected key-unwrapping or media-decryption implementation was copied, run or added.
+
+### Implementation delivered in this increment
+
+Start: clean `feature/hongguo-single-apk` at `a7e59060cb4ae33ee532caa73b716d4f759fe011`.
+
+| File | Purpose |
+| --- | --- |
+| `app/src/main/java/com/cinestream/tv/HongguoPlaybackMetadata.kt` | Isolated on-demand metadata resolver using the existing registered identity and CineDBKTV package/version profile. Strict requested-episode association; parses JSON-string/object models and object/array rows; supports direct and nested protection metadata; bounded two-attempt transport/empty-response recovery, HTTPS-only source validation, sanitized errors, cancellation before work, response-size limits and redacted representations. |
+| `app/src/test/java/com/cinestream/tv/HongguoPlaybackMetadataTest.kt` | Eight focused tests for both observed protection shapes, unverified-clear handling, response/episode rejection, unsafe URLs/codecs, request identity, bounded recovery, pre-start cancellation, and opt-in live metadata verification. Synthetic URLs/key labels occur only in tests; no production sample-source fallback exists. |
+| `PHASE_5J_HANDOVER.md` | Permission record, exact remaining dependency, test evidence and continuation instructions. |
+
+`HongguoPlaybackMetadata.forApplication(context)` composes the existing registration component with the network resolver; it is NOT called from provider dispatch or UI. The result contains selected media URLs in memory and basic source metadata, but no wrapped/decrypted key fields. Protection metadata is inspected only for presence. Options are classified `PROTECTED` or `UNVERIFIED`; no metadata-only option is labelled verified-clear/playable. `Result.requirePlayable()` always fails explicitly until a supported media path is verified. Missing encryption flags never imply permission or decodability.
+
+The resolver does not fetch media/fallback URLs, cache media URLs across resolutions, guess expiration periods, automatically replace an identity after rejection, or implement a DRM session. Existing Hongguo guards/notices and other providers remain unchanged. No SDK/Go/native library, companion app, cloud service or new permission was introduced.
+
+### Supported SDK candidate: new concrete evidence, not established Hongguo compatibility
+
+The [official Volcengine private-encryption documentation](https://docs.volcengine.com/docs/video-on-demand/private-encryption-legacy?lang=en) documents an Android DirectUrl source with a server-issued protected playback authorization, handled inside its own player SDK. This is an in-APK candidate that avoids an independently reproduced protected-key decoder. The documented authorization flow is not proof that Hongguo's `spade_a` can be substituted for the SDK's authorization field.
+
+The [SDK FAQ](https://docs.volcengine.com/docs/video-on-demand/player-sdk-faq?lang=en) specifies AppID/package/validity checks, and [Android integration instructions](https://docs.volcengine.com/docs/video-on-demand/android-player-integration?lang=zh) require the SDK licence setup. No valid SDK entitlement bound to `com.cinestream.tv` or compatible provider-issued playback authorization has been established for this project. No licence account, paid subscription, trial or provider credential was created or purchased, and no SDK was downloaded/integrated. This candidate may require provider participation; no external backend was introduced to manufacture authorization.
+
+**Remaining dependency:** establish a supported protection adapter and valid playback authorization for the exact Hongguo source/metadata format. The reported community-code reuse grant does not supply those SDK assets or establish the provider's protected-media contract. CENC by itself still does not prove a particular DRM system or legal prohibition. No claim of impossibility is made.
+
+### Validation and playback status
+
+- Unit suite: **49 tests total, 48 passed, 1 skipped, 0 failures/errors**. All eight new metadata tests passed. The skipped test was the separate opt-in live registration test; it was intentionally not requested again. The new live metadata test obtains a fresh anonymous identity as its prerequisite, not as another registration investigation.
+- Actual live Kotlin resolver result: requested episode `7695729320861387838`, metadata duration **140.714 seconds**, **4 options**, all classified **PROTECTED**. The only emitted diagnostic was `HONGGUO_METADATA_VERIFIED: requested episode, duration=140.714, options=4; protected playback remains disabled`. No media request, key decode or video playback occurred.
+- `assembleDebug`: PASS. `lintDebug`: PASS, **0 errors / 6 existing warnings**, no findings in the new resolver. Tests and build/lint ran sequentially with the previously verified smaller JVM configuration. Logs: ignored `phase5j-metadata-tests.log` and `phase5j-metadata-build-lint.log`; result XML is under `app/build/test-results/testDebugUnitTest/`.
+- The application factory/private-preference composition and Android-device network behavior have not been emulator verified; the production resolver class was exercised by the live JVM test. Pre-start cancellation is tested; immediate interruption of an in-flight socket is not claimed.
+- Current validation APK: `D:\CineStreamTV\cinedbktv-development\app\build\outputs\apk\debug\app-debug.apk`, SHA-256 **`81f3569a77ea0591b2f4edbffba704e836933cabf265ae9984dbb7bedd725553`**. This regenerates the ordinary build output; section 9's older `80898...` hash is a historical registration-only build, not the current file. No stable/Phase 4 artifact was overwritten. Both stable and Phase 4 hashes were rechecked against section 9 and matched.
+
+No in-CineDBKTV video/audio playback is established. Episodes **1, 51, 88 and 90: requested playback/controls/30-second acceptance tests NOT PERFORMED**. Hongguo playback remains disabled. Stable and Phase 4 APK files are not build outputs of this increment and are not overwritten. A newly built ordinary debug APK, if validation completes, is a resolver-validation artifact with playback still disabled; it must not be advertised as the single-APK playback deliverable.
+
+### Next action and resource closeout
+
+The next dependent action is to establish a licensed in-app protection adapter and compatible provider-issued authorization (or another verified permitted playable source). For the official SDK candidate, the concrete missing inputs are the target-package SDK licence/entitlement and a documented supported playback authorization. Do not paste credentials in chat. Without those inputs or another established permitted path, retain the existing playback guards; do not bypass protection or repurpose the community app's sessions/keys/stream.
+
+Once a supported source is available, connect this resolver to an isolated Hongguo player adapter, reusing episode IDs/navigation and existing controls where compatible. Then perform the four requested in-app tests for at most 30 seconds each and the relevant regressions/build/lint. No new player backend, companion application, push, merge or release is authorized by this handover.
+
+- Actual starting balances for this increment: **94% five-hour / 74% weekly remaining**. The protected 5% minimum and 7-point weekly approval threshold remain in force.
+- Five-minute progress checkpoint: **91% / 74%**, consumption **3 / 0 points**; tests were running, reserve safe, estimated remaining validation/closeout 5–10 minutes. Account-wide rounded balances are accessible but not continuously measurable.
+- Final balance before commit: **85% five-hour / 73% weekly remaining**; observed consumption **9 / 1 percentage points**. The 5% reserve remains intact and the 7-point weekly threshold was not reached. The commit containing this section is discoverable with `git log -1 --format=%H -- PHASE_5J_HANDOVER.md` and is returned in the final response. Do not push or resume another development step after closeout without a new instruction.
