@@ -35,7 +35,7 @@ import kotlinx.coroutines.delay
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
-fun PlayerScreen(url: String, title: String, headers: Map<String, String> = emptyMap(), onBack: () -> Unit) {
+fun PlayerScreen(url: String, title: String, headers: Map<String, String> = emptyMap(), initialPosition: Long = 0, onPosition: (Long) -> Unit = {}, onFailure: (String) -> Boolean = { false }, onBack: () -> Unit) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     var error by remember(url) { mutableStateOf<String?>(null) }
@@ -43,7 +43,7 @@ fun PlayerScreen(url: String, title: String, headers: Map<String, String> = empt
     var tracks by remember(url) { mutableStateOf(Tracks.EMPTY) }
     var picker by remember { mutableStateOf<Int?>(null) }
     var diagnostics by remember { mutableStateOf(false) }
-    var savedPosition by rememberSaveable(url) { mutableLongStateOf(0L) }
+    var savedPosition by rememberSaveable(url) { mutableLongStateOf(initialPosition) }
     var position by remember(url) { mutableLongStateOf(savedPosition) }
     var duration by remember(url) { mutableLongStateOf(0L) }
     var buffered by remember(url) { mutableIntStateOf(0) }
@@ -51,7 +51,9 @@ fun PlayerScreen(url: String, title: String, headers: Map<String, String> = empt
     var muted by remember(url) { mutableStateOf(false) }
     var controls by remember { mutableStateOf(true) }
     var interaction by remember { mutableLongStateOf(0L) }
-    var scrubbing by remember { mutableStateOf(false) }
+    val scrub = remember(url) { MediaScrub() }
+    val timelineFocus = remember { FocusRequester() }
+    val scrubbing = scrub.target != null
     val rootFocus = remember { FocusRequester() }
     val playFocus = remember { FocusRequester() }
     val player = remember(url) {
@@ -63,6 +65,7 @@ fun PlayerScreen(url: String, title: String, headers: Map<String, String> = empt
             setMediaItem(MediaItem.fromUri(url)); seekTo(savedPosition); prepare(); playWhenReady = true
         }
     }
+    LaunchedEffect(error) { error?.let { if (onFailure(it)) error = null } }
     DisposableEffect(player, owner) {
         val listener = object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) { buffering = state == Player.STATE_BUFFERING }
@@ -78,13 +81,14 @@ fun PlayerScreen(url: String, title: String, headers: Map<String, String> = empt
         while (true) {
             if (!scrubbing) position = player.currentPosition.coerceAtLeast(0L)
             savedPosition = player.currentPosition
+            onPosition(savedPosition)
             duration = player.duration.takeIf { it != C.TIME_UNSET && it > 0 } ?: 0L
             buffered = player.bufferedPercentage
             playing = player.isPlaying
             delay(500)
         }
     }
-    LaunchedEffect(controls) { withFrameNanos { }; if (controls) playFocus.requestFocus() else rootFocus.requestFocus() }
+    LaunchedEffect(controls, scrubbing) { withFrameNanos { }; if (scrubbing && controls && duration > 0) timelineFocus.requestFocus() else if (controls) playFocus.requestFocus() else rootFocus.requestFocus() }
     LaunchedEffect(playing, controls, interaction, picker, error, scrubbing) {
         if (playing && controls && picker == null && error == null && !scrubbing) { delay(5000); controls = false }
     }
@@ -95,9 +99,11 @@ fun PlayerScreen(url: String, title: String, headers: Map<String, String> = empt
                 KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> { if (player.isPlaying) player.pause() else player.play(); interact(); true }
                 KeyEvent.KEYCODE_MEDIA_PLAY -> { player.play(); interact(); true }
                 KeyEvent.KEYCODE_MEDIA_PAUSE -> { player.pause(); interact(); true }
-                KeyEvent.KEYCODE_MEDIA_REWIND -> { player.seekTo((player.currentPosition - 10000).coerceAtLeast(0)); interact(); true }
-                KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> { player.seekTo((player.currentPosition + 10000).coerceAtMost(if (duration > 0) duration else Long.MAX_VALUE)); interact(); true }
-                KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> { val hidden = !controls; interact(); hidden }
+                KeyEvent.KEYCODE_MEDIA_REWIND -> { scrub.move(position, duration, -1, event.nativeKeyEvent.repeatCount); interact(); true }
+                KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> { scrub.move(position, duration, 1, event.nativeKeyEvent.repeatCount); interact(); true }
+                KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> { val hidden = !controls
+                    if (hidden && event.nativeKeyEvent.keyCode in listOf(KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT)) scrub.move(position, duration, if (event.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) 1 else -1, event.nativeKeyEvent.repeatCount)
+                    interact(); hidden }
                 else -> false
             }
         }
@@ -116,13 +122,12 @@ fun PlayerScreen(url: String, title: String, headers: Map<String, String> = empt
             }
             Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .7f), Color.Black.copy(alpha = .95f)))).padding(if (compact) 16.dp else 40.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (duration > 0) {
-                    Slider(value = position.toFloat().coerceIn(0f, duration.toFloat()), onValueChange = { scrubbing = true; position = it.toLong(); interact() }, valueRange = 0f..duration.toFloat(), onValueChangeFinished = { player.seekTo(position); scrubbing = false; interact() }, colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Accent, inactiveTrackColor = Color(0xFF353535)))
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text(clock(position), fontSize = 12.sp, color = Color.LightGray); Text(clock(duration), fontSize = 12.sp, color = Color.LightGray) }
+                    MediaTimeline(position, duration, scrub, timelineFocus) { player.seekTo(it); interact() }
                 }
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    RoundControl("Rewind 10 seconds", Icons.Outlined.Replay10) { player.seekTo((player.currentPosition - 10000).coerceAtLeast(0)); interact() }
+                    RoundControl("Seek backward", Icons.Outlined.FastRewind) { scrub.move(position, duration, -1, 0); interact(); timelineFocus.requestFocus() }
                     RoundControl(if (playing) "Pause" else "Play", if (playing) Icons.Outlined.Pause else Icons.Outlined.PlayArrow, primary = true, requester = playFocus) { if (player.isPlaying) player.pause() else player.play(); interact() }
-                    RoundControl("Forward 10 seconds", Icons.Outlined.Forward10) { player.seekTo((player.currentPosition + 10000).coerceAtMost(if (duration > 0) duration else Long.MAX_VALUE)); interact() }
+                    RoundControl("Seek forward", Icons.Outlined.FastForward) { scrub.move(position, duration, 1, 0); interact(); timelineFocus.requestFocus() }
                     if (!compact) Spacer(Modifier.width(40.dp))
                     listOf(C.TRACK_TYPE_TEXT to "Subtitles", C.TRACK_TYPE_VIDEO to "Quality", C.TRACK_TYPE_AUDIO to "Audio").forEach { (type, label) ->
                         val count = tracks.groups.filter { it.type == type }.sumOf { group -> (0 until group.length).count { group.isTrackSupported(it) } }
@@ -163,3 +168,4 @@ private fun RoundControl(label: String, icon: ImageVector, primary: Boolean = fa
     Button(onClick, Modifier.size(if (primary) 56.dp else 44.dp).then(if (requester != null) Modifier.focusRequester(requester) else Modifier).onFocusChanged { focused = it.isFocused }, shape = CircleShape, contentPadding = PaddingValues(10.dp), border = BorderStroke(if (focused) 3.dp else 0.dp, if (focused) Accent else Color.Transparent), colors = ButtonDefaults.buttonColors(containerColor = if (focused) Color.White else if (primary) Accent else Color.Black.copy(alpha = .3f), contentColor = if (focused || primary) Color.Black else Color.White)) { Icon(icon, label, Modifier.size(if (primary) 28.dp else 24.dp)) }
 }
 private fun clock(ms: Long): String { val seconds = ms.coerceAtLeast(0) / 1000; return if (seconds >= 3600) "%d:%02d:%02d".format(seconds / 3600, seconds / 60 % 60, seconds % 60) else "%02d:%02d".format(seconds / 60, seconds % 60) }
+

@@ -1,19 +1,26 @@
-# Verification — 31 October 2026 (Singapore)
+# CineDBKTV 1.3.2 verification — 1 November 2026
 
-- Original archive unchanged: SHA256 `c98f6f0a3a5b5fb65b6e043eef7a96a8063c2d9b9be6a045a5b1c1010543e18b`.
-- Archive inspection confirmed 18 embedded definitions, matching the web source, and missing `TvAppNavigation`, `MockData`, `CineStreamApp` definitions. Exporter-only strings/styles were omitted from the previous extraction.
-- Existing native project backed up to `D:\CineStreamTV_Native_backup_20261031_225341` before changes. Retired original app source and malformed old version catalog also preserved there.
-- Final command: `D:\CineStreamTV_Native\Build.ps1` (Gradle `assembleDebug testDebugUnitTest lintDebug`).
-- Final build: **BUILD SUCCESSFUL**. 2 unit tests, 0 failures, 0 errors.
-- Android lint: 0 errors, 9 warnings. Warnings concern newer dependency versions, backup declaration and raster density variants; no lint errors.
-- APK: `D:\CineStreamTV_Native\app\build\outputs\apk\debug\app-debug.apk` (12,210,504 bytes).
-- APK SHA256: `b70e74efec3ed71df6c5498f6e6589f69f46da61cea99aa186bf15d5a1e1000a`.
-- `apksigner verify`: exit 0. This verifies the debug artifact's signature, not device installation.
-- `aapt dump badging`: package `com.cinestream.tv`, version code 2, minSdk 26, target/compile SDK 35, phone and Leanback launch activities present, TV and touchscreen optional.
-- Tool versions checked: Android Studio JBR 25.0.4; separate build JDK Microsoft 17.0.21.0.2; Gradle 8.9; AGP 8.6.1; Kotlin 2.0.21; Build Tools 36.0.0; independently installed SDK platform 35 revision 2. Gradle distribution checksum pinned to the official published checksum.
-- First staging build encountered a Kotlin compiler daemon connection reset and succeeded using its in-process fallback. Final configuration uses in-process Kotlin compilation and two workers; the final destination build succeeded.
-- Original MP4 samples: HTTP 403 from this computer, including a ranged GET for Big Buck Bunny. Catalog descriptions disclose this. Primary Apple HLS sample playlist: HTTP 200. These are desktop HTTP checks, not playback verification.
-- ADB check: no devices connected. **Installation: not performed. Android device behavior: not verified.**
-- Release configuration prepared, release artifact not built, no release signing key created or supplied. Debug signing is for development only.
+- assembleDebug, testDebugUnitTest and lintDebug completed successfully in build-1.3.2-verified.log. 16 tests, 0 failures; lint 0 errors, 14 warnings.
+- APK installed in Android TV API 34 emulator. Production EmbeddedPlayer loaded a real published Cineby/Xpass episode source. Playback advanced; source buffering was also observed.
+- Final packaged APK: Android remote key events moved through Pause, Forward, Rewind, Mute, Servers and Settings without entering the timeline. Center opened the actual quality menu showing Auto, 1080p and 720p.
+- Player measured 961.995 x 540.998 CSS pixels against viewport 962 x 541. Video preserves aspect ratio and encoded black bars.
+- Earlier component inspection successfully changed actual JW quality to 720p; final packaged APK quality-change and Back recheck were interrupted when the emulator stopped. These remain physical-TV acceptance checks.
+- Tested source reported captions Off only. No missing tracks are invented. Other sources, subtitle selection, timeline interaction, phone touch behavior and DBKU regression playback require further device testing.
+- No on-screen D-pad is rendered (FloatingRemote has no call sites). Native duplicate timeline/header and global Cineby arrow-volume mapping removed. Arrows on a selected timeline may seek; arrows over buttons navigate.
+- Live transcription is not implemented. Existing provider subtitle options remain provider-dependent.
+- No physical TV tested by the agent. This is a debug TV test candidate, version 1.3.2 / code 9. Phone launcher retained. No private signing key created or changed.
+- SHA256: ccf2376a0ce2587dabbdc2f5c6cb05ebeb8146fa7cd33f48875fd3a90a8a93d5
 
-Review `README.md` for exact build/install/start commands, integration requirements and remaining limitations. The original web exporter remains historical; use this native project.
+Build with Java 17 and D: SDK/cache: .\gradlew.bat --offline --no-daemon --console=plain assembleDebug testDebugUnitTest lintDebug
+Install: D:\AndroidSdk\platform-tools\adb.exe install -r CineDBKTV-1.3.2.apk
+
+## Phase 5J incremental registration — 2 November 2026
+
+- `HongguoRegistration` is an independently written, dormant Kotlin registration component. It is not connected to catalog/provider/player routing. Hongguo playback remains disabled.
+- Anonymous registration accepted CineDBKTV's own package/version profile: HTTP 200 with nonzero device and installation IDs. No official-app package impersonation, account credentials, captured sessions or cookies were used. Identifiers are redacted from diagnostics; the application adapter uses private preferences, with application backup already disabled.
+- Registration has bounded transport retries, response size/digest/ID validation, explicit invalidation, and no invented upstream expiration period. Private Android preference retention still requires device verification; the live JVM check verifies in-memory retention and reuse.
+- A separate disposable diagnostic obtained episode 1 metadata for 《一个人的长征》: business code 0, duration 140.714 seconds, four HEVC/bytevc1 qualities (360p/480p/540p/720p). Intermittent empty metadata responses were observed.
+- HTTP Range returned 206. Structural inspection of the first 64 KiB of each quality found encrypted visual sample entries (`encv`), original-format boxes (`frma`), `schm=cenc` and `tenc`. Media prefixes were inspected in memory, not saved.
+- The returned fallback metadata contained wrapped-key fields, with no license URL found by the diagnostic. Keys were not decoded, and video was not decrypted. CENC alone does not establish the legal/authorization status; an authorized key/license workflow or confirmed clear-media alternative remains unresolved.
+- No playback within CineDBKTV was demonstrated for episodes 1, 51 or 90. D-pad, seeking, fullscreen, audio, progression and physical-TV acceptance are unverified for Hongguo. No companion workflow, Go service or playback dependency was added.
+- Validation: 41 unit tests passed (7 new registration tests, including opt-in live registration), debug build passed, lint passed with 0 errors and 6 existing warnings. The first combined run failed due to native JVM memory exhaustion; separate single-worker test and build/lint runs succeeded. No emulator was started for this increment.

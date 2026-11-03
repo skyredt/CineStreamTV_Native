@@ -11,10 +11,17 @@ android {
         applicationId = "com.cinestream.tv"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.1.1"
+        testInstrumentationRunner = "com.cinestream.tv.TvSmokeRunner"
+        versionCode = 12
+        versionName = "1.6.0"
+    }
+    testOptions { unitTests.all { it.maxHeapSize = "256m" } }
+    sourceSets {
+        getByName("test").java.srcDir("src/engineFixture/java")
+        getByName("androidTest").java.srcDir("src/engineFixture/java")
     }
     buildFeatures { compose = true }
+    packaging { jniLibs { useLegacyPackaging = true; keepDebugSymbols += "**/libhongguotv.so" } }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -46,3 +53,4 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20240303")
 }
+
